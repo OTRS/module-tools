@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: link.pl,v 1.5 2005-01-21 12:59:21 martin Exp $
+# $Id: link.pl,v 1.6 2005-01-21 13:01:42 martin Exp $
 
 use strict;
 
@@ -34,12 +34,12 @@ sub R {
 #            my $Dir =~ s/^(.*)\//$1/;
             if ($File !~ /Entries|Repository|Root|CVS/) {
 #            if (!-e"$Dest/$File" || (-l "$Dest/$File" && unlink ("$Dest/$File"))) {
-                if (-l "$Dest/$File" && unlink ("$Dest/$File")) {
+                if (-l "$Dest/$File") {
                     unlink ("$Dest/$File") || die "ERROR: Can't unlink symlink: $Dest/$File";
                 }
                 if (-e "$Dest/$File") {
-                    if (! rename("$Dest/$File", "$Dest/$File.old")) {
-                        print "NOTICE: Backup orig file: $Dest/$File.old";
+                    if (rename("$Dest/$File", "$Dest/$File.old")) {
+                        print "NOTICE: Backup orig file: $Dest/$File.old\n";
                     }
                     else {
                         die "ERROR: Can't rename $Dest/$File to $Dest/$File.old: $!";
