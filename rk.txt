@@ -1,5 +1,0 @@
-$Id: rk.txt,v 1.3 2005-02-04 11:30:53 rk Exp $
-Das ist eine Testdatei
-neue zeile......
-EOT
-
