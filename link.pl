@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: link.pl,v 1.2 2004-09-15 09:37:57 martin Exp $
+# $Id: link.pl,v 1.3 2004-10-25 06:14:52 martin Exp $
 
 use strict;
 
@@ -34,15 +34,23 @@ sub R {
 #            my $Dir =~ s/^(.*)\//$1/;
           if ($File !~ /Entries|Repository|Root|CVS/) {
             if (!-e"$Dest/$File" || (-l "$Dest/$File" && unlink ("$Dest/$File"))) {
-                if (!symlink ($OrigFile, "$Dest/$File")) {
-                    die "Can't link: $!";
+                if (!-e $Dest) {
+                    die "ERROR: No such directory: $Dest";
+                }
+                elsif (!-e $OrigFile) {
+                    die "ERROR: No such orig file: $OrigFile";
+                }
+                elsif (!symlink ($OrigFile, "$Dest/$File")) {
+#                    die "ERROR: Can't link ($OrigFile->$Dest/$File): $!";
+                    die "ERROR: Can't link: $!";
                 }
                 else {
-                    print "Link File: $OrigFile -> $Dest/$File\n";
+                    print "NOTICE: Link: $OrigFile -> \n";
+                    print "NOTICE:       $Dest/$File\n";
                 }
             }
             elsif (-e "$Dest/$File") {
-                die "Can't link, file already exists: $Dest/$File";
+                die "ERROR: Can't link, file already exists: $Dest/$File";
             }
           }
 #            system ("");
