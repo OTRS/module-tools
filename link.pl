@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: link.pl,v 1.1.1.1 2004-09-05 01:40:27 martin Exp $
+# $Id: link.pl,v 1.2 2004-09-15 09:37:57 martin Exp $
 
 use strict;
 
@@ -22,7 +22,7 @@ sub R {
     my @List = glob("$In/*");
     foreach my $File (@List) {
         $File =~ s/\/\//\//g;
-        if (-d $File) {
+        if (-d $File && $File !~ /CVS/) {
             R($File);
             $File =~ s/$Start//;
 #            print "Directory: $File\n";
@@ -32,6 +32,7 @@ sub R {
             $File =~ s/$Start//;
 #            print "File: $File\n";
 #            my $Dir =~ s/^(.*)\//$1/;
+          if ($File !~ /Entries|Repository|Root|CVS/) {
             if (!-e"$Dest/$File" || (-l "$Dest/$File" && unlink ("$Dest/$File"))) {
                 if (!symlink ($OrigFile, "$Dest/$File")) {
                     die "Can't link: $!";
@@ -43,6 +44,7 @@ sub R {
             elsif (-e "$Dest/$File") {
                 die "Can't link, file already exists: $Dest/$File";
             }
+          }
 #            system ("");
         }
     }
