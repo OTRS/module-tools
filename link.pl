@@ -1,16 +1,16 @@
 #!/usr/bin/perl -w
 
-# $Id: link.pl,v 1.3 2004-10-25 06:14:52 martin Exp $
+# $Id: link.pl,v 1.4 2005-01-21 09:55:47 martin Exp $
 
 use strict;
 
-my $Source = shift || die "Need Module CVS location as ARG0";
+my $Source = shift || die "Need Application CVS location as ARG0";
 if (! -d $Source) {
-    die "ERROR: invalid Module CVS directory '$Source'";
+    die "ERROR: invalid Application CVS directory '$Source'";
 }
-my $Dest = shift || die "Need Application-Root location as ARG1";
+my $Dest = shift || die "Need Framework-Root location as ARG1";
 if (! -d $Dest) {
-    die "ERROR: invalid Application-Root directory '$Dest'";
+    die "ERROR: invalid Framework-Root directory '$Dest'";
 }
 
 my @Dirs = ();
@@ -40,9 +40,17 @@ sub R {
                 elsif (!-e $OrigFile) {
                     die "ERROR: No such orig file: $OrigFile";
                 }
+                elsif (-e "$Dest/$File") {
+                    if (! rename("$Dest/$File", "$Dest/$File.old")) {
+                        print "NOTICE: Backup orig file: $Dest/$File.old";
+                    }
+                    {
+                        die "ERROR: Can't rename $Dest/$File to $Dest/$File.old: $!";
+                    }
+                }
                 elsif (!symlink ($OrigFile, "$Dest/$File")) {
 #                    die "ERROR: Can't link ($OrigFile->$Dest/$File): $!";
-                    die "ERROR: Can't link: $!";
+                    die "ERROR: Can't $File link: $!";
                 }
                 else {
                     print "NOTICE: Link: $OrigFile -> \n";
