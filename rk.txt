@@ -1,3 +1,4 @@
 Das ist eine Testdatei
+neue zeile......
 EOT
 
