@@ -1,4 +1,0 @@
-das ist ein Tes
-
-Bla Update
-$Id: sr.txt,v 1.3 2005-02-04 11:30:24 sr Exp $
