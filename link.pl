@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: link.pl,v 1.6 2005-01-21 13:01:42 martin Exp $
+# $Id: link.pl,v 1.7 2006-08-01 20:41:17 martin Exp $
 
 use strict;
 
@@ -33,6 +33,23 @@ sub R {
 #            print "File: $File\n";
 #            my $Dir =~ s/^(.*)\//$1/;
             if ($File !~ /Entries|Repository|Root|CVS/) {
+                # check directory of loaction (in case create a directory)
+                if ("$Dest/$File" =~ /^(.*)\/(.+?|)$/) {
+                    my $Directory = $1;
+                    my @Directories = split(/\//, $Directory);
+                    my $DirectoryCurrent = '';
+                    foreach my $Directory (@Directories) {
+                        $DirectoryCurrent .= "/$Directory";
+                        if ($DirectoryCurrent && ! -d $DirectoryCurrent) {
+                            if (mkdir $DirectoryCurrent) {
+                                print STDERR "NOTICE: Create Directory $DirectoryCurrent\n";
+                            }
+                            else {
+                                die "ERROR: can't create directory $DirectoryCurrent: $!";
+                            }
+                        }
+                    }
+                }
 #            if (!-e"$Dest/$File" || (-l "$Dest/$File" && unlink ("$Dest/$File"))) {
                 if (-l "$Dest/$File") {
                     unlink ("$Dest/$File") || die "ERROR: Can't unlink symlink: $Dest/$File";
