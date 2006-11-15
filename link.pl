@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: link.pl,v 1.7 2006-08-01 20:41:17 martin Exp $
+# $Id: link.pl,v 1.8 2006-11-15 18:43:36 martin Exp $
 
 use strict;
 
@@ -32,7 +32,7 @@ sub R {
             $File =~ s/$Start//;
 #            print "File: $File\n";
 #            my $Dir =~ s/^(.*)\//$1/;
-            if ($File !~ /Entries|Repository|Root|CVS/) {
+            if ($File !~ /\/(Entries|Repository|Root|CVS)/ && $File !~ /^(Entries|Repository|Root|CVS)/) {
                 # check directory of loaction (in case create a directory)
                 if ("$Dest/$File" =~ /^(.*)\/(.+?|)$/) {
                     my $Directory = $1;
