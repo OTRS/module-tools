@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: link.pl,v 1.8 2006-11-15 18:43:36 martin Exp $
+# $Id: link.pl,v 1.9 2007-02-16 15:02:21 tr Exp $
 
 use strict;
 
@@ -22,7 +22,7 @@ sub R {
     my @List = glob("$In/*");
     foreach my $File (@List) {
         $File =~ s/\/\//\//g;
-        if (-d $File && $File !~ /CVS/) {
+        if (-d $File && $File !~ /^CVS$/) {
             R($File);
             $File =~ s/$Start//;
 #            print "Directory: $File\n";
@@ -32,7 +32,7 @@ sub R {
             $File =~ s/$Start//;
 #            print "File: $File\n";
 #            my $Dir =~ s/^(.*)\//$1/;
-            if ($File !~ /\/(Entries|Repository|Root|CVS)/ && $File !~ /^(Entries|Repository|Root|CVS)/) {
+            if ($File !~ /\/(Entries|Repository|Root|^CVS$)/ && $File !~ /^(Entries|Repository|Root|^CVS$)/) {
                 # check directory of loaction (in case create a directory)
                 if ("$Dest/$File" =~ /^(.*)\/(.+?|)$/) {
                     my $Directory = $1;
