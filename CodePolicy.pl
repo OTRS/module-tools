@@ -3,7 +3,7 @@
 # CodePolicy.pl - a tool to remotely execute the OTRS code policy against local code
 # Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
 # --
-# $Id: CodePolicy.pl,v 1.1 2008-02-20 22:41:50 ot Exp $
+# $Id: CodePolicy.pl,v 1.2 2008-02-22 16:42:10 ot Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,49 +23,483 @@
 use strict;
 use warnings;
 
-our $VERSION = qw($Revision: 1.1 $) [1];
+our $VERSION = qw($Revision: 1.2 $) [1];
 
+# disable output buffering
+use IO::Handle;
+STDOUT->autoflush(1);
+STDERR->autoflush(1);
+
+use sigtrap qw( die normal-signals error-signals );
+
+use File::Basename;
+use File::Find;
+use MIME::Base64;
 use SOAP::Lite;
 
 my $ProtocolVersion = 1;
 
-my $SOAP = SOAP::Lite
-    ->uri('http://otrs.org/OTRS/CodePolicy/SOAPRunner')
-    ->proxy('http://172.17.17.1/soap/otrs-code-policy')
-    ->on_fault(sub {
-        my $SOAP   = shift;
-        my $Result = shift;
+use Getopt::Long;
+use Pod::Usage;
 
-        my $errorMsg
-            = ref($Result)
-                ? $Result->faultstring()
-                : $SOAP->transport->status();
-        die "*** SOAP-ERROR: $errorMsg\n";
-    });
+my ( $SOAP, $SessionID );
 
-my $SessionCookie = $SOAP->StartSession({
-    ARGV            => \@ARGV,
-    ProtocolVersion => $ProtocolVersion,
-})->result;
-if (!$SessionCookie) {
-    die "*** Got no session - could not connect to CodePolicy server.\n";
+my $ExitCode = 0;
+
+my %GeneralOption = (
+    Verbose => 0,
+);
+Getopt::Long::Configure( qw( default pass_through ) );
+GetOptions(
+    'dry-run'  => \$GeneralOption{DryRun},
+    'help|?'   => \$GeneralOption{Help},
+    'man'      => \$GeneralOption{Man},
+    'verbose+' => \$GeneralOption{Verbose},
+    'version'  => \$GeneralOption{Version},
+) or pod2usage(2);
+if ($GeneralOption{Help}) {
+    pod2usage(
+        -msg => 'CodyPolicy.pl - a tool to remotely execute the OTRS code policy against local code',
+        -verbose => 0,
+        -exitval => 1
+    )
+}
+elsif ($GeneralOption{Man}) {
+    # avoid dubious problem with perldoc in combination with UTF-8 that
+    # leads to strange dashes and single-quotes being used
+    $ENV{LC_ALL} = 'POSIX';
+    pod2usage(-verbose => 2);
+}
+elsif ($GeneralOption{Version}) {
+    print "$0: $VERSION (protocol version: $ProtocolVersion)\n";
+    exit 0;
 }
 
-# start processing loop (single stepping through all different protocol stages
-my ( $NextStep, $StepResult );
-while( $NextStep = $SOAP->NextStep( $SessionCookie, $StepResult ) ) {
-    $StepResult = ExecuteStep( $NextStep );
+my $Action = shift @ARGV || '';
+if ($Action =~ m[^check-d]i) {
+    RunChecksRemotely(
+        'Dir',
+        "*** The action '$Action' requires a directory!\n*** See $0 --help for more info.\n"
+    );
+}
+elsif ($Action =~ m[^check-f]i) {
+    RunChecksRemotely(
+        'File',
+        "*** The action '$Action' requires a file!\n*** See $0 --help for more info.\n"
+    );
+}
+elsif ($Action =~ m[^check-m]i) {
+    RunChecksRemotely(
+        'Module',
+        "*** The action '$Action' requires a module path or *.sopm file!\n"
+            . "*** See $0 --help for more info.\n"
+    );
+}
+elsif ($Action =~ m[^fix-d]i) {
+    RunFixesRemotely(
+        'Dir',
+        "*** The action '$Action' requires a directory!\n*** See $0 --help for more info.\n"
+    );
+}
+elsif ($Action =~ m[^fix-f]i) {
+    RunFixesRemotely(
+        'File',
+        "*** The action '$Action' requires a file!\n*** See $0 --help for more info.\n"
+    );
+}
+elsif ($Action =~ m[^fix-m]i) {
+    RunFixesRemotely(
+        'Module',
+        "*** The action '$Action' requires a module path or *.sopm file!\n"
+            . "*** See $0 --help for more info.\n"
+    );
+}
+elsif ($Action =~ m[^recode-d]i) {
+    RunRecodingsRemotely(
+        'Dir',
+        "*** The action '$Action' requires a directory!\n*** See $0 --help for more info.\n"
+    );
+}
+elsif ($Action =~ m[^recode-f]i) {
+    RunRecodingsRemotely(
+        'File',
+        "*** The action '$Action' requires a file!\n*** See $0 --help for more info.\n"
+    );
+}
+elsif ($Action =~ m[^recode-m]i) {
+    RunRecodingsRemotely(
+        'Module',
+        "*** The action '$Action' requires a module path or *.sopm file!\n"
+            . "*** See $0 --help for more info.\n"
+    );
+}
+elsif ($Action =~ m[^list-c]i) {
+    ListChecks();
+}
+elsif ($Action =~ m[^list-d]i) {
+    ListDomains();
+}
+elsif ($Action =~ m[^list-f]i) {
+    ListFixes();
+}
+elsif ($Action =~ m[^list-p]i) {
+    ListProfiles();
+}
+elsif ($Action =~ m[^list-r]i) {
+    ListRecodings();
+}
+else {
+    print STDERR <<"    End-of-Here";
+    You need to specify exactly one of these actions:
+        check-dir
+        check-file
+        check-module
+        fix-dir
+        fix-file
+        fix-module
+        list-checks
+        list-domains
+        list-fixes
+        list-profiles
+        list-recodings
+        recode-dir
+        recode-file
+        recode-module
+    Try '$0 --help' for more info.
+    End-of-Here
+    $ExitCode = 1;
 }
 
-# cleanup session
-$SOAP->EndSession( $SessionCookie );
+exit $ExitCode;
 
-sub ExecuteStep {
-    my ( $Step ) = @_;
+sub RunChecksRemotely {
+    my ( $Mode, $ErrorMessage ) = @_;
 
-    my $Result;
+    # disable pass_through and evaluate remaining options
+    my %ActionOption = (
+        Actions => '',
+    );
+    GetOptions(
+        'actions=s' => \$ActionOption{Actions},
+        'profile=s' => \$ActionOption{Profile},
+    ) or pod2usage(2);
 
-    return $Result;
+    my $Arg = shift @ARGV or die( $ErrorMessage );
+
+    Connect();
+    my $ArgAsRelativePath = UploadFiles( $Mode, $Arg );
+
+    print STDERR "running checks...";
+    my $Result = eval {
+        $SOAP->RunChecks($SessionID, {
+            GeneralOption => \%GeneralOption,
+            ActionOption  => \%ActionOption,
+            Mode          => $Mode,
+            Arg           => $ArgAsRelativePath,
+        } )->result;
+    };
+
+    if (!$Result) {
+        $ExitCode = 5;
+        print STDERR "an unexpected problem occurred!\n";
+    }
+    else {
+        my $Log = $Result->{Log};
+        if ($Log) {
+            print STDERR "\n", @{ $Log };
+        }
+        if (!$Result->{Status}) {
+            $ExitCode = 10;
+            print STDERR "*** not ok - see the problems shown above!\n";
+        }
+        else {
+            print STDERR "ok - everything looks fine!\n";
+        }
+    }
+
+    Disconnect();
+
+    return;
+}
+
+sub RunFixesRemotely {
+    my ( $Mode, $ErrorMessage ) = @_;
+
+    # disable pass_through and evaluate remaining options
+    my %ActionOption = (
+        Actions => '',
+    );
+    GetOptions(
+        'actions=s' => \$ActionOption{Actions},
+        'profile=s' => \$ActionOption{Profile},
+    ) or pod2usage(2);
+
+    my $Arg = shift @ARGV or die( $ErrorMessage );
+    Connect();
+    my $ArgAsRelativePath = UploadFiles( $Mode, $Arg );
+
+    print STDERR "running fixes...";
+    my $Result = eval {
+        $SOAP->RunFixes($SessionID, {
+            GeneralOption => \%GeneralOption,
+            ActionOption  => \%ActionOption,
+            Mode          => $Mode,
+            Arg           => $ArgAsRelativePath,
+        } )->result;
+    };
+
+    if (!$Result) {
+        $ExitCode = 5;
+        print STDERR "an unexpected problem occurred!\n";
+    }
+    else {
+        my $Log = $Result->{Log};
+        if ($Log) {
+            print STDERR "\n", @{ $Log };
+        }
+        if (!$Result->{Status}) {
+            $ExitCode = 10;
+            print STDERR "*** something has gone wrong - see the problems shown above!\n";
+        }
+        else {
+            print STDERR "ok!\n";
+            my $ChangedFiles = $Result->{ChangedFiles};
+            if ($ChangedFiles && @{ $ChangedFiles }) {
+                DownloadFiles( $ChangedFiles );
+            }
+        }
+
+    }
+
+    Disconnect();
+
+    return;
+}
+
+sub RunRecodingsRemotely {
+    my ( $Mode, $ErrorMessage ) = @_;
+
+    # disable pass_through and evaluate remaining options
+    my %ActionOption = (
+        Actions => '',
+    );
+    GetOptions(
+        'actions=s' => \$ActionOption{Actions},
+        'profile=s' => \$ActionOption{Profile},
+    ) or pod2usage(2);
+
+    my $Arg = shift @ARGV or die( $ErrorMessage );
+    Connect();
+    my $ArgAsRelativePath = UploadFiles( $Mode, $Arg );
+
+    print STDERR "running recodings...";
+    my $Result = eval {
+        $SOAP->RunRecodings($SessionID, {
+            GeneralOption => \%GeneralOption,
+            ActionOption  => \%ActionOption,
+            Mode          => $Mode,
+            Arg           => $ArgAsRelativePath,
+        } )->result;
+    };
+
+    if (!$Result) {
+        $ExitCode = 5;
+        print STDERR "an unexpected problem occurred!\n";
+    }
+    else {
+        my $Log = $Result->{Log};
+        if ($Log) {
+            print STDERR "\n", @{ $Log };
+        }
+        if (!$Result->{Status}) {
+            $ExitCode = 10;
+            print STDERR "*** something has gone wrong - see the problems shown above!\n";
+        }
+        else {
+            print STDERR "ok!\n";
+            my $ChangedFiles = $Result->{ChangedFiles};
+            if ($ChangedFiles && @{ $ChangedFiles }) {
+                DownloadFiles( $ChangedFiles );
+            }
+        }
+
+    }
+
+    Disconnect();
+
+    return;
+}
+
+sub Connect {
+    print STDERR "connecting...";
+    $SOAP = SOAP::Lite
+        ->uri('http://otrs.org/OTRS/CodePolicyAPI')
+#        ->proxy('http://172.17.17.1/soap/code-policy')
+        ->proxy('http://localhost/soap/code-policy')
+        ->on_fault(sub {
+            my $SOAP   = shift;
+            my $Result = shift;
+
+            my $errorMsg
+                = ref($Result)
+                    ? $Result->faultstring()
+                    : $SOAP->transport->status();
+            die "*** SERVER-MSG: $errorMsg\n";
+        });
+
+    $SessionID = $SOAP->StartSession({
+        ARGV            => \@ARGV,
+        ProtocolVersion => $ProtocolVersion,
+    })->result;
+    if (!$SessionID) {
+        die "*** Got no session - could not connect to CodePolicy server.\n";
+    }
+    print STDERR "ok - remote session ID is $SessionID\n";
+
+    return;
+}
+
+sub Disconnect {
+    my $ID = $SessionID;
+    $SessionID = undef;
+    $SOAP->EndSession( $ID );
+
+    return;
+}
+
+sub UploadFiles {
+    my ( $Mode, $Arg ) = @_;
+
+    my $File = $Mode eq 'Dir' ? undef : basename( $Arg );
+    my $Dir  = $Mode eq 'Dir' ? $Arg  : dirname( $Arg );
+
+    my $ParentDir = dirname( $Dir );
+    my $SubDir    = basename( $Dir );
+    chdir $ParentDir or die "*** unable to chdir into '$ParentDir'! ($!)\n";
+
+    print STDERR "uploading files...";
+    if ($Mode eq 'File') {
+        UploadFile( "$SubDir/$File" );
+        # now check for CVS/Entries and .svn/entries as either of those might be used on server
+        # in order to automatically determine the name of the applicable profile
+        for my $EntriesFile ( qw( CVS/Entries .svn/entries ) ) {
+            if (-e "$SubDir/$EntriesFile") {
+                UploadFile( "$SubDir/$EntriesFile" );
+            }
+        }
+    }
+    elsif ($Mode eq 'Dir' || $Mode eq 'Module') {
+        my $wanted = sub {
+            return if -d $File::Find::name;
+            UploadFile( $File::Find::name );
+        };
+        find( { wanted => $wanted, no_chdir => 1 }, $SubDir );
+    }
+    else {
+        die "*** unknown mode '$Mode' given!";
+    }
+    print STDERR "done\n";
+
+    my $ArgAsRelativePath = $File ? "$SubDir/$File" : $SubDir;
+    return $ArgAsRelativePath;
+}
+
+sub UploadFile {
+    my ( $File ) = @_;
+
+    my $Contents = SlurpFile($File);
+    my $MD5Sum = MD5ForFile($File);
+
+    return $SOAP->UploadFile( $SessionID, {
+        Filename => $File,
+        Contents => encode_base64( $Contents ),
+        MD5Sum   => $MD5Sum
+    } )->result;
+}
+
+sub DownloadFiles {
+    my ( $Files ) = @_;
+
+    print STDERR "downloading changed files...";
+    for my $File ( @{ $Files } ) {
+        DownloadFile( $File );
+    }
+    print STDERR "done\n";
+
+    return 1;
+}
+
+sub DownloadFile {
+    my ( $File ) = @_;
+
+    my $FileInfo = $SOAP->DownloadFile( $SessionID, $File )->result;
+    die "*** unable to download file '$File'!\n" if !$FileInfo;
+
+    die "*** downloaded file '$File' does not exist on client!\n" if !-e $File;
+
+    my $Contents = decode_base64( $FileInfo->{Contents} );
+    OverwriteFile( $File, $Contents, $FileInfo->{MD5Sum} );
+
+    return 1;
+}
+
+sub SlurpFile {
+    my ( $File ) = @_;
+
+    my $FH;
+    open($FH, '<', $File)
+        or die "*** could not open file '$File' for reading! ($!)\n";
+    if (wantarray()) {
+        my @Lines = <$FH>;
+        close($FH)
+            or die "*** could not close file '$File'! ($!)\n";
+        return @Lines;
+    }
+    local $/ = undef;
+    my $Text = <$FH>;
+    close($FH)
+        or die "*** could not close file '$File'! ($!)\n";
+    return $Text;
+}
+
+sub OverwriteFile {
+    my ( $File, $Content, $RequiredMD5Sum ) = @_;
+
+    my $FH;
+    my $TempFile = "${File}_tmp_$$";
+    open($FH, '>', $TempFile)
+        or die "*** could not open file '$TempFile' for writing! ($!)\n";
+    print $FH $Content;
+    close($FH)
+        or die "*** could not close file '$TempFile'! ($!)\n";
+    if (defined $RequiredMD5Sum) {
+        my $MD5Sum = MD5ForFile($TempFile);
+        if ($RequiredMD5Sum ne $MD5Sum) {
+            die "*** wrong MD5-sum for '$File' (server: $RequiredMD5Sum <=> client: $MD5Sum)!\n";
+        }
+    }
+    rename $TempFile, $File
+        or die "*** could not rename file '$TempFile' to '$File'! ($!)\n";
+    return;
+}
+
+sub MD5ForFile {
+    my ( $File ) = @_;
+
+    my $Output = qx{md5sum $File};
+    return if !$Output;
+    return if $Output !~ m{^(\w+)};
+    return "d$1";
+}
+
+END {
+    # if we still have a session-ID, we need to disconnect, such that the server has a chance
+    # to cleanup the session
+    if ($SessionID) {
+        print STDERR "cleaning up...";
+        Disconnect();
+        print STDERR "done\n";
+    }
 }
 
 =head1 NAME
@@ -189,6 +623,6 @@ did not receive this file, see http://www.gnu.org/licenses/gpl-2.0.txt.
 
 =head1 VERSION
 
-$Revision: 1.1 $ $Date: 2008-02-20 22:41:50 $
+$Revision: 1.2 $ $Date: 2008-02-22 16:42:10 $
 
 =cut
