@@ -3,7 +3,7 @@
 # CodePolicy.pl - a tool to remotely execute the OTRS code policy against local code
 # Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
 # --
-# $Id: CodePolicy.pl,v 1.2 2008-02-22 16:42:10 ot Exp $
+# $Id: CodePolicy.pl,v 1.3 2008-02-25 08:53:17 ot Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 use strict;
 use warnings;
 
-our $VERSION = qw($Revision: 1.2 $) [1];
+our $VERSION = qw($Revision: 1.3 $) [1];
 
 # disable output buffering
 use IO::Handle;
@@ -489,7 +489,7 @@ sub MD5ForFile {
     my $Output = qx{md5sum $File};
     return if !$Output;
     return if $Output !~ m{^(\w+)};
-    return "d$1";
+    return $1;
 }
 
 END {
@@ -623,6 +623,6 @@ did not receive this file, see http://www.gnu.org/licenses/gpl-2.0.txt.
 
 =head1 VERSION
 
-$Revision: 1.2 $ $Date: 2008-02-22 16:42:10 $
+$Revision: 1.3 $ $Date: 2008-02-25 08:53:17 $
 
 =cut
