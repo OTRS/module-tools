@@ -3,7 +3,7 @@
 # CodePolicy.pl - a tool to remotely execute the OTRS code policy against local code
 # Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
 # --
-# $Id: CodePolicy.pl,v 1.3 2008-02-25 08:53:17 ot Exp $
+# $Id: CodePolicy.pl,v 1.4 2008-02-28 15:04:06 ot Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 use strict;
 use warnings;
 
-our $VERSION = qw($Revision: 1.3 $) [1];
+our $VERSION = qw($Revision: 1.4 $) [1];
 
 # disable output buffering
 use IO::Handle;
@@ -334,8 +334,7 @@ sub Connect {
     print STDERR "connecting...";
     $SOAP = SOAP::Lite
         ->uri('http://otrs.org/OTRS/CodePolicyAPI')
-#        ->proxy('http://172.17.17.1/soap/code-policy')
-        ->proxy('http://localhost/soap/code-policy')
+        ->proxy('http://172.17.17.1/soap/code-policy')
         ->on_fault(sub {
             my $SOAP   = shift;
             my $Result = shift;
@@ -600,8 +599,6 @@ exported by the module.
     --actions=<string-list>     specifies the list of actions that shall be run
     --domain=<string>           lists only actions applicable for the given domain
     --profile=<string>          sets the profile from which actions are picked
-    --svnlook=<string>          defines the svnlook binary to use when checking
-                                a subversion commit.
 
 =head1 DESCRIPTION
 
@@ -623,6 +620,6 @@ did not receive this file, see http://www.gnu.org/licenses/gpl-2.0.txt.
 
 =head1 VERSION
 
-$Revision: 1.3 $ $Date: 2008-02-25 08:53:17 $
+$Revision: 1.4 $ $Date: 2008-02-28 15:04:06 $
 
 =cut
