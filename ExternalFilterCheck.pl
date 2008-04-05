@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 # --
 # ExternalFilterCheck.pl - a tool to check all files with filter.pl of the cvs
-# Copyright (C) 2001-2006 OTRS GmbH, http://otrs.org/
+# Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
 # --
-# $Id: ExternalFilterCheck.pl,v 1.1 2006-11-23 08:49:04 tr Exp $
+# $Id: ExternalFilterCheck.pl,v 1.2 2008-04-05 14:17:35 tr Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,18 +29,18 @@ use lib dirname($RealBin)."/Kernel/cpan-lib";
 use strict;
 
 use vars qw($VERSION $RealBin);
-$VERSION = '$Revision: 1.1 $';
+$VERSION = '$Revision: 1.2 $';
 $VERSION =~ s/^\$.*:\W(.*)\W.+?$/$1/;
 
 use Getopt::Std;
 
 # get options
-my %Opts = ();
-my $Filterpath = '';
+my %Opts           = ();
+my $Filterpath     = '';
 my $CheckDirectory = '';
 
-getopt('hfdewn', \%Opts);
-if ($Opts{'h'} || !$Opts{'f'} || !$Opts{'d'}) {
+getopt('hfdn', \%Opts);
+if ($Opts{h} || !$Opts{f} || !$Opts{d}) {
     print "ExternalFilterCheck.pl <Revision $VERSION> - OTRS check all files with filter.pl\n";
     print "Copyright (c) 2001-2006 OTRS GmbH, http://otrs.org/\n";
     print "usage: ExternalFilterCheck.pl -f /path/to/filter.pl -d /path/to/wanteddirectory\n";
@@ -48,11 +48,11 @@ if ($Opts{'h'} || !$Opts{'f'} || !$Opts{'d'}) {
     exit 1;
 }
 
-if ($Opts{'f'}) {
-    $Filterpath = $Opts{'f'};
+if ($Opts{f}) {
+    $Filterpath = $Opts{f};
 }
-if ($Opts{'d'}) {
-    $CheckDirectory = $Opts{'d'};
+if ($Opts{d}) {
+    $CheckDirectory = $Opts{d};
 }
 
 my $Bugfiles = ReadDirectory($Filterpath, $CheckDirectory);
@@ -64,7 +64,7 @@ my %WhiteList = ();
 #$WhiteList{'Advisory.pm'} = 1;
 $WhiteList{'ZZZAuto.pm'}  = 1;
 $WhiteList{'ZZZAAuto.pm'} = 1;
-foreach my $Filename (keys %{$Bugfiles}) {
+for my $Filename (keys %{$Bugfiles}) {
     $Filename =~ /\/([^\/]+)$/;
     if ($Bugfiles->{$Filename} && !$WhiteList{$1}) {
         if (defined($Opts{'n'}) && $Bugfiles->{$Filename}{Notice}) {
@@ -85,49 +85,51 @@ foreach my $Filename (keys %{$Bugfiles}) {
 1;
 
 sub ReadDirectory {
-    my $Filterpath = shift;
+    my $Filterpath     = shift;
     my $CheckDirectory = shift;
-    my @Directory = ();
-    my @File = ();
-    my @Symlink = ();
-    my $Bugfiles = {};
+    my @Directory      = ();
+    my @File           = ();
+    my @Symlink        = ();
+    my $Bugfiles       = {};
 
-    if (!opendir(DIR, $CheckDirectory)) {
+    if (!opendir DIR, $CheckDirectory) {
         print "Can not open Directory: $CheckDirectory";
         return;
     }
 
     while (defined (my $Filename = readdir DIR)) {
         if (-d "$CheckDirectory/$Filename") {
-            if ($Filename ne 'CVS' && $Filename ne '..' && $Filename ne '.') {
-                push(@Directory, "$CheckDirectory/$Filename")
+            if ($Filename ne 'CVS' && $Filename ne '..' && $Filename ne '.' && $Filename ne 'var') {
+                push @Directory, "$CheckDirectory/$Filename";
             }
         }
         elsif (-l "$CheckDirectory/$Filename"){
-            push (@Symlink,"$CheckDirectory/$Filename");
+            push @Symlink,"$CheckDirectory/$Filename";
         }
         elsif (-f "$CheckDirectory/$Filename"){
             unless ($Filename=~ /.*\.kdevses$/ || $Filename=~ /.*\.kdevelop$/|| $Filename=~ /.*\.tmp$/) {
-                push(@File, "$CheckDirectory/$Filename")
+                push @File, "$CheckDirectory/$Filename";
             }
         }
     }
-    closedir(DIR);
+    closedir DIR;
 
-    foreach $_ (@Symlink) {
+    for (@Symlink) {
         print "Symlink : $_ \n";
     }
 
-    foreach my $Directoryname (@Directory) {
+    for my $Directoryname (@Directory) {
         %{$Bugfiles} = (%{$Bugfiles}, %{ReadDirectory($Filterpath, $Directoryname)});
         #print "Directory : $Directoryname \n";
     }
 
     my %Bugfiles =();
     foreach my $Filenames (@File) {
-        system ("cp $Filenames $Filenames.ttmp");
+        next if $Filenames =~ m{\.cvsignore}xms;
+        system "cp $Filenames $Filenames.ttmp";
 
-        if (open (OUTPUT, "perl $Filterpath/filter-extended.pl $CheckDirectory $Filenames |")) {
+#        if (open (OUTPUT, "perl $Filterpath/filter.pl $CheckDirectory $Filenames |")) {
+        if (open OUTPUT, "perl $Filterpath/filter-extended.pl $CheckDirectory $Filenames |") {
             while (<OUTPUT>) {
                 if ($_=~ /^ERROR:.+/) {
                     $Bugfiles->{$Filenames}{Error} .= $_;
@@ -142,14 +144,14 @@ sub ReadDirectory {
                     $Bugfiles->{$Filenames}{Misc} .= $_;
                 }
             }
-            close (OUTPUT);
+            close OUTPUT;
         }
 
         if (-f "$Filenames.tmp") {
-            system ("rm $Filenames.tmp");
+            system "rm $Filenames.tmp";
         }
-        system ("rm $Filenames");
-        system ("mv $Filenames.ttmp $Filenames");
+        system "rm $Filenames";
+        system "mv $Filenames.ttmp $Filenames";
     }
 
     return $Bugfiles;
