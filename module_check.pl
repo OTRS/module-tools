@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.1 2008-06-04 16:50:48 mh Exp $
+# $Id: module_check.pl,v 1.2 2008-06-18 16:15:51 ub Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.1 $) [1];
+$VERSION = qw($Revision: 1.2 $) [1];
 
 # get options
 my %Opts = ();
@@ -49,9 +49,12 @@ if ( $Opts{'h'} ) {
 my $OriginalPath = $Opts{'o'} . '/';
 my $ModulePath   = $Opts{'m'} . '/';
 
+$OriginalPath =~ s{ /+ $ }{/}xms;
+$ModulePath =~ s{ /+ $ }{/}xms;
+
 print "\n";
-print "[$OriginalPath]\n";
-print "[$ModulePath]\n\n";
+print "Original-Framework-Path: [$OriginalPath]\n";
+print "Module-Path            : [$ModulePath]\n\n";
 print "-------------------------------------------------------------------------------------------------------------\n";
 
 find( \&CheckFile, ($ModulePath) );
@@ -77,9 +80,10 @@ sub CheckFile {
     # get and prepare module content
     my $ModuleContent = ModuleContentPrepare(File => $ModuleFile );
 
-    # build  original filename
-    ( my $OriginalFile = $ModuleDir ) =~ s{ \A $ModulePath }{$OriginalPath}xms;
-    $OriginalFile .= '/' . $OriginalFilename;
+    # build original filename
+    my $OriginalFile = $ModuleDir . '/';
+    $OriginalFile =~ s{ $ModulePath }{$OriginalPath}xms;
+    $OriginalFile .= $OriginalFilename;
 
     # get and prepare original content
     my $OriginalContent = OriginalContentPrepare(File => $OriginalFile );
@@ -112,7 +116,6 @@ sub CheckFile {
         print "VERIFY DIFF\n";
         print $DiffResult . "\n\n";
     }
-
     print "---------------------------------------------------------------------------------------------------------\n";
 
     return 1;
@@ -125,6 +128,9 @@ sub OriginalContentPrepare {
     open my $FH, '<', $Param{File} or die "could not open file $Param{File}\n";
     my $Content = do { local $/; <$FH> };
     close $FH;
+
+    # delete version line
+    $Content = DeleteVersionLine( Content => $Content );
 
     return $Content;
 }
@@ -146,15 +152,12 @@ sub ModuleContentPrepare {
         ^ \# [ ] --- \s*? $
     }{---PLACEHOLDER---}xms
     ) {
-
         my $Block = $1;
 
         my $NewCode = '';
-        while ( $Block =~ s{ \A \# (.+?) $ }{}xms ) {
-
-            $NewCode .= $1;
+        while ( $Block =~ s{ ^ \# (.+?) $ }{}xms ) {
+            $NewCode .= $1 . "\n";
         }
-
         push @NewCodeBlocks, $NewCode;
     }
 
@@ -164,10 +167,13 @@ sub ModuleContentPrepare {
     }
 
     # delete ID line
-    $Content =~ s{ ^ \# [ ] \$Id: module_check.pl,v 1.1 2008-06-04 16:50:48 mh Exp $ $ }{}ixms;
+    $Content =~ s{ ^ \# [ ] \$[I]d: .+? $ }{}ixms;
 
     # replace OldId with Id
     $Content =~ s{ \s ^ \# [ ] \$OldId: }{\# \$Id:}ixms;
+
+    # delete version line
+    $Content = DeleteVersionLine( Content => $Content );
 
     return $Content;
 }
@@ -196,6 +202,35 @@ sub OriginalFilenameGet {
     close $FH;
 
     return $Filename;
+}
+
+sub DeleteVersionLine {
+    my (%Param) = @_;
+
+    my $Content = $Param{Content};
+
+    # delete the different version lines
+    #
+    # example1: $VERSION = qw($Revision: 1.2 $) [1];
+    # example2: $VERSION = '$Revision: 1.2 $';
+    # example3:
+    #=head1 VERSION
+    #
+    #$Revision: 1.2 $ $Date: 2008-06-18 16:15:51 $
+    #
+    #=cut
+    #
+    $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
+    $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
+    $Content =~ s{
+        ^ =head1 [ ] VERSION    $ \s
+        ^                       $ \s
+        ^ \$[R]evision: [ ] .+? $ \s
+        ^                       $ \s
+        ^ =cut                  $
+    }{}ixms;
+
+    return $Content;
 }
 
 exit 0;
