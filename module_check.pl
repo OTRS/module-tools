@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.2 2008-06-18 16:15:51 ub Exp $
+# $Id: module_check.pl,v 1.3 2008-06-19 08:09:21 ub Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.2 $) [1];
+$VERSION = qw($Revision: 1.3 $) [1];
 
 # get options
 my %Opts = ();
@@ -71,7 +71,7 @@ sub CheckFile {
     return if -d $ModuleFile;
 
     # skip file if not of file type (.pl .pm .dtl)
-    return if $ModuleFile !~ m{ [.](pl|pm|dtl) \s* \z }ixms;
+    return if $ModuleFile !~ m{ [.](pl|pm|dtl|t) \s* \z }ixms;
 
     # get original file name from OldId
     my $OriginalFilename = OriginalFilenameGet(File => $ModuleFile);
@@ -129,8 +129,8 @@ sub OriginalContentPrepare {
     my $Content = do { local $/; <$FH> };
     close $FH;
 
-    # delete version line
-    $Content = DeleteVersionLine( Content => $Content );
+    # clean the content
+    $Content = ContentClean( Content => $Content );
 
     return $Content;
 }
@@ -172,8 +172,8 @@ sub ModuleContentPrepare {
     # replace OldId with Id
     $Content =~ s{ \s ^ \# [ ] \$OldId: }{\# \$Id:}ixms;
 
-    # delete version line
-    $Content = DeleteVersionLine( Content => $Content );
+    # clean the content
+    $Content = ContentClean( Content => $Content );
 
     return $Content;
 }
@@ -204,30 +204,39 @@ sub OriginalFilenameGet {
     return $Filename;
 }
 
-sub DeleteVersionLine {
+sub ContentClean {
     my (%Param) = @_;
 
     my $Content = $Param{Content};
 
     # delete the different version lines
-    #
-    # example1: $VERSION = qw($Revision: 1.2 $) [1];
-    # example2: $VERSION = '$Revision: 1.2 $';
+
+    # example1: $VERSION = qw($Revision: 1.3 $) [1];
+    $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
+
+    # example2: $VERSION = '$Revision: 1.3 $';
+    $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
+
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.2 $ $Date: 2008-06-18 16:15:51 $
+    #$Revision: 1.3 $ $Date: 2008-06-19 08:09:21 $
     #
     #=cut
-    #
-    $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
-    $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
     $Content =~ s{
         ^ =head1 [ ] VERSION    $ \s
         ^                       $ \s
         ^ \$[R]evision: [ ] .+? $ \s
         ^                       $ \s
         ^ =cut                  $
+    }{}ixms;
+
+    # delete copyright line
+    $Content =~ s{ ^ \# [ ] Copyright [ ] \( C \) .+?  http://otrs\.org/ $ }{}ixms;
+
+    # delete GPL line
+    $Content =~ s{
+        ^ \# [ ] did [ ] not [ ] receive [ ] this [ ] file, [ ] see [ ] http://www\.gnu\.org .+? $
     }{}ixms;
 
     return $Content;
