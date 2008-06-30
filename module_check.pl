@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.4 2008-06-19 14:51:40 ub Exp $
+# $Id: module_check.pl,v 1.5 2008-06-30 11:59:48 ub Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.4 $) [1];
+$VERSION = qw($Revision: 1.5 $) [1];
 
 # get options
 my %Opts = ();
@@ -153,12 +153,19 @@ sub ModuleContentPrepare {
     }{---PLACEHOLDER---}xms
     ) {
         my $Block = $1;
-
         my $NewCode = '';
-        while ( $Block =~ s{ ^ \# (.+?) $ }{}xms ) {
-            $NewCode .= $1 . "\n";
+        my @Lines = split q{\n}, $Block;
+        LINE:
+        for my $Line ( @Lines ) {
+            if ( $Line =~ s{ ^ \# (.*?) $ }{}xms ) {
+                $NewCode .= $1 . "\n";
+            }
+            else {
+                last LINE;
+            }
         }
         push @NewCodeBlocks, $NewCode;
+
     }
 
     while ( $Content =~ s{ ^ ---PLACEHOLDER--- $ \s }{ shift @NewCodeBlocks }xmse ) {
@@ -211,16 +218,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.4 $) [1];
+    # example1: $VERSION = qw($Revision: 1.5 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.4 $';
+    # example2: $VERSION = '$Revision: 1.5 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.4 $ $Date: 2008-06-19 14:51:40 $
+    #$Revision: 1.5 $ $Date: 2008-06-30 11:59:48 $
     #
     #=cut
     $Content =~ s{
