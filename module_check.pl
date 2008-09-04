@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.5 2008-06-30 11:59:48 ub Exp $
+# $Id: module_check.pl,v 1.6 2008-09-04 12:21:29 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.5 $) [1];
+$VERSION = qw($Revision: 1.6 $) [1];
 
 # get options
 my %Opts = ();
@@ -42,7 +42,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
 if ( $Opts{'h'} ) {
     print "module_check.pl <Revision $VERSION> - Check OTRS modules\n";
     print "Copyright (C) 2001-2008 OTRS AG, http://otrs.org/\n";
-    print "usage: module_check.pl -o <Original-Framework-Path> -m <Module-Path> -d [debug mode 1]\n\n";
+    print "usage: module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1]\n\n";
     exit 1;
 }
 
@@ -55,7 +55,7 @@ $ModulePath =~ s{ /+ $ }{/}xms;
 print "\n";
 print "Original-Framework-Path: [$OriginalPath]\n";
 print "Module-Path            : [$ModulePath]\n\n";
-print "-------------------------------------------------------------------------------------------------------------\n";
+print "-----------------------------------------------------------------------------------------------------\n";
 
 find( \&CheckFile, ($ModulePath) );
 
@@ -104,10 +104,12 @@ sub CheckFile {
     my $DiffResult = `diff $OriginalTempfile $ModuleTempfile`;
 
     # print diff result
-    print "DIFF RESULT for:\n";
-    print "$OriginalFile\n";
-    print "$ModuleFile\n\n";
-    print $DiffResult . "\n\n" if $DiffResult;
+    if ( $Opts{'v'} || $DiffResult ) {
+        print "DIFF RESULT for:\n";
+        print "$OriginalFile\n";
+        print "$ModuleFile\n\n";
+        print $DiffResult . "\n\n" if $DiffResult;
+    }
 
     # verify the real files in debug mode
     if ( $Opts{'d'} ) {
@@ -116,7 +118,10 @@ sub CheckFile {
         print "VERIFY DIFF\n";
         print $DiffResult . "\n\n";
     }
-    print "---------------------------------------------------------------------------------------------------------\n";
+
+    if ( $Opts{'v'} || $DiffResult ) {
+        print "-----------------------------------------------------------------------------------------------------\n";
+    }
 
     return 1;
 }
@@ -218,16 +223,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.5 $) [1];
+    # example1: $VERSION = qw($Revision: 1.6 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.5 $';
+    # example2: $VERSION = '$Revision: 1.6 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.5 $ $Date: 2008-06-30 11:59:48 $
+    #$Revision: 1.6 $ $Date: 2008-09-04 12:21:29 $
     #
     #=cut
     $Content =~ s{
@@ -239,7 +244,7 @@ sub ContentClean {
     }{}ixms;
 
     # delete copyright line
-    $Content =~ s{ ^ \# [ ] Copyright [ ] \( C \) .+?  http://otrs\.org/ $ }{}ixms;
+    $Content =~ s{ ^ \# [ ] Copyright [ ] \( C \) .+?  http://otrs\.(org|com)/ $ }{}ixms;
 
     # delete GPL line
     $Content =~ s{
