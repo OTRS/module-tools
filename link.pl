@@ -1,8 +1,48 @@
 #!/usr/bin/perl -w
+# --
+# module-tools/link.pl
+#   - script for linking OTRS modules into framework root
+# Copyright (C) 2001-2009 OTRS AG, http://otrs.org/
+# --
+# $Id: link.pl,v 1.12 2009-07-03 11:40:01 bes Exp $
+# --
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU AFFERO General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# or see http://www.gnu.org/licenses/agpl.txt.
+# --
 
-# $Id: link.pl,v 1.11 2009-06-22 13:24:16 mg Exp $
+=head1 NAME
+
+link.pl - script for linking OTRS modules into framework root
+
+=head1 SYNOPSIS
+
+link.pl <source-module-folder> <otrs-folder>
+
+link.pl <source-module-folder> <otrs-folder>
+
+=head1 DESCRIPTION
+
+This script installs a given OTRS module into the OTRS framework by creating
+appropriate links.
+
+Please send any questions, suggestions & complaints to <ot@otrs.com>
+
+=cut
 
 use strict;
+use warnings;
 
 my $Source = shift || die "Need Application CVS location as ARG0";
 if (! -d $Source) {
@@ -13,7 +53,7 @@ if (! -d $Dest) {
     die "ERROR: invalid Framework-Root directory '$Dest'";
 }
 
-my @Dirs = ();
+my @Dirs;
 my $Start = $Source;
 R($Start);
 
