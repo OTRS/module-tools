@@ -4,7 +4,7 @@
 #   - script for linking OTRS modules into framework root
 # Copyright (C) 2001-2009 OTRS AG, http://otrs.org/
 # --
-# $Id: link.pl,v 1.12 2009-07-03 11:40:01 bes Exp $
+# $Id: link.pl,v 1.13 2009-07-09 06:31:13 bes Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -28,7 +28,7 @@ link.pl - script for linking OTRS modules into framework root
 
 =head1 SYNOPSIS
 
-link.pl <source-module-folder> <otrs-folder>
+link.pl -h
 
 link.pl <source-module-folder> <otrs-folder>
 
@@ -36,6 +36,7 @@ link.pl <source-module-folder> <otrs-folder>
 
 This script installs a given OTRS module into the OTRS framework by creating
 appropriate links.
+Beware that code from the .sopm file is not executed.
 
 Please send any questions, suggestions & complaints to <ot@otrs.com>
 
@@ -43,6 +44,19 @@ Please send any questions, suggestions & complaints to <ot@otrs.com>
 
 use strict;
 use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+# get options
+my ($OptHelp);
+GetOptions( 'h'   => \$OptHelp ) || pod2usage( -verbose => 1, message => 'invalid params' );
+
+if ( $OptHelp ) {
+    pod2usage( -verbose => 2 );   # this will exit the script
+}
+
+# Now get the work done
 
 my $Source = shift || die "Need Application CVS location as ARG0";
 if (! -d $Source) {
