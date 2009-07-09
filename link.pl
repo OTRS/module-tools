@@ -4,7 +4,7 @@
 #   - script for linking OTRS modules into framework root
 # Copyright (C) 2001-2009 OTRS AG, http://otrs.org/
 # --
-# $Id: link.pl,v 1.13 2009-07-09 06:31:13 bes Exp $
+# $Id: link.pl,v 1.14 2009-07-09 10:52:30 bes Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -38,7 +38,15 @@ This script installs a given OTRS module into the OTRS framework by creating
 appropriate links.
 Beware that code from the .sopm file is not executed.
 
+Existing files are backupped by adding the extension '.old'.
+So this script can be used for an already installed module, when linking
+files from CVS checkout directory.
+
 Please send any questions, suggestions & complaints to <ot@otrs.com>
+
+=head1 TODO
+
+When running the scripts twice, the '.old' files might be overwritten.
 
 =cut
 
@@ -47,6 +55,7 @@ use warnings;
 
 use Getopt::Long;
 use Pod::Usage;
+use File::Spec    ();
 
 # get options
 my ($OptHelp);
@@ -59,10 +68,13 @@ if ( $OptHelp ) {
 # Now get the work done
 
 my $Source = shift || die "Need Application CVS location as ARG0";
+$Source = File::Spec->rel2abs( $Source );
 if (! -d $Source) {
     die "ERROR: invalid Application CVS directory '$Source'";
 }
+
 my $Dest = shift || die "Need Framework-Root location as ARG1";
+$Dest = File::Spec->rel2abs( $Dest );
 if (! -d $Dest) {
     die "ERROR: invalid Framework-Root directory '$Dest'";
 }
