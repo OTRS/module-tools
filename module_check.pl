@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2009 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.9 2009-07-15 10:23:40 bes Exp $
+# $Id: module_check.pl,v 1.10 2009-07-15 16:57:11 bes Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.9 $) [1];
+$VERSION = qw($Revision: 1.10 $) [1];
 
 # get options
 my %Opts = ();
@@ -272,16 +272,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.9 $) [1];
+    # example1: $VERSION = qw($Revision: 1.10 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.9 $';
+    # example2: $VERSION = '$Revision: 1.10 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.9 $ $Date: 2009-07-15 10:23:40 $
+    #$Revision: 1.10 $ $Date: 2009-07-15 16:57:11 $
     #
     #=cut
     $Content =~ s{
@@ -298,6 +298,17 @@ sub ContentClean {
     # delete GPL line
     $Content =~ s{
         ^ \# [ ] did [ ] not [ ] receive [ ] this [ ] file, [ ] see [ ] http://www\.gnu\.org .+? $
+    }{}ixms;
+
+    # Delete the standard comment with the filenname and a description.
+    # The name of the file could have changed.
+    # example4:
+    # # CustomerLHSServiceFAQ.dtl - provides Stuttgart specific HTML view for faq articles
+    $Content =~ s{
+        ^ \# [ ]                   # a hash at start of line followed by a space
+        [\\/\w]+ \. \w{1,3}        # a filename with an extension
+        [ ] - [ ]                  # separated by ' - '
+        \w .+? $                   # the description till the end of the current line
     }{}ixms;
 
     return $Content;
