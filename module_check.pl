@@ -1,24 +1,43 @@
 #!/usr/bin/perl -w
 # --
 # module-tools/module_check.pl - script to check OTRS modules
-# Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2009 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.7 2008-10-01 12:53:38 mh Exp $
+# $Id: module_check.pl,v 1.8 2009-07-15 10:15:01 bes Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU AFFERO General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# or see http://www.gnu.org/licenses/agpl.txt.
 # --
+
+=head1 NAME
+
+module_check.pl - script to check OTRS modules
+
+=head1 SYNOPSIS
+
+module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1]
+
+=head1 DESCRIPTION
+
+Check the change markers for the files that contain an OldID.
+
+=head1 SUBROUTINES
+
+=over 4
+
+=cut
 
 use strict;
 use warnings;
@@ -29,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.7 $) [1];
+$VERSION = qw($Revision: 1.8 $) [1];
 
 # get options
 my %Opts = ();
@@ -41,7 +60,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
 }
 if ( $Opts{'h'} ) {
     print "module_check.pl <Revision $VERSION> - Check OTRS modules\n";
-    print "Copyright (C) 2001-2008 OTRS AG, http://otrs.org/\n";
+    print "Copyright (C) 2001-2009 OTRS AG, http://otrs.org/\n";
     print "usage: module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1]\n\n";
     exit 1;
 }
@@ -61,6 +80,12 @@ find( \&CheckFile, ($ModulePath) );
 
 1;
 
+=item CheckFile
+
+No documentation yet.
+
+=cut
+
 sub CheckFile {
 
     # get current module filename and directory from File::Find
@@ -70,10 +95,10 @@ sub CheckFile {
     # skip directories
     return if -d $ModuleFile;
 
-    # skip file if not of file type (.pl .pm .dtl)
+    # check only Perl- and Template-files
     return if $ModuleFile !~ m{ [.](pl|pm|dtl|t) \s* \z }ixms;
 
-    # get original file name from OldId
+    # get original file name from OldId, continue only when an original name was found
     my $OriginalFilename = OriginalFilenameGet(File => $ModuleFile);
     return if !$OriginalFilename;
 
@@ -126,6 +151,12 @@ sub CheckFile {
     return 1;
 }
 
+=item OriginalContentPrepare
+
+No documentation yet.
+
+=cut
+
 sub OriginalContentPrepare {
     my (%Param) = @_;
 
@@ -139,6 +170,12 @@ sub OriginalContentPrepare {
 
     return $Content;
 }
+
+=item ModuleContentPrepare
+
+No documentation yet.
+
+=cut
 
 sub ModuleContentPrepare {
     my (%Param) = @_;
@@ -190,6 +227,12 @@ sub ModuleContentPrepare {
     return $Content;
 }
 
+=item OriginalFilenameGet
+
+No documentation yet.
+
+=cut
+
 sub OriginalFilenameGet {
     my (%Param) = @_;
 
@@ -216,6 +259,12 @@ sub OriginalFilenameGet {
     return $Filename;
 }
 
+=item ContentClean
+
+No documentation yet.
+
+=cut
+
 sub ContentClean {
     my (%Param) = @_;
 
@@ -223,16 +272,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.7 $) [1];
+    # example1: $VERSION = qw($Revision: 1.8 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.7 $';
+    # example2: $VERSION = '$Revision: 1.8 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.7 $ $Date: 2008-10-01 12:53:38 $
+    #$Revision: 1.8 $ $Date: 2009-07-15 10:15:01 $
     #
     #=cut
     $Content =~ s{
@@ -255,3 +304,11 @@ sub ContentClean {
 }
 
 exit 0;
+
+=back
+
+=head1 SEE ALSO
+
+L<https://wiki.otrs.com/twiki/bin/view/Development/KennzeichnungVonCodestellenAngepassterOTRS-Framework-Dateien>
+
+=cut
