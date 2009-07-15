@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2009 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.8 2009-07-15 10:15:01 bes Exp $
+# $Id: module_check.pl,v 1.9 2009-07-15 10:23:40 bes Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.8 $) [1];
+$VERSION = qw($Revision: 1.9 $) [1];
 
 # get options
 my %Opts = ();
@@ -272,16 +272,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.8 $) [1];
+    # example1: $VERSION = qw($Revision: 1.9 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.8 $';
+    # example2: $VERSION = '$Revision: 1.9 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.8 $ $Date: 2009-07-15 10:15:01 $
+    #$Revision: 1.9 $ $Date: 2009-07-15 10:23:40 $
     #
     #=cut
     $Content =~ s{
@@ -306,6 +306,10 @@ sub ContentClean {
 exit 0;
 
 =back
+
+=head1 KNOWN LIMITATIONS
+
+False negatives might be reported when the first line of the new content starts with an '#'.
 
 =head1 SEE ALSO
 
