@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2009 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.11 2009-09-29 10:32:04 kk Exp $
+# $Id: module_check.pl,v 1.12 2009-09-29 11:49:54 kk Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.11 $) [1];
+$VERSION = qw($Revision: 1.12 $) [1];
 
 # get options
 my %Opts = ();
@@ -134,7 +134,7 @@ sub CheckFile {
     }
 
     # make a diff of the content
-    my $DiffResult = `diff $DiffOptions $ModuleTempfile $OriginalTempfile`;
+    my $DiffResult = `diff $DiffOptions $OriginalTempfile $ModuleTempfile`;
 
     # print diff result
     if ( $Opts{'v'} || $DiffResult ) {
@@ -146,7 +146,7 @@ sub CheckFile {
 
     # verify the real files in debug mode
     if ( $Opts{'d'} ) {
-        $DiffResult = `diff $ModuleFile $OriginalFile`;
+        $DiffResult = `diff $DiffOptions $OriginalFile $ModuleFile`;
         print "-----------------------------------------------------------------------------------------------------\n";
         print "VERIFY DIFF\n";
         print $DiffResult . "\n\n";
@@ -280,16 +280,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.11 $) [1];
+    # example1: $VERSION = qw($Revision: 1.12 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.11 $';
+    # example2: $VERSION = '$Revision: 1.12 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.11 $ $Date: 2009-09-29 10:32:04 $
+    #$Revision: 1.12 $ $Date: 2009-09-29 11:49:54 $
     #
     #=cut
     $Content =~ s{
