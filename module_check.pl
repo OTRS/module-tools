@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 # --
 # module-tools/module_check.pl - script to check OTRS modules
-# Copyright (C) 2001-2009 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.15 2009-10-09 16:02:03 kk Exp $
+# $Id: module_check.pl,v 1.16 2010-09-01 21:37:03 sb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.15 $) [1];
+$VERSION = qw($Revision: 1.16 $) [1];
 
 # get options
 my %Opts = ();
@@ -60,7 +60,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
 }
 if ( $Opts{'h'} ) {
     print "module_check.pl <Revision $VERSION> - Check OTRS modules\n";
-    print "Copyright (C) 2001-2009 OTRS AG, http://otrs.org/\n";
+    print "Copyright (C) 2001-2010 OTRS AG, http://otrs.org/\n";
     print "usage: module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]\n\n";
     exit 1;
 }
@@ -193,13 +193,26 @@ sub ModuleContentPrepare {
     my $Content = do { local $/; <$FH> };
     close $FH;
 
+    # prevent checking of files with nested markers (markers within markers)
+    if ( $Content =~ m{
+        ^ \# [ ] --- [ \t]* \n
+        ^ \# [ ] [^\s]+? [ \t]* \n
+        ^ \# [ ] --- [ \t]* \n
+        (?: (?! ^ \# [ ] --- [ \t]* \n ). )+
+        ^ \# [ ] --- [ \t]* \n
+        ^ \# [ ] [^\s]+? [ \t]* \n
+        ^ \# [ ] --- [ \t]* \n
+    }xms ) {
+        die "Nested custom markers found in '$Param{File}'!";
+    }
+
     my @NewCodeBlocks;
     while ( $Content =~ s{
-        ^ \# [ ] --- \s*? $ \s
-        ^ \# [ ] .+? \s*? $ \s
-        ^ \# [ ] --- \s*? $ \s
-        (.+?)
-        ^ \# [ ] --- \s*? $
+        ^ \# [ ] --- [ \t]* \n
+        ^ \# [ ] [^\s]+? [ \t]* \n
+        ^ \# [ ] --- [ \t]* \n
+        ( .+? )
+        ^ \# [ ] --- [ \t]*
     }{---PLACEHOLDER---}xms
     ) {
         my $Block = $1;
@@ -211,10 +224,10 @@ sub ModuleContentPrepare {
             # lines beginning with "##" but which are necessary to cover the case
             # of removed lines that begin as a comment ("#").  very special case,
             # it catches lines beginning with # ' ' #.
-            if ( $Line =~ s{ ^ \# \s \# (.*?) $ }{}xms ) {
-                $NewCode .= '#' . $1 . "\n";
+            if ( $Line =~ s{ \A \# [ ] ( \# .* ) \z }{}xms ) {
+                $NewCode .= $1 . "\n";
             }
-            elsif ( $Line =~ s{ ^ \# (.*?) $ }{}xms ) {
+            elsif ( $Line =~ s{ \A \# ( .* ) \z }{}xms ) {
                 $NewCode .= $1 . "\n";
             }
             else {
@@ -225,16 +238,14 @@ sub ModuleContentPrepare {
 
     }
 
-    while ( $Content =~ s{ ^ ---PLACEHOLDER--- $ \s }{ shift @NewCodeBlocks }xmse ) {
-
-        # Do nothing  *lol*
-    }
+    # put formerly commented code in place
+    $Content =~ s{ ^ ---PLACEHOLDER--- $ \s }{ shift @NewCodeBlocks }xmseg;
 
     # delete ID line
-    $Content =~ s{ ^ \# [ ] \$[I]d: .+? $ }{}ixms;
+    $Content =~ s{ ^ \# [ ] \$Id: [^\n]+ \n }{}xms;
 
     # replace OldId with Id
-    $Content =~ s{ \s ^ \# [ ] \$OldId: }{\# \$Id:}ixms;
+    $Content =~ s{ ^ \# [ ] \$OldId: }{\# \$Id:}xms;
 
     # clean the content
     $Content = ContentClean( Content => $Content );
@@ -287,16 +298,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.15 $) [1];
+    # example1: $VERSION = qw($Revision: 1.16 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.15 $';
+    # example2: $VERSION = '$Revision: 1.16 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.15 $ $Date: 2009-10-09 16:02:03 $
+    #$Revision: 1.16 $ $Date: 2010-09-01 21:37:03 $
     #
     #=cut
     $Content =~ s{
