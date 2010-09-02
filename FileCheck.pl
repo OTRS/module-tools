@@ -3,7 +3,7 @@
 # module-tools/FileCheck.pl - searchs for existent mistakes in the list of files registered in SOPM
 # Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: FileCheck.pl,v 1.1 2010-08-24 19:38:56 dz Exp $
+# $Id: FileCheck.pl,v 1.2 2010-09-02 18:42:16 dz Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -27,7 +27,6 @@ use warnings;
 use Getopt::Std;
 use File::Find;
 use XML::Simple;
-use Data::Dumper;
 
 =head1 NAME
 
@@ -69,7 +68,7 @@ if ( $Opt{m} && -d $Opt{m} ) {
 
     # find and read sopm in main path.
     $ModulePath = $Opt{m};
-    $ModulePath =~ s{(\w*)(\/)*}{$1}xms;
+    $ModulePath =~ s{(/*)\z}{}xms;
 
     $SOPMFile = glob "$ModulePath/*.sopm";
 
@@ -166,14 +165,14 @@ sub GetDirectoryFileList {
 
     my $WantedFunction =
         sub {
-        my $Directory = $File::Find::dir;
         my $FullName  = $File::Find::name;
         my $Name      = $_;
+        my $CleanName = $FullName;
+
+        # cleaning FullName to store
+        $CleanName =~ s{\A\Q$ModulePath\E/?}{};
 
         # filtering results
-        $Directory =~ s{\A$Dir/(.*)?}{$1};
-        $FullName  =~ s{\A$Dir/(.*)?}{$1};
-
         # ignore directories
         if ( -d $Name ) {
             return;
@@ -195,7 +194,7 @@ sub GetDirectoryFileList {
             }
 
             if ( !$MatchD && !$MatchF ) {
-                push @FileList, $FullName;
+                push @FileList, $CleanName;
             }
         }
         };
@@ -235,7 +234,9 @@ sub PrintFiles() {
 }
 
 sub DiffList {
-    my %Param = @_;
+    my %Param         = @_;
+    my $CleanSOPMFile = $SOPMFile;
+    $CleanSOPMFile =~ s{\Q$ModulePath\E/?}{}xms;
 
     # look for needed parameters
     for my $Parameter (qw( SOPM Directory )) {
@@ -246,7 +247,7 @@ sub DiffList {
 
     # convert array to hash to compare faster
     my %SOPM;
-    my %Directory = @{ $Param{Directory} };
+    my %Directory;
 
     for my $Key ( @{ $Param{SOPM} } ) {
         $SOPM{$Key} = 1;
@@ -279,7 +280,10 @@ sub DiffList {
         #Diff
         print "\n\n"
             . "------------------------------------------------------\n"
-            . "    DIFF RESULTS Comparing $SOPMFile & $ModulePath  \n"
+            . "                    DIFF RESULTS    \n"
+            . "------------------------------------------------------\n"
+            . " SOPM:      $CleanSOPMFile \n"
+            . " Directory: $ModulePath \n"
             . "------------------------------------------------------\n";
 
         # print diff
@@ -301,7 +305,7 @@ sub DiffList {
         if (@DIRvsSOPM) {
             print "\n----------------\n"
                 . "This files are in File System but were not found in SOPM\n"
-                . "Some times this is ok, but may be you miss write this files\n"
+                . "Some times this is ok, but maybe you forgot register"
                 . "in SOPM file\n"
                 . "--------\n";
 
@@ -335,6 +339,6 @@ USAGE:
 
 End-of-Here
 
-    return;
+    exit 1;
 }
 1;
