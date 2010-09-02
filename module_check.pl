@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.16 2010-09-01 21:37:03 sb Exp $
+# $Id: module_check.pl,v 1.17 2010-09-02 21:43:16 dz Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.16 $) [1];
+$VERSION = qw($Revision: 1.17 $) [1];
 
 # get options
 my %Opts = ();
@@ -109,6 +109,7 @@ sub CheckFile {
     my $OriginalFile = $ModuleDir . '/';
     $OriginalFile =~ s{ $ModulePath }{$OriginalPath}xms;
     $OriginalFile .= $OriginalFilename;
+    $OriginalFile  =~ s{\s}{}xms;
 
     # get and prepare original content
     my $OriginalContent = OriginalContentPrepare(File => $OriginalFile );
@@ -298,16 +299,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.16 $) [1];
+    # example1: $VERSION = qw($Revision: 1.17 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.16 $';
+    # example2: $VERSION = '$Revision: 1.17 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.16 $ $Date: 2010-09-01 21:37:03 $
+    #$Revision: 1.17 $ $Date: 2010-09-02 21:43:16 $
     #
     #=cut
     $Content =~ s{
