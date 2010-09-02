@@ -3,7 +3,7 @@
 # module-tools/FileCheck.pl - searchs for existent mistakes in the list of files registered in SOPM
 # Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: FileCheck.pl,v 1.2 2010-09-02 18:42:16 dz Exp $
+# $Id: FileCheck.pl,v 1.3 2010-09-02 19:15:51 dz Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -62,6 +62,7 @@ if ( $Opt{h} ) {
 my $ModulePath;
 my $SOPMFile;
 my %ListOfFiles;
+my $CleanSOPMFile;
 
 # look for module main directory in parameters and look for it.
 if ( $Opt{m} && -d $Opt{m} ) {
@@ -70,7 +71,9 @@ if ( $Opt{m} && -d $Opt{m} ) {
     $ModulePath = $Opt{m};
     $ModulePath =~ s{(/*)\z}{}xms;
 
-    $SOPMFile = glob "$ModulePath/*.sopm";
+    $SOPMFile      = glob "$ModulePath/*.sopm";
+    $CleanSOPMFile = $SOPMFile;
+    $CleanSOPMFile =~ s{\Q$ModulePath\E/?}{}xms;
 
     if ($SOPMFile) {
 
@@ -114,7 +117,7 @@ sub GetPackageFileList {
     $SOPM = $Param{SOPM};
 
     if ( -e $SOPM ) {
-        print "\n >> reading sopm file: $SOPM ... \n";
+        print "\n >> reading sopm file: $CleanSOPMFile ... \n";
 
         # build xml object
         my $XMLObject = new XML::Simple;
@@ -136,13 +139,12 @@ sub GetPackageFileList {
             }
             return @FileList;
         }
-        else {
-            return 0;
-        }
     }
     else {
         die "\n can't find sopm file!: $SOPM \n"
     }
+
+    return;
 }
 
 sub GetDirectoryFileList {
@@ -234,9 +236,7 @@ sub PrintFiles() {
 }
 
 sub DiffList {
-    my %Param         = @_;
-    my $CleanSOPMFile = $SOPMFile;
-    $CleanSOPMFile =~ s{\Q$ModulePath\E/?}{}xms;
+    my %Param = @_;
 
     # look for needed parameters
     for my $Parameter (qw( SOPM Directory )) {
@@ -289,7 +289,7 @@ sub DiffList {
         # print diff
         if (@SOPMvsDIR) {
             print "----------------\n"
-                . "This files are in SOPM but were not found in File System\n"
+                . "This files are in SOPM but were not found in File System.\n"
                 . "Please check for syntax errors\n"
                 . "----------------\n";
             my $Counter = 0;
@@ -304,10 +304,10 @@ sub DiffList {
 
         if (@DIRvsSOPM) {
             print "\n----------------\n"
-                . "This files are in File System but were not found in SOPM\n"
-                . "Some times this is ok, but maybe you forgot register"
+                . "This files are in File System but were not found in SOPM.\n"
+                . "Some times this is ok, but maybe you forgot to register them\n"
                 . "in SOPM file\n"
-                . "--------\n";
+                . "----------------\n";
 
             my $Counter = 0;
             for my $file (@DIRvsSOPM) {
