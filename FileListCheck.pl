@@ -1,10 +1,10 @@
 #!/usr/bin/perl -wl
 # --
 # module-tools/FileListCheck.pl
-#   - script for linking OTRS modules into framework root
+#   - script for checking the file list in the .sopm file
 # Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: FileListCheck.pl,v 1.1 2010-08-25 10:10:51 mae Exp $
+# $Id: FileListCheck.pl,v 1.2 2010-10-29 10:01:53 bes Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -24,7 +24,7 @@
 
 =head1 NAME
 
-FileListCheck.pl - script for checking of complete file list in OPMS-files of packages.
+FileListCheck.pl - script for checking completeness of the file list in OPMS-files of packages.
 
 =head1 SYNOPSIS
 
