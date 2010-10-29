@@ -3,7 +3,7 @@
 # module-tools/FileCheck.pl - searchs for existent mistakes in the list of files registered in SOPM
 # Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: FileCheck.pl,v 1.4 2010-10-29 10:32:55 bes Exp $
+# $Id: FileCheck.pl,v 1.5 2010-10-29 10:40:21 bes Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -50,11 +50,11 @@ and compare against the sopm list to see if you forgot include some in the list.
 =cut
 
 # get options
-my (%Opt);
+my %Opt;
 
 getopt( 'hm', \%Opt );
 
-if ( $Opt{h} ) {
+if ( exists $Opt{h} ) {
     Usage();
     exit;
 }
@@ -296,9 +296,11 @@ sub DiffList {
     }
     else {
         print <<'END_OF_HERE';
+
 ----------------
 Good Job, all files are well registered!
 ----------------
+
 END_OF_HERE
     }
 }
@@ -306,7 +308,9 @@ END_OF_HERE
 sub Usage {
     my ($Message) = @_;
 
-    print 'Usage', <<"END_OF_HERE";
+    $Message ||= '';
+
+    print <<"END_OF_HERE";
 
 $Message
 
