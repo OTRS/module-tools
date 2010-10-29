@@ -3,7 +3,7 @@
 # module-tools/FileCheck.pl - searchs for existent mistakes in the list of files registered in SOPM
 # Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: FileCheck.pl,v 1.3 2010-09-02 19:15:51 dz Exp $
+# $Id: FileCheck.pl,v 1.4 2010-10-29 10:32:55 bes Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -36,7 +36,7 @@ FileCheck.pl - searchs for existent mistakes in the list of files registered in 
 
  FileCheck.pl <source-module-folder> [-v]
 
- [-v] optional to see intermidiate results
+ [-v] optional to see intermediate results
 
 =head1 DESCRIPTION
 
@@ -55,13 +55,12 @@ my (%Opt);
 getopt( 'hm', \%Opt );
 
 if ( $Opt{h} ) {
-    &Usage;
+    Usage();
     exit;
 }
 
+# some globals
 my $ModulePath;
-my $SOPMFile;
-my %ListOfFiles;
 my $CleanSOPMFile;
 
 # look for module main directory in parameters and look for it.
@@ -69,9 +68,9 @@ if ( $Opt{m} && -d $Opt{m} ) {
 
     # find and read sopm in main path.
     $ModulePath = $Opt{m};
-    $ModulePath =~ s{(/*)\z}{}xms;
+    $ModulePath =~ s{ /* \z}{}xms;
 
-    $SOPMFile      = glob "$ModulePath/*.sopm";
+    my $SOPMFile = glob "$ModulePath/*.sopm";
     $CleanSOPMFile = $SOPMFile;
     $CleanSOPMFile =~ s{\Q$ModulePath\E/?}{}xms;
 
@@ -90,22 +89,20 @@ if ( $Opt{m} && -d $Opt{m} ) {
         );
     }
     else {
-        Usage("sopm file doesn't found");
+        Usage('sopm file not found');
     }
 
     exit;
 }
 elsif ( !$Opt{m} ) {
-    Usage("needed module path!");
+    Usage('needed module path!');
 }
 else {
-    &Usage("non existent path!");
+    Usage('non existent path!');
 }
 
 sub GetPackageFileList {
     my %Param = @_;
-    my $SOPM;
-    my @FileList;
 
     # look for needed parameters
     for my $Parameter (qw( SOPM )) {
@@ -114,43 +111,33 @@ sub GetPackageFileList {
         }
     }
 
-    $SOPM = $Param{SOPM};
+    my $SOPM = $Param{SOPM};
 
-    if ( -e $SOPM ) {
-        print "\n >> reading sopm file: $CleanSOPMFile ... \n";
+    die "\n can't find sopm file!: $SOPM \n" if !-e $SOPM;
 
-        # build xml object
-        my $XMLObject = new XML::Simple;
+    print "\n >> reading sopm file: $CleanSOPMFile ... \n";
 
-        # read XML file
-        my $XMLContent = $XMLObject->XMLin("$SOPM");
+    # build xml object
+    my $XMLObject = XML::Simple->new();
 
-        # find the list of needed files inside sopm.
-        for my $File ( @{ $XMLContent->{Filelist}->{File} } ) {
-            push @FileList, $File->{Location};
-        }
+    # read XML file
+    my $XMLContent = $XMLObject->XMLin($SOPM);
 
-        if (@FileList) {
-            if ( $Opt{v} ) {
-                PrintFiles(
-                    Source      => 'SOPM file',
-                    ListOfFiles => \@FileList,
-                );
-            }
-            return @FileList;
-        }
-    }
-    else {
-        die "\n can't find sopm file!: $SOPM \n"
+    # find the list of needed files inside sopm.
+    my @FileList = map { $_->{Location} } @{ $XMLContent->{Filelist}->{File} };
+
+    if ( $Opt{v} ) {
+        PrintFiles(
+            Source      => 'SOPM file',
+            ListOfFiles => \@FileList,
+        );
     }
 
-    return;
+    return @FileList;
 }
 
 sub GetDirectoryFileList {
     my %Param = @_;
-    my $Dir;
-    my @FileList;
 
     # look for needed parameters
     for my $Parameter (qw( ModuleDirectory )) {
@@ -163,10 +150,10 @@ sub GetDirectoryFileList {
     my @IgnoreFiles = ( '.cvsignore', '.project', '.*\.sopm', '\.tmp.*', );
     my @IgnoreDirs = ( 'CVS', '.settings', );
 
-    $Dir = $Param{ModuleDirectory};
+    my $Dir = $Param{ModuleDirectory};
 
-    my $WantedFunction =
-        sub {
+    my @FileList;
+    my $WantedFunction = sub {
         my $FullName  = $File::Find::name;
         my $Name      = $_;
         my $CleanName = $FullName;
@@ -176,30 +163,26 @@ sub GetDirectoryFileList {
 
         # filtering results
         # ignore directories
-        if ( -d $Name ) {
-            return;
+        return if -d $Name;
+
+        # ignore files inside preconfigured directories
+        my $MatchD = 0;
+        my $MatchF = 0;
+
+        for my $IgnoreDirectory (@IgnoreDirs) {
+            $MatchD = $FullName =~ m{$IgnoreDirectory/}xms;
+            last if ($MatchD);
         }
-        else {
 
-            # ignore files inside preconfigured directories
-            my $MatchD = 0;
-            my $MatchF = 0;
-
-            for my $IgnoreDirectory (@IgnoreDirs) {
-                $MatchD = $FullName =~ m{$IgnoreDirectory/}xms;
-                last if ($MatchD);
-            }
-
-            for my $IgnoreFile (@IgnoreFiles) {
-                $MatchF = $Name =~ m{\A$IgnoreFile\z}xms;
-                last if ($MatchF);
-            }
-
-            if ( !$MatchD && !$MatchF ) {
-                push @FileList, $CleanName;
-            }
+        for my $IgnoreFile (@IgnoreFiles) {
+            $MatchF = $Name =~ m{\A$IgnoreFile\z}xms;
+            last if ($MatchF);
         }
-        };
+
+        if ( !$MatchD && !$MatchF ) {
+            push @FileList, $CleanName;
+        }
+    };
 
     print " >> reading file system: $Dir ... \n";
     find( $WantedFunction, $Dir );
@@ -246,16 +229,8 @@ sub DiffList {
     }
 
     # convert array to hash to compare faster
-    my %SOPM;
-    my %Directory;
-
-    for my $Key ( @{ $Param{SOPM} } ) {
-        $SOPM{$Key} = 1;
-    }
-
-    for my $Key ( @{ $Param{Directory} } ) {
-        $Directory{$Key} = 1;
-    }
+    my %SOPM      = map { $_ => 1 } @{ $Param{SOPM} };
+    my %Directory = map { $_ => 1 } @{ $Param{Directory} };
 
     # get files in SOPM and not in File System
     # diff Hashes
@@ -320,25 +295,27 @@ sub DiffList {
         }
     }
     else {
-        print "\n----------------\n"
-            . "Good Job, all files are well registered!! :)\n"
-            . "----------------\n";
-
+        print <<'END_OF_HERE';
+----------------
+Good Job, all files are well registered!
+----------------
+END_OF_HERE
     }
 }
 
 sub Usage {
     my ($Message) = @_;
-    print "Usage";
-    print STDERR <<"End-of-Here";
+
+    print 'Usage', <<"END_OF_HERE";
 
 $Message
 
 USAGE:
-    FileCheck.pl -m <source-module-path> -v (optional to see intermidiate results)
+    FileCheck.pl -m <source-module-path> -v (optional to see intermediate results)
 
-End-of-Here
+END_OF_HERE
 
     exit 1;
 }
+
 1;
