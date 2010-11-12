@@ -4,7 +4,7 @@
 #   - script for get changed file between different releases of OTRS
 # Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: CheckChangedFiles.pl,v 1.3 2010-11-12 13:43:44 mae Exp $
+# $Id: CheckChangedFiles.pl,v 1.4 2010-11-12 13:53:16 mae Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -134,8 +134,6 @@ if ($ModuleVersionFile2MD5) {
     print 'List of changed files module (#', scalar @ChangedModuleFiles, '):';
     map { print "\t$_" } @ChangedModuleFiles;
 }
-
-#GetHeaderOfFiles('/tmp/otrs-2.4.8/Kernel/System/Main.pm');
 
 =item FindFilesOfVersion()
 
