@@ -4,7 +4,7 @@
 #   - script for get changed file between different releases of OTRS
 # Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: CheckChangedFiles.pl,v 1.2 2010-11-12 13:42:11 mae Exp $
+# $Id: CheckChangedFiles.pl,v 1.3 2010-11-12 13:43:44 mae Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -128,8 +128,7 @@ if ($ModuleVersionFile2MD5) {
     # get list of changed files of the given module
     my @ChangedModuleFiles = grep {
         $ModuleVersionFile2MD5->{$_} && $ModuleVersionFile2MD5->{$_} ne $NewVersionFile2MD5->{$_}
-        }
-        sort keys %CheckFileList;
+    } sort keys %CheckFileList;
 
     print '==============================';
     print 'List of changed files module (#', scalar @ChangedModuleFiles, '):';
