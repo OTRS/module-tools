@@ -4,7 +4,7 @@
 #   - script for get changed file between different releases of OTRS
 # Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
 # --
-# $Id: CheckChangedFiles.pl,v 1.1 2010-11-12 11:23:02 mae Exp $
+# $Id: CheckChangedFiles.pl,v 1.2 2010-11-12 13:42:11 mae Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -34,7 +34,10 @@ Get help dialog.
 CheckChangedFiles.pl -r
 Reduce to be checked files to core files.
 
-CheckChangedFiles.pl /path/to/base/version /path/to/new/version
+CheckChangedFiles.pl -m
+Path to a module where to check if files in there are affected.
+
+CheckChangedFiles.pl [ -h | -r | -m /path/to/module ] /path/to/base/version /path/to/new/version
 
 =head1 DESCRIPTION
 
@@ -51,8 +54,12 @@ use File::Find;
 use Digest::MD5 qw(md5_hex);
 
 # check if help got requested
-my ( $OptHelp, $ReducedCheck );
-GetOptions( 'h' => \$OptHelp, 'r' => \$ReducedCheck );
+my ( $OptHelp, $ReducedCheck, $ModulePath );
+GetOptions(
+    'h'   => \$OptHelp,
+    'm=s' => \$ModulePath,
+    'r'   => \$ReducedCheck,
+);
 pod2usage( -verbose => 2 ) if $OptHelp;
 
 # define whitelist for reduceded checks
@@ -72,10 +79,17 @@ die "New version directory is not given."  if !$NewVersion;
 # verify that given params are existing directories
 die "Directory $BaseVersion does not exist or is not a directory." if !-d $BaseVersion;
 die "Directory $NewVersion does not exist or is not a directory."  if !-d $NewVersion;
+if ($ModulePath) {
+    die "Directory $ModulePath does not exist or is not a directory." if !-d $ModulePath;
+}
 
 # get list of files and their MD5 digests
 my $BaseVersionFile2MD5 = FindFilesOfVersion($BaseVersion) || {};
 my $NewVersionFile2MD5  = FindFilesOfVersion($NewVersion)  || {};
+my $ModuleVersionFile2MD5;
+if ($ModulePath) {
+    $ModuleVersionFile2MD5 = FindFilesOfVersion($ModulePath) || {};
+}
 
 # get list of deleted and new files
 my @DeletedFiles = grep { !defined $NewVersionFile2MD5->{$_} } sort keys %{$BaseVersionFile2MD5};
@@ -108,6 +122,22 @@ if (@ChangedFiles) {
     map { print "\t$_" } @ChangedFiles;
 }
 
+# module has been given
+if ($ModuleVersionFile2MD5) {
+
+    # get list of changed files of the given module
+    my @ChangedModuleFiles = grep {
+        $ModuleVersionFile2MD5->{$_} && $ModuleVersionFile2MD5->{$_} ne $NewVersionFile2MD5->{$_}
+        }
+        sort keys %CheckFileList;
+
+    print '==============================';
+    print 'List of changed files module (#', scalar @ChangedModuleFiles, '):';
+    map { print "\t$_" } @ChangedModuleFiles;
+}
+
+#GetHeaderOfFiles('/tmp/otrs-2.4.8/Kernel/System/Main.pm');
+
 =item FindFilesOfVersion()
 
 Returns a HASHREF with file names as key and its MD5 hex digest as value.
@@ -125,6 +155,10 @@ $FileName2MD5 = {
 sub FindFilesOfVersion {
     my $VersionDirectory = shift;
 
+    # check directory path
+    return if !$VersionDirectory;
+    return if !-d $VersionDirectory;
+
     # define function for traversing
     my %VersionFile2MD5;
     my $FindFilesOfVersion = sub {
@@ -132,7 +166,9 @@ sub FindFilesOfVersion {
 
         # only return valid files
         return if !-f $FileName;
-        return if $FileName =~ m{CVS}xms;
+
+        # have directory in, may be there CVS is contained
+        return if $FileName =~ m{ \A VersionDirectory / .* CVS }xms;
 
         # get file name without root path and possible tailing '/'
         my ($PackageName) = $FileName =~ m{\A $VersionDirectory (?: / )? (.*) \z}xms;
