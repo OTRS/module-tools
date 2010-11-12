@@ -1,0 +1,154 @@
+#!/usr/bin/perl -wl
+# --
+# module-tools/CheckChangedFiles.pl
+#   - script for get changed file between different releases of OTRS
+# Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
+# --
+# $Id: CheckChangedFiles.pl,v 1.1 2010-11-12 11:23:02 mae Exp $
+# --
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU AFFERO General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# or see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+=head1 NAME
+
+CheckChangedFiles.pl - script for get changed file between different releases of OTRS
+
+=head1 SYNOPSIS
+
+CheckChangedFiles.pl -h
+Get help dialog.
+
+CheckChangedFiles.pl -r
+Reduce to be checked files to core files.
+
+CheckChangedFiles.pl /path/to/base/version /path/to/new/version
+
+=head1 DESCRIPTION
+
+Please send any questions, suggestions & complaints to <dev-support@otrs.com>
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Find;
+use Digest::MD5 qw(md5_hex);
+
+# check if help got requested
+my ( $OptHelp, $ReducedCheck );
+GetOptions( 'h' => \$OptHelp, 'r' => \$ReducedCheck );
+pod2usage( -verbose => 2 ) if $OptHelp;
+
+# define whitelist for reduceded checks
+my @ReducedChecks;
+if ($ReducedCheck) {
+    @ReducedChecks = qw(Kernel bin);
+}
+
+# get given params
+my $BaseVersion = shift(@ARGV);
+my $NewVersion  = shift(@ARGV);
+
+# verify if the given params are not empty
+die "Base version directory is not given." if !$BaseVersion;
+die "New version directory is not given."  if !$NewVersion;
+
+# verify that given params are existing directories
+die "Directory $BaseVersion does not exist or is not a directory." if !-d $BaseVersion;
+die "Directory $NewVersion does not exist or is not a directory."  if !-d $NewVersion;
+
+# get list of files and their MD5 digests
+my $BaseVersionFile2MD5 = FindFilesOfVersion($BaseVersion) || {};
+my $NewVersionFile2MD5  = FindFilesOfVersion($NewVersion)  || {};
+
+# get list of deleted and new files
+my @DeletedFiles = grep { !defined $NewVersionFile2MD5->{$_} } sort keys %{$BaseVersionFile2MD5};
+my @NewFiles     = grep { !defined $BaseVersionFile2MD5->{$_} } sort keys %{$NewVersionFile2MD5};
+
+# get list of to be checked files
+my %CheckFileList = %{$BaseVersionFile2MD5};
+map { delete $CheckFileList{$_} } @DeletedFiles;
+
+# get list of changed files
+my @ChangedFiles = grep { $BaseVersionFile2MD5->{$_} ne $NewVersionFile2MD5->{$_} }
+    sort keys %CheckFileList;
+
+# produce output if data had been gathered
+if (@DeletedFiles) {
+    print '==============================';
+    print 'List of deleted files (#', scalar @DeletedFiles, '):';
+    map { print "\t$_" } @DeletedFiles;
+}
+
+if (@NewFiles) {
+    print '==============================';
+    print 'List of new files (#', scalar @NewFiles, '):';
+    map { print "\t$_" } @NewFiles;
+}
+
+if (@ChangedFiles) {
+    print '==============================';
+    print 'List of changed files (#', scalar @ChangedFiles, '):';
+    map { print "\t$_" } @ChangedFiles;
+}
+
+=item FindFilesOfVersion()
+
+Returns a HASHREF with file names as key and its MD5 hex digest as value.
+It strips out the root directory from the file name.
+
+my $FileName2MD5 = FindFilesOfVersion( '/ws/otrs-head' );
+
+results will look like:
+$FileName2MD5 = {
+    'Kernel/System/Main.pm' => '7731615a697d7ed0da2579a9c71d7d9c',
+};
+
+=cut
+
+sub FindFilesOfVersion {
+    my $VersionDirectory = shift;
+
+    # define function for traversing
+    my %VersionFile2MD5;
+    my $FindFilesOfVersion = sub {
+        my $FileName = $File::Find::name;
+
+        # only return valid files
+        return if !-f $FileName;
+        return if $FileName =~ m{CVS}xms;
+
+        # get file name without root path and possible tailing '/'
+        my ($PackageName) = $FileName =~ m{\A $VersionDirectory (?: / )? (.*) \z}xms;
+
+        # check for reduceded file checking
+        return if @ReducedChecks && !grep { $PackageName =~ m{\A $_ }xms } @ReducedChecks;
+
+        # create file handle for digest function
+        open( FH, '<', $FileName ) or return;
+        binmode(FH);
+        $VersionFile2MD5{$PackageName} = Digest::MD5->new->addfile(*FH)->hexdigest;
+        close(FH);
+    };
+
+    # start gathering filelist
+    find( $FindFilesOfVersion, $VersionDirectory );
+
+    return \%VersionFile2MD5;
+}
