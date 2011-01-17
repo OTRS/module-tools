@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 # --
 # module-tools/module_check.pl - script to check OTRS modules
-# Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.17 2010-09-02 21:43:16 dz Exp $
+# $Id: module_check.pl,v 1.18 2011-01-17 13:59:59 sb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.17 $) [1];
+$VERSION = qw($Revision: 1.18 $) [1];
 
 # get options
 my %Opts = ();
@@ -60,7 +60,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
 }
 if ( $Opts{'h'} ) {
     print "module_check.pl <Revision $VERSION> - Check OTRS modules\n";
-    print "Copyright (C) 2001-2010 OTRS AG, http://otrs.org/\n";
+    print "Copyright (C) 2001-2011 OTRS AG, http://otrs.org/\n";
     print "usage: module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]\n\n";
     exit 1;
 }
@@ -197,11 +197,11 @@ sub ModuleContentPrepare {
     # prevent checking of files with nested markers (markers within markers)
     if ( $Content =~ m{
         ^ \# [ ] --- [ \t]* \n
-        ^ \# [ ] [^\s]+? [ \t]* \n
+        ^ \# [ ] [^\n]+ \n
         ^ \# [ ] --- [ \t]* \n
         (?: (?! ^ \# [ ] --- [ \t]* \n ). )+
         ^ \# [ ] --- [ \t]* \n
-        ^ \# [ ] [^\s]+? [ \t]* \n
+        ^ \# [ ] [^\n]+ \n
         ^ \# [ ] --- [ \t]* \n
     }xms ) {
         die "Nested custom markers found in '$Param{File}'!";
@@ -210,7 +210,7 @@ sub ModuleContentPrepare {
     my @NewCodeBlocks;
     while ( $Content =~ s{
         ^ \# [ ] --- [ \t]* \n
-        ^ \# [ ] [^\s]+? [ \t]* \n
+        ^ \# [ ] [^\n]+ \n
         ^ \# [ ] --- [ \t]* \n
         ( .+? )
         ^ \# [ ] --- [ \t]*
@@ -299,16 +299,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.17 $) [1];
+    # example1: $VERSION = qw($Revision: 1.18 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.17 $';
+    # example2: $VERSION = '$Revision: 1.18 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.17 $ $Date: 2010-09-02 21:43:16 $
+    #$Revision: 1.18 $ $Date: 2011-01-17 13:59:59 $
     #
     #=cut
     $Content =~ s{
