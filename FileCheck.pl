@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 # --
-# module-tools/FileCheck.pl - searchs for existent mistakes in the list of files registered in SOPM
-# Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
+# module-tools/FileCheck.pl - searchs for mistakes in the list of files registered in SOPM
+# Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
 # --
-# $Id: FileCheck.pl,v 1.5 2010-10-29 10:40:21 bes Exp $
+# $Id: FileCheck.pl,v 1.6 2011-01-18 09:55:52 bes Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -30,28 +30,25 @@ use XML::Simple;
 
 =head1 NAME
 
-FileCheck.pl - searchs for existent mistakes in the list of files registered in SOPM
+FileCheck.pl - searchs for mistakes in the list of files registered in SOPM
 
 =head1 SYNOPSIS
 
- FileCheck.pl <source-module-folder> [-v]
+ FileCheck.pl -m <source-module-folder> [-v]
 
  [-v] optional to see intermediate results
 
 =head1 DESCRIPTION
 
-This module searchs for existent mistakes in the list of files registered
-in SOPM file, this can reads the complete sopm list and try to find every file
+This script searchs for mistakes in the list of files registered
+in SOPM file. It reads the complete sopm list and tries to find every file
 in the main module directory or even look for all files in main module directory
-and compare against the sopm list to see if you forgot include some in the list.
-
-=head1 TODO
+and compare against the sopm list to see if you forgot to include some in the list.
 
 =cut
 
 # get options
 my %Opt;
-
 getopt( 'hm', \%Opt );
 
 if ( exists $Opt{h} ) {
@@ -118,7 +115,9 @@ sub GetPackageFileList {
     print "\n >> reading sopm file: $CleanSOPMFile ... \n";
 
     # build xml object
-    my $XMLObject = XML::Simple->new();
+    my $XMLObject = XML::Simple->new(
+        ForceArray => [qw(File)],
+    );
 
     # read XML file
     my $XMLContent = $XMLObject->XMLin($SOPM);
@@ -140,9 +139,9 @@ sub GetDirectoryFileList {
     my %Param = @_;
 
     # look for needed parameters
-    for my $Parameter (qw( ModuleDirectory )) {
-        if ( !$Param{$Parameter} ) {
-            die "\n Needed parameter, $Parameter! \n";
+    for my $Needed (qw( ModuleDirectory )) {
+        if ( !$Param{$Needed} ) {
+            die "\n Needed parameter, $Needed! \n";
         }
     }
 
@@ -204,8 +203,7 @@ sub GetDirectoryFileList {
 sub PrintFiles() {
     my %Param = @_;
 
-    print "\n"
-        . "+ List of files in $Param{Source} +\n";
+    print "\n+ List of files in $Param{Source} +\n";
     print "---------\n";
     my $Counter = 0;
     for my $file ( @{ $Param{ListOfFiles} } ) {
@@ -222,9 +220,9 @@ sub DiffList {
     my %Param = @_;
 
     # look for needed parameters
-    for my $Parameter (qw( SOPM Directory )) {
-        if ( !$Param{$Parameter} ) {
-            die "\n Needed parameter, $Parameter! \n";
+    for my $Needed (qw( SOPM Directory )) {
+        if ( !$Param{$Needed} ) {
+            die "\n Needed parameter, $Needed! \n";
         }
     }
 
@@ -253,7 +251,8 @@ sub DiffList {
     if ( @DIRvsSOPM || @SOPMvsDIR ) {
 
         #Diff
-        print "\n\n"
+        print "\n"
+            . "\n"
             . "------------------------------------------------------\n"
             . "                    DIFF RESULTS    \n"
             . "------------------------------------------------------\n"
@@ -286,7 +285,7 @@ sub DiffList {
 
             my $Counter = 0;
             for my $file (@DIRvsSOPM) {
-                print "  " . $file . "\n";
+                print "  $file\n";
                 $Counter++;
             }
             print "----------------\n"
@@ -305,6 +304,7 @@ END_OF_HERE
     }
 }
 
+# exit after printing the usage message
 sub Usage {
     my ($Message) = @_;
 
