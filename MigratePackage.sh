@@ -5,7 +5,7 @@
 #   - script for migrating package to a certain OTRS release.
 # Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
 # --
-# $Id: MigratePackage.sh,v 1.1 2011-01-21 11:01:49 mae Exp $
+# $Id: MigratePackage.sh,v 1.2 2011-01-21 12:39:18 mae Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -32,7 +32,7 @@
 #
 
 # version detection
-VERSION=$(echo "\$Revision: 1.1 $" | awk '{print $2}');
+VERSION=$(echo "\$Revision: 1.2 $" | awk '{print $2}');
 
 # flag definition
 DEBUG=
@@ -117,8 +117,8 @@ function create_diff {
     # second perl part removes VERSION patching
     echo -n "- generating patch file - "
     diff -u $FW_FILE $PKG_FILE \
-        | perl -le '$PatchContent = join("", <STDIN>); $PatchContent =~ s{(@@ .*? @@\n .*? Id .*? [^@@]+)(.*)}{$2}xms' \
-        | perl -le '$PatchContent = join("", <STDIN>); $PatchContent =~ s{(@@ .*? @@\n .*? VERSION .*? [^@@]+)(.*)}{$2}xms' \
+        | perl -le '$PatchContent = join("", <STDIN>); $PatchContent =~ s{ (?: @@ .*? @@\n .*? Id            .*? [^@@]+ ) }{}xms; print $PatchContent' \
+        | perl -le '$PatchContent = join("", <STDIN>); $PatchContent =~ s{ (?: @@ .*? @@\n .*? VERSION \s+ = .*? [^@@]+ ) }{}xms; print $PatchContent' \
         > ${TEMP_DIR}/${PATCH_FILE}.patch
     if [ "x$?" != "x0" ]; then
         echo -n "- patch file creation failed - "
