@@ -5,7 +5,7 @@
 #   - script for migrating package to a certain OTRS release.
 # Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
 # --
-# $Id: MigratePackage.sh,v 1.2 2011-01-21 12:39:18 mae Exp $
+# $Id: MigratePackage.sh,v 1.3 2011-01-21 13:58:31 mae Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -26,13 +26,12 @@
 # TODO:
 # * verbose/non-verbose mode
 # * some error handling
-# * setting new OldId of patched file
 # * clean up inside of tmp dir
 # * maybe: force mode - if file versions are not matching
 #
 
 # version detection
-VERSION=$(echo "\$Revision: 1.2 $" | awk '{print $2}');
+VERSION=$(echo "\$Revision: 1.3 $" | awk '{print $2}');
 
 # flag definition
 DEBUG=
@@ -116,7 +115,7 @@ function create_diff {
     # first perl part removes patching of Id and OldId
     # second perl part removes VERSION patching
     echo -n "- generating patch file - "
-    diff -u $FW_FILE $PKG_FILE \
+    diff -Naur $FW_FILE $PKG_FILE \
         | perl -le '$PatchContent = join("", <STDIN>); $PatchContent =~ s{ (?: @@ .*? @@\n .*? Id            .*? [^@@]+ ) }{}xms; print $PatchContent' \
         | perl -le '$PatchContent = join("", <STDIN>); $PatchContent =~ s{ (?: @@ .*? @@\n .*? VERSION \s+ = .*? [^@@]+ ) }{}xms; print $PatchContent' \
         > ${TEMP_DIR}/${PATCH_FILE}.patch
@@ -126,6 +125,8 @@ function create_diff {
     fi
 }
 
+# function creates the package file
+# patching and OldId injection
 function create_pkg_file {
     TEMP_DIR=$1
     FW_FILE=$2
@@ -144,6 +145,12 @@ function create_pkg_file {
         echo -n "- patching failed - "
         return 1
     fi
+
+    # setting duplicating Id line to OldId
+    # just duplicating Id line due to CVS will overwrite Id with the proper value
+    cat ${TEMP_DIR}/${PKG_BASENAME} \
+        | perl -le '$FileContent = join("", <STDIN>); $FileContent =~ s{^(\# \s+ \$)Id(.*?)$}{$1Id$2\n$1OldId$2}xms; print $FileContent;' \
+        > ${TEMP_DIR}/${PKG_BASENAME}
 }
 
 # function to find framework file of package file
@@ -195,7 +202,7 @@ function handle_pkg_file {
 
     # check file IDs
     if [ "x$old_file_id" != "x$fw_file_id" ]; then
-        echo -n " - file ID mismatch - "
+        echo -n " - file ID mismatch ($old_file_id - $fw_file_id) - "
         return 1
     fi
 
