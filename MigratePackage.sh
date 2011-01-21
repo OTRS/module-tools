@@ -5,7 +5,7 @@
 #   - script for migrating package to a certain OTRS release.
 # Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
 # --
-# $Id: MigratePackage.sh,v 1.3 2011-01-21 13:58:31 mae Exp $
+# $Id: MigratePackage.sh,v 1.4 2011-01-21 14:01:34 mae Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -31,7 +31,7 @@
 #
 
 # version detection
-VERSION=$(echo "\$Revision: 1.3 $" | awk '{print $2}');
+VERSION=$(echo "\$Revision: 1.4 $" | awk '{print $2}');
 
 # flag definition
 DEBUG=
@@ -55,8 +55,9 @@ PKG_EXCLUDE_CONF=" ! -path */Kernel/Config/Files/* "
 # function for printing out usage and exit
 function usage {
     echo -e \
-        "usage: $0 [-d] [-v] [-m module path] [-s source path] [-t target path] \n" \
+        "usage: $0 [-h] [-d] [-v] [-m module path] [-s source path] [-t target path] \n" \
         "\tVersion: $VERSION \n" \
+        "\t-h: prints this help dialogue \n" \
         "\t-d: enable shell debug mode \n" \
         "\t-v: enable verbose mode \n" \
         "\t-m: /path/to/custom/package \n" \
@@ -224,17 +225,17 @@ function handle_pkg_file {
 }
 
 # get submitted params
-while getopts "dvm:s:t:" opt
+while getopts "hdvm:s:t:" opt
 do
     case "$opt" in
-        d)    DEBUG=on;;
-        v)    VERBOSE=on;;
-        m)    MODULE="$OPTARG";;
-        s)    SOURCE="$OPTARG";;
-        t)    TARGET="$OPTARG";;
-        \?)   # unknown flag
-            usage
-            ;;
+        h)  usage;;
+        d)  DEBUG=on;;
+        v)  VERBOSE=on;;
+        m)  MODULE="$OPTARG";;
+        s)  SOURCE="$OPTARG";;
+        t)  TARGET="$OPTARG";;
+        \?) # unknown flag
+            usage;;
     esac
 done
 shift `expr $OPTIND - 1`
