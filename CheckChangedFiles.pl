@@ -2,9 +2,9 @@
 # --
 # module-tools/CheckChangedFiles.pl
 #   - script for get changed file between different releases of OTRS
-# Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
 # --
-# $Id: CheckChangedFiles.pl,v 1.4 2010-11-12 13:53:16 mae Exp $
+# $Id: CheckChangedFiles.pl,v 1.5 2011-02-25 14:46:08 sb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -165,10 +165,13 @@ sub FindFilesOfVersion {
         return if !-f $FileName;
 
         # have directory in, may be there CVS is contained
-        return if $FileName =~ m{ \A VersionDirectory / .* CVS }xms;
+        return if $FileName =~ m{ \A $VersionDirectory [/]? .* CVS }xms;
 
         # get file name without root path and possible tailing '/'
         my ($PackageName) = $FileName =~ m{\A $VersionDirectory (?: / )? (.*) \z}xms;
+
+        # consider customized files for OTRS 2.4 in Kernel/Custom/
+        $PackageName =~ s{ Kernel/Custom/ }{}xms;
 
         # check for reduceded file checking
         return if @ReducedChecks && !grep { $PackageName =~ m{\A $_ }xms } @ReducedChecks;
