@@ -2,9 +2,9 @@
 # --
 # module-tools/FileListCheck.pl
 #   - script for checking the file list in the .sopm file
-# Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
 # --
-# $Id: FileListCheck.pl,v 1.2 2010-10-29 10:01:53 bes Exp $
+# $Id: FileListCheck.pl,v 1.3 2011-03-25 16:23:10 fk Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -121,3 +121,7 @@ my @MissingFileListEntries = grep { $ModuleFileInFileList{$_} == 0 } keys %Modul
 # generate output
 map { print "File '$_' is listed in SOPM, but missing in file system!" } @MissingFiles;
 map { print "File '$_' is in the file system, but missing in the SOPM!" } @MissingFileListEntries;
+print '###############################';
+print '# Insert this into your sopm! #';
+print '###############################';
+map { print "        <File Permission=\"644\" Location=\"$_\"\/>" } sort @MissingFileListEntries;
