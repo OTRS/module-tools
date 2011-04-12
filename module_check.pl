@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.18 2011-01-17 13:59:59 sb Exp $
+# $Id: module_check.pl,v 1.19 2011-04-12 16:20:29 sb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.18 $) [1];
+$VERSION = qw($Revision: 1.19 $) [1];
 
 # get options
 my %Opts = ();
@@ -196,15 +196,17 @@ sub ModuleContentPrepare {
 
     # prevent checking of files with nested markers (markers within markers)
     if ( $Content =~ m{
-        ^ \# [ ] --- [ \t]* \n
-        ^ \# [ ] [^\n]+ \n
-        ^ \# [ ] --- [ \t]* \n
-        (?: (?! ^ \# [ ] --- [ \t]* \n ). )+
-        ^ \# [ ] --- [ \t]* \n
-        ^ \# [ ] [^\n]+ \n
-        ^ \# [ ] --- [ \t]* \n
+        (
+            ^ \# [ ] --- [ \t]* \n
+            ^ \# [ ] [^\n ][^\n]+ \n
+            ^ \# [ ] --- [ \t]* \n
+            (?: (?! ^ \# [ ] --- [ \t]* \n ). )+
+            ^ \# [ ] --- [ \t]* \n
+            ^ \# [ ] [^\n ][^\n]+ \n
+            ^ \# [ ] --- [ \t]* \n
+        )
     }xms ) {
-        die "Nested custom markers found in '$Param{File}'!";
+        die "Nested custom markers found in '$Param{File}': $1!";
     }
 
     my @NewCodeBlocks;
@@ -299,16 +301,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.18 $) [1];
+    # example1: $VERSION = qw($Revision: 1.19 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.18 $';
+    # example2: $VERSION = '$Revision: 1.19 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.18 $ $Date: 2011-01-17 13:59:59 $
+    #$Revision: 1.19 $ $Date: 2011-04-12 16:20:29 $
     #
     #=cut
     $Content =~ s{
