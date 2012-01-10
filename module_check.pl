@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 # --
 # module-tools/module_check.pl - script to check OTRS modules
-# Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.20 2011-09-09 19:37:50 sb Exp $
+# $Id: module_check.pl,v 1.21 2012-01-10 12:51:30 sb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.20 $) [1];
+$VERSION = qw($Revision: 1.21 $) [1];
 
 # get options
 my %Opts = ();
@@ -60,7 +60,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
 }
 if ( $Opts{'h'} ) {
     print "module_check.pl <Revision $VERSION> - Check OTRS modules\n";
-    print "Copyright (C) 2001-2011 OTRS AG, http://otrs.org/\n";
+    print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n";
     print "usage: module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]\n\n";
     exit 1;
 }
@@ -199,13 +199,13 @@ sub ModuleContentPrepare {
     # prevent checking of files with nested markers (markers within markers)
     if ( $Content =~ m{
         (
-            ^ \# [ ] --- [ \t]* \n
-            ^ \# [ ] [^\n ][^\n]+ \n
-            ^ \# [ ] --- [ \t]* \n
-            (?: (?! ^ \# [ ] --- [ \t]* \n ). )+
-            ^ \# [ ] --- [ \t]* \n
-            ^ \# [ ] [^\n ][^\n]+ \n
-            ^ \# [ ] --- [ \t]* \n
+            ^ [ \t]* \# [ ] --- [ \t]* \n
+            ^ [ \t]* \# [ ] [^\n ][^\n]+ \n
+            ^ [ \t]* \# [ ] --- [ \t]* \n
+            (?: (?! ^ [ \t]* \# [ ] --- [ \t]* \n ). )+
+            ^ [ \t]* \# [ ] --- [ \t]* \n
+            ^ [ \t]* \# [ ] [^\n ][^\n]+ \n
+            ^ [ \t]* \# [ ] --- [ \t]* \n
         )
     }xms ) {
         die "Nested custom markers found in '$Param{File}': $1!";
@@ -213,11 +213,11 @@ sub ModuleContentPrepare {
 
     my @NewCodeBlocks;
     while ( $Content =~ s{
-        ^ \# [ ] --- [ \t]* \n
-        ^ \# [ ] [^\n]+ \n
-        ^ \# [ ] --- [ \t]* \n
+        ^ [ \t]* \# [ ] --- [ \t]* \n
+        ^ [ \t]* \# [ ] [^\n]+ \n
+        ^ [ \t]* \# [ ] --- [ \t]* \n
         ( .+? )
-        ^ \# [ ] --- [ \t]*
+        ^ [ \t]* \# [ ] --- [ \t]*
     }{---PLACEHOLDER---}xms
     ) {
         my $Block = $1;
@@ -303,16 +303,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.20 $) [1];
+    # example1: $VERSION = qw($Revision: 1.21 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.20 $';
+    # example2: $VERSION = '$Revision: 1.21 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.20 $ $Date: 2011-09-09 19:37:50 $
+    #$Revision: 1.21 $ $Date: 2012-01-10 12:51:30 $
     #
     #=cut
     $Content =~ s{
