@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.23 2012-01-21 14:35:15 sb Exp $
+# $Id: module_check.pl,v 1.24 2012-01-21 14:44:34 sb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.23 $) [1];
+$VERSION = qw($Revision: 1.24 $) [1];
 
 # get options
 my %Opts = ();
@@ -246,15 +246,16 @@ sub ModuleContentPrepare {
     # put formerly commented code in place
     $Content =~ s{ ^ ---PLACEHOLDER--- $ \s }{ shift @NewCodeBlocks }xmseg;
 
-    # delete ID line
-    $Content =~ s{ ^ \# [ ] \$Id: [^\n]+ \n }{}xms;
+    # delete ID line and remember for possible occurance in perldoc
+    $Content =~ s{ ^ \# [ ] ( \$Id: [^\n]+ ) \n }{}xms;
+    my $ModuleTagLine = $1;
 
     # replace OldId with Id and remember Id-Line for possible occurance in perldoc
-    $Content =~ s{ ^ \# [ ] \$OldId: [ ] ( [^\n]+ ) }{\# \$Id: module_check.pl,v 1.23 2012-01-21 14:35:15 sb Exp $1}xms;
+    $Content =~ s{ ^ ( \# [ ] \$ ) Old ( Id: [^\n]+ ) }{$1$2}xms;
+    my $OrgTagLine = '$' . $2;
 
     # replace possible occurances of $Id: in perldoc
-    my $TagLine = $1 || '';
-    $Content =~ s{ \n \$Id: module_check.pl,v 1.23 2012-01-21 14:35:15 sb Exp $Id: $TagLine}xmsg;
+    $Content =~ s{ ^ \Q$ModuleTagLine\E }{$OrgTagLine}xmsg;
 
     # clean the content
     $Content = ContentClean( Content => $Content );
@@ -307,16 +308,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.23 $) [1];
+    # example1: $VERSION = qw($Revision: 1.24 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.23 $';
+    # example2: $VERSION = '$Revision: 1.24 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.23 $ $Date: 2012-01-21 14:35:15 $
+    #$Revision: 1.24 $ $Date: 2012-01-21 14:44:34 $
     #
     #=cut
     $Content =~ s{
