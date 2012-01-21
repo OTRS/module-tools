@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.22 2012-01-21 14:26:20 sb Exp $
+# $Id: module_check.pl,v 1.23 2012-01-21 14:35:15 sb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.22 $) [1];
+$VERSION = qw($Revision: 1.23 $) [1];
 
 # get options
 my %Opts = ();
@@ -250,11 +250,11 @@ sub ModuleContentPrepare {
     $Content =~ s{ ^ \# [ ] \$Id: [^\n]+ \n }{}xms;
 
     # replace OldId with Id and remember Id-Line for possible occurance in perldoc
-    $Content =~ s{ ^ \# [ ] \$OldId: ( [^\n]+ ) }{\# \$Id: module_check.pl,v 1.22 2012-01-21 14:26:20 sb Exp $1}xms;
+    $Content =~ s{ ^ \# [ ] \$OldId: [ ] ( [^\n]+ ) }{\# \$Id: module_check.pl,v 1.23 2012-01-21 14:35:15 sb Exp $1}xms;
 
     # replace possible occurances of $Id: in perldoc
-    my $IdLine = $1 || '';
-    $Content =~ s{ ^ \$Id: module_check.pl,v 1.22 2012-01-21 14:26:20 sb Exp $Id:$IdLine}xmsg;
+    my $TagLine = $1 || '';
+    $Content =~ s{ \n \$Id: module_check.pl,v 1.23 2012-01-21 14:35:15 sb Exp $Id: $TagLine}xmsg;
 
     # clean the content
     $Content = ContentClean( Content => $Content );
@@ -307,16 +307,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.22 $) [1];
+    # example1: $VERSION = qw($Revision: 1.23 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.22 $';
+    # example2: $VERSION = '$Revision: 1.23 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.22 $ $Date: 2012-01-21 14:26:20 $
+    #$Revision: 1.23 $ $Date: 2012-01-21 14:35:15 $
     #
     #=cut
     $Content =~ s{
