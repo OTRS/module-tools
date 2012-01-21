@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.24 2012-01-21 14:44:34 sb Exp $
+# $Id: module_check.pl,v 1.25 2012-01-21 14:58:03 sb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.24 $) [1];
+$VERSION = qw($Revision: 1.25 $) [1];
 
 # get options
 my %Opts = ();
@@ -308,16 +308,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.24 $) [1];
+    # example1: $VERSION = qw($Revision: 1.25 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.24 $';
+    # example2: $VERSION = '$Revision: 1.25 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.24 $ $Date: 2012-01-21 14:44:34 $
+    #$Revision: 1.25 $ $Date: 2012-01-21 14:58:03 $
     #
     #=cut
     $Content =~ s{
@@ -336,15 +336,18 @@ sub ContentClean {
         ^ \# [ ] did [ ] not [ ] receive [ ] this [ ] file, [ ] see [ ] http://www\.gnu\.org .+? $
     }{}ixms;
 
-    # Delete the standard comment with the filenname and a description.
+    # Delete the standard comment with the filenname and an optional description.
     # The name of the file could have changed.
     # example4:
     # # CustomerLHSServiceFAQ.dtl - provides Stuttgart specific HTML view for faq articles
     $Content =~ s{
         ^ \# [ ]                   # a hash at start of line followed by a space
         [\\/\w]+ \. \w{1,3}        # a filename with an extension
+        (?:                        # the rest is optional
         [ ] - [ ]                  # separated by ' - '
-        \w .+? $                   # the description till the end of the current line
+        \w .+?                     # the description
+        )?                         # end of optional part
+        $                          # end of the current line
     }{}ixms;
 
     return $Content;
