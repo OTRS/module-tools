@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: remove_links.pl,v 1.2 2010-06-17 13:43:19 reb Exp $
+# $Id: remove_links.pl,v 1.3 2012-03-02 12:27:39 mg Exp $
 
 use strict;
 
@@ -33,19 +33,18 @@ sub R {
         $File =~ s/\/\//\//g;
         if ( -d $File ) {
             R($File);
-
-            #            $File =~ s/$Start//;
-            #            print "Directory: $File\n";
         }
         else {
             my $OrigFile = $File;
             $File =~ s/$Start//;
-
-            #            print "File: $File\n";
-            #            my $Dir =~ s/^(.*)\//$1/;
             if ( -l $OrigFile ) {
                 print "Unlink Symlink: $File\n";
                 unlink $OrigFile || die $!;
+
+                if ( -f "$OrigFile.old" ) {
+                    print "Restore orginal copy: $File\n";
+                    rename( "$OrigFile.old", $OrigFile ) || die $!;
+                }
             }
         }
     }
