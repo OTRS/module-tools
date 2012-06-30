@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 # --
 # module-tools/FileCheck.pl - searchs for mistakes in the list of files registered in SOPM
-# Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: FileCheck.pl,v 1.6 2011-01-18 09:55:52 bes Exp $
+# $Id: FileCheck.pl,v 1.7 2012-06-30 18:26:35 cr Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -146,10 +146,54 @@ sub GetDirectoryFileList {
     }
 
     # files and directories to ignore
-    my @IgnoreFiles = ( '.cvsignore', '.project', '.*\.sopm', '\.tmp.*', );
+    my @IgnoreFiles = (
+        '.cvsignore', '.project', '.includepath', '.*\.sopm', '\.tmp.*', '.filecheckignore'
+        , '.filecheckdirignore'
+    );
+
     my @IgnoreDirs = ( 'CVS', '.settings', );
 
     my $Dir = $Param{ModuleDirectory};
+
+    # set custom files to ignore file location
+    my $CustomIgnoreFilesLocation = $Param{ModuleDirectory} . '/.filecheckignore';
+
+    # set custom dirs to ignore file location
+    my $CustomIgnoreDirsLocation = $Param{ModuleDirectory} . '/.filecheckdirignore';
+
+    # read and add custom files to ignore
+    if ( -e $CustomIgnoreFilesLocation ) {
+
+        # check if file can not open
+        my $FH;
+        if ( !open $FH, '<', $CustomIgnoreFilesLocation ) {
+            print "Can't open or read '$CustomIgnoreFilesLocation': $!"
+        }
+        else {
+            my @CustomIgnoreFiles = <$FH>;
+            for my $File (@CustomIgnoreFiles) {
+                chomp($File);
+                push @IgnoreFiles, $File;
+            }
+        }
+    }
+
+    # read and add custom files to ignore
+    if ( -e $CustomIgnoreDirsLocation ) {
+
+        # check if file can not open
+        my $FH;
+        if ( !open $FH, '<', $CustomIgnoreDirsLocation ) {
+            print "Can't open or read '$CustomIgnoreDirsLocation': $!"
+        }
+        else {
+            my @CustomIgnoreDirs = <$FH>;
+            for my $Dir (@CustomIgnoreDirs) {
+                chomp($Dir);
+                push @IgnoreDirs, $Dir;
+            }
+        }
+    }
 
     my @FileList;
     my $WantedFunction = sub {
@@ -165,20 +209,22 @@ sub GetDirectoryFileList {
         return if -d $Name;
 
         # ignore files inside preconfigured directories
-        my $MatchD = 0;
-        my $MatchF = 0;
+        my $MatchDir        = 0;
+        my $MatchFile       = 0;
+        my $MatchCustomFile = 0;
 
         for my $IgnoreDirectory (@IgnoreDirs) {
-            $MatchD = $FullName =~ m{$IgnoreDirectory/}xms;
-            last if ($MatchD);
+            $MatchDir = $FullName =~ m{$IgnoreDirectory/}xms;
+            last if ($MatchDir);
         }
 
         for my $IgnoreFile (@IgnoreFiles) {
-            $MatchF = $Name =~ m{\A$IgnoreFile\z}xms;
-            last if ($MatchF);
+            $MatchFile       = $Name      =~ m{\A$IgnoreFile\z}xms;
+            $MatchCustomFile = $CleanName =~ m{\A$IgnoreFile\z}xms;
+            last if ( $MatchFile || $MatchCustomFile );
         }
 
-        if ( !$MatchD && !$MatchF ) {
+        if ( !$MatchDir && !$MatchFile && !$MatchCustomFile ) {
             push @FileList, $CleanName;
         }
     };
@@ -315,7 +361,19 @@ sub Usage {
 $Message
 
 USAGE:
-    FileCheck.pl -m <source-module-path> -v (optional to see intermediate results)
+   FileCheck.pl -m <source-module-path> -v (optional to see intermediate results)
+
+    You can add custom files to ignore in source-module-path/.filecheckignore
+        .filecheckignore content Example:
+
+            doc/en/ModuleDoc.xml
+            Changes.MyModule
+
+    You can add custom directories to ignore in source-module-path/.filecheckdirignore
+        .filecheckdirignore content Example:
+
+            development
+            testing
 
 END_OF_HERE
 
