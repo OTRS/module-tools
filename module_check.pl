@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.25 2012-01-21 14:58:03 sb Exp $
+# $Id: module_check.pl,v 1.26 2012-09-04 18:05:23 sb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.25 $) [1];
+$VERSION = qw($Revision: 1.26 $) [1];
 
 # get options
 my %Opts = ();
@@ -199,13 +199,13 @@ sub ModuleContentPrepare {
     # prevent checking of files with nested markers (markers within markers)
     if ( $Content =~ m{
         (
-            ^ [ \t]* \# [ ] --- [ \t]* \n
-            ^ [ \t]* \# [ ] [^\n ][^\n]+ \n
-            ^ [ \t]* \# [ ] --- [ \t]* \n
-            (?: (?! ^ [ \t]* \# [ ] --- [ \t]* \n ). )+
-            ^ [ \t]* \# [ ] --- [ \t]* \n
-            ^ [ \t]* \# [ ] [^\n ][^\n]+ \n
-            ^ [ \t]* \# [ ] --- [ \t]* \n
+            ^ \# [ ] --- [ \t]* \n
+            ^ \# [ ] [^\n ][^\n]+ \n
+            ^ \# [ ] --- [ \t]* \n
+            (?: (?! ^ \# [ ] --- [ \t]* \n ). )+
+            ^ \# [ ] --- [ \t]* \n
+            ^ \# [ ] [^\n ][^\n]+ \n
+            ^ \# [ ] --- [ \t]* \n
         )
     }xms ) {
         die "Nested custom markers found in '$Param{File}': $1!";
@@ -308,16 +308,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.25 $) [1];
+    # example1: $VERSION = qw($Revision: 1.26 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.25 $';
+    # example2: $VERSION = '$Revision: 1.26 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.25 $ $Date: 2012-01-21 14:58:03 $
+    #$Revision: 1.26 $ $Date: 2012-09-04 18:05:23 $
     #
     #=cut
     $Content =~ s{
