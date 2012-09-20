@@ -2,9 +2,9 @@
 # --
 # module-tools/FileListCheck.pl
 #   - script for checking the file list in the .sopm file
-# Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: FileListCheck.pl,v 1.3 2011-03-25 16:23:10 fk Exp $
+# $Id: FileListCheck.pl,v 1.4 2012-09-20 08:38:37 mb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -32,6 +32,8 @@ FileListCheck.pl -h
 
 FileListCheck.pl /path/to/module
 
+FileListCheck.pl /path/to/module -s       # include symlinked directories
+
 =head1 DESCRIPTION
 
 Please send any questions, suggestions & complaints to <dev-support@otrs.com>
@@ -49,7 +51,11 @@ use Data::Dumper;
 
 # check if help got requested
 my $OptHelp;
-GetOptions( 'h' => \$OptHelp );
+my $OptSymlink;
+GetOptions(
+    'h' => \$OptHelp,
+    's' => \$OptSymlink,
+);
 pod2usage( -verbose => 2 ) if $OptHelp;
 
 # check if directory exists
@@ -99,13 +105,16 @@ my $ModuleFinder = sub {
     my $FileName = $File::Find::name;
 
     return if !-f $FileName;
+    return if $FileName =~ m{\.project}xms;
+    return if $FileName =~ m{SVN}xms;
+    return if $FileName =~ m{\.svn}xms;
     return if $FileName =~ m{CVS}xms;
     return if $FileName =~ m{ $SOPMFileName \z}xms;
     return if $FileName =~ m{ \. dia \z }xms;
 
     push @ModuleFiles, $FileName;
 };
-find( $ModuleFinder, $ModuleDirectory );
+find( { wanted => $ModuleFinder, follow => $OptSymlink }, $ModuleDirectory );
 
 # get listed but not existing files
 my @MissingFiles = grep { !-f $ModuleDirectory . '/' . $_ } @FileList;
