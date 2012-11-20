@@ -3,9 +3,9 @@
 # --
 # module-tools/MigratePackage.sh
 #   - script for migrating package to a certain OTRS release.
-# Copyright (C) 2001-2011 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: MigratePackage.sh,v 1.4 2011-01-21 14:01:34 mae Exp $
+# $Id: MigratePackage.sh,v 1.5 2012-11-20 19:17:02 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -19,7 +19,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
@@ -31,7 +31,7 @@
 #
 
 # version detection
-VERSION=$(echo "\$Revision: 1.4 $" | awk '{print $2}');
+VERSION=$(echo "\$Revision: 1.5 $" | awk '{print $2}');
 
 # flag definition
 DEBUG=

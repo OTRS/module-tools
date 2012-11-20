@@ -3,7 +3,7 @@
 # bin/DatabaseInstall.pl - to install the packages DatabaseInstall()
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: DatabaseInstall.pl,v 1.1 2012-10-24 08:52:25 mb Exp $
+# $Id: DatabaseInstall.pl,v 1.2 2012-11-20 19:16:51 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
@@ -33,7 +33,7 @@ use lib dirname($RealBin) . "/Kernel/cpan-lib";
 use Getopt::Std;
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.1 $) [1];
+$VERSION = qw($Revision: 1.2 $) [1];
 
 use Kernel::Config;
 use Kernel::System::Encode;

@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 # --
 # CodePolicy.pl - a tool to remotely execute the OTRS code policy against local code
-# Copyright (C) 2001-2008 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: CodePolicy.pl,v 1.4 2008-02-28 15:04:06 ot Exp $
+# $Id: CodePolicy.pl,v 1.5 2012-11-20 19:16:45 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # --
 
 use strict;
 use warnings;
 
-our $VERSION = qw($Revision: 1.4 $) [1];
+our $VERSION = qw($Revision: 1.5 $) [1];
 
 # disable output buffering
 use IO::Handle;
@@ -49,7 +49,7 @@ my $ExitCode = 0;
 my %GeneralOption = (
     Verbose => 0,
 );
-Getopt::Long::Configure( qw( default pass_through ) );
+Getopt::Long::Configure(qw( default pass_through ));
 GetOptions(
     'dry-run'  => \$GeneralOption{DryRun},
     'help|?'   => \$GeneralOption{Help},
@@ -57,95 +57,97 @@ GetOptions(
     'verbose+' => \$GeneralOption{Verbose},
     'version'  => \$GeneralOption{Version},
 ) or pod2usage(2);
-if ($GeneralOption{Help}) {
+if ( $GeneralOption{Help} ) {
     pod2usage(
-        -msg => 'CodyPolicy.pl - a tool to remotely execute the OTRS code policy against local code',
+        -msg =>
+            'CodyPolicy.pl - a tool to remotely execute the OTRS code policy against local code',
         -verbose => 0,
         -exitval => 1
-    )
+        )
 }
-elsif ($GeneralOption{Man}) {
+elsif ( $GeneralOption{Man} ) {
+
     # avoid dubious problem with perldoc in combination with UTF-8 that
     # leads to strange dashes and single-quotes being used
     $ENV{LC_ALL} = 'POSIX';
-    pod2usage(-verbose => 2);
+    pod2usage( -verbose => 2 );
 }
-elsif ($GeneralOption{Version}) {
+elsif ( $GeneralOption{Version} ) {
     print "$0: $VERSION (protocol version: $ProtocolVersion)\n";
     exit 0;
 }
 
 my $Action = shift @ARGV || '';
-if ($Action =~ m[^check-d]i) {
+if ( $Action =~ m[^check-d]i ) {
     RunChecksRemotely(
         'Dir',
         "*** The action '$Action' requires a directory!\n*** See $0 --help for more info.\n"
     );
 }
-elsif ($Action =~ m[^check-f]i) {
+elsif ( $Action =~ m[^check-f]i ) {
     RunChecksRemotely(
         'File',
         "*** The action '$Action' requires a file!\n*** See $0 --help for more info.\n"
     );
 }
-elsif ($Action =~ m[^check-m]i) {
+elsif ( $Action =~ m[^check-m]i ) {
     RunChecksRemotely(
         'Module',
         "*** The action '$Action' requires a module path or *.sopm file!\n"
             . "*** See $0 --help for more info.\n"
     );
 }
-elsif ($Action =~ m[^fix-d]i) {
+elsif ( $Action =~ m[^fix-d]i ) {
     RunFixesRemotely(
         'Dir',
         "*** The action '$Action' requires a directory!\n*** See $0 --help for more info.\n"
     );
 }
-elsif ($Action =~ m[^fix-f]i) {
+elsif ( $Action =~ m[^fix-f]i ) {
     RunFixesRemotely(
         'File',
         "*** The action '$Action' requires a file!\n*** See $0 --help for more info.\n"
     );
 }
-elsif ($Action =~ m[^fix-m]i) {
+elsif ( $Action =~ m[^fix-m]i ) {
     RunFixesRemotely(
         'Module',
         "*** The action '$Action' requires a module path or *.sopm file!\n"
             . "*** See $0 --help for more info.\n"
     );
 }
-elsif ($Action =~ m[^recode-d]i) {
+elsif ( $Action =~ m[^recode-d]i ) {
     RunRecodingsRemotely(
         'Dir',
         "*** The action '$Action' requires a directory!\n*** See $0 --help for more info.\n"
     );
 }
-elsif ($Action =~ m[^recode-f]i) {
+elsif ( $Action =~ m[^recode-f]i ) {
     RunRecodingsRemotely(
         'File',
         "*** The action '$Action' requires a file!\n*** See $0 --help for more info.\n"
     );
 }
-elsif ($Action =~ m[^recode-m]i) {
+elsif ( $Action =~ m[^recode-m]i ) {
     RunRecodingsRemotely(
         'Module',
         "*** The action '$Action' requires a module path or *.sopm file!\n"
             . "*** See $0 --help for more info.\n"
     );
 }
-elsif ($Action =~ m[^list-c]i) {
+elsif ( $Action =~ m[^list-c]i ) {
     ListChecks();
 }
-elsif ($Action =~ m[^list-d]i) {
+elsif ( $Action =~ m[^list-d]i ) {
     ListDomains();
 }
-elsif ($Action =~ m[^list-f]i) {
+elsif ( $Action =~ m[^list-f]i ) {
     ListFixes();
 }
-elsif ($Action =~ m[^list-p]i) {
+elsif ( $Action =~ m[^list-p]i ) {
     ListProfiles();
 }
-elsif ($Action =~ m[^list-r]i) {
+elsif ( $Action =~ m[^list-r]i ) {
     ListRecodings();
 }
 else {
@@ -184,31 +186,34 @@ sub RunChecksRemotely {
         'profile=s' => \$ActionOption{Profile},
     ) or pod2usage(2);
 
-    my $Arg = shift @ARGV or die( $ErrorMessage );
+    my $Arg = shift @ARGV or die($ErrorMessage);
 
     Connect();
     my $ArgAsRelativePath = UploadFiles( $Mode, $Arg );
 
     print STDERR "running checks...";
     my $Result = eval {
-        $SOAP->RunChecks($SessionID, {
-            GeneralOption => \%GeneralOption,
-            ActionOption  => \%ActionOption,
-            Mode          => $Mode,
-            Arg           => $ArgAsRelativePath,
-        } )->result;
+        $SOAP->RunChecks(
+            $SessionID,
+            {
+                GeneralOption => \%GeneralOption,
+                ActionOption  => \%ActionOption,
+                Mode          => $Mode,
+                Arg           => $ArgAsRelativePath,
+            }
+        )->result;
     };
 
-    if (!$Result) {
+    if ( !$Result ) {
         $ExitCode = 5;
         print STDERR "an unexpected problem occurred!\n";
     }
     else {
         my $Log = $Result->{Log};
         if ($Log) {
-            print STDERR "\n", @{ $Log };
+            print STDERR "\n", @{$Log};
         }
-        if (!$Result->{Status}) {
+        if ( !$Result->{Status} ) {
             $ExitCode = 10;
             print STDERR "*** not ok - see the problems shown above!\n";
         }
@@ -234,38 +239,41 @@ sub RunFixesRemotely {
         'profile=s' => \$ActionOption{Profile},
     ) or pod2usage(2);
 
-    my $Arg = shift @ARGV or die( $ErrorMessage );
+    my $Arg = shift @ARGV or die($ErrorMessage);
     Connect();
     my $ArgAsRelativePath = UploadFiles( $Mode, $Arg );
 
     print STDERR "running fixes...";
     my $Result = eval {
-        $SOAP->RunFixes($SessionID, {
-            GeneralOption => \%GeneralOption,
-            ActionOption  => \%ActionOption,
-            Mode          => $Mode,
-            Arg           => $ArgAsRelativePath,
-        } )->result;
+        $SOAP->RunFixes(
+            $SessionID,
+            {
+                GeneralOption => \%GeneralOption,
+                ActionOption  => \%ActionOption,
+                Mode          => $Mode,
+                Arg           => $ArgAsRelativePath,
+            }
+        )->result;
     };
 
-    if (!$Result) {
+    if ( !$Result ) {
         $ExitCode = 5;
         print STDERR "an unexpected problem occurred!\n";
     }
     else {
         my $Log = $Result->{Log};
         if ($Log) {
-            print STDERR "\n", @{ $Log };
+            print STDERR "\n", @{$Log};
         }
-        if (!$Result->{Status}) {
+        if ( !$Result->{Status} ) {
             $ExitCode = 10;
             print STDERR "*** something has gone wrong - see the problems shown above!\n";
         }
         else {
             print STDERR "ok!\n";
             my $ChangedFiles = $Result->{ChangedFiles};
-            if ($ChangedFiles && @{ $ChangedFiles }) {
-                DownloadFiles( $ChangedFiles );
+            if ( $ChangedFiles && @{$ChangedFiles} ) {
+                DownloadFiles($ChangedFiles);
             }
         }
 
@@ -288,38 +296,41 @@ sub RunRecodingsRemotely {
         'profile=s' => \$ActionOption{Profile},
     ) or pod2usage(2);
 
-    my $Arg = shift @ARGV or die( $ErrorMessage );
+    my $Arg = shift @ARGV or die($ErrorMessage);
     Connect();
     my $ArgAsRelativePath = UploadFiles( $Mode, $Arg );
 
     print STDERR "running recodings...";
     my $Result = eval {
-        $SOAP->RunRecodings($SessionID, {
-            GeneralOption => \%GeneralOption,
-            ActionOption  => \%ActionOption,
-            Mode          => $Mode,
-            Arg           => $ArgAsRelativePath,
-        } )->result;
+        $SOAP->RunRecodings(
+            $SessionID,
+            {
+                GeneralOption => \%GeneralOption,
+                ActionOption  => \%ActionOption,
+                Mode          => $Mode,
+                Arg           => $ArgAsRelativePath,
+            }
+        )->result;
     };
 
-    if (!$Result) {
+    if ( !$Result ) {
         $ExitCode = 5;
         print STDERR "an unexpected problem occurred!\n";
     }
     else {
         my $Log = $Result->{Log};
         if ($Log) {
-            print STDERR "\n", @{ $Log };
+            print STDERR "\n", @{$Log};
         }
-        if (!$Result->{Status}) {
+        if ( !$Result->{Status} ) {
             $ExitCode = 10;
             print STDERR "*** something has gone wrong - see the problems shown above!\n";
         }
         else {
             print STDERR "ok!\n";
             my $ChangedFiles = $Result->{ChangedFiles};
-            if ($ChangedFiles && @{ $ChangedFiles }) {
-                DownloadFiles( $ChangedFiles );
+            if ( $ChangedFiles && @{$ChangedFiles} ) {
+                DownloadFiles($ChangedFiles);
             }
         }
 
@@ -335,22 +346,26 @@ sub Connect {
     $SOAP = SOAP::Lite
         ->uri('http://otrs.org/OTRS/CodePolicyAPI')
         ->proxy('http://172.17.17.1/soap/code-policy')
-        ->on_fault(sub {
+        ->on_fault(
+        sub {
             my $SOAP   = shift;
             my $Result = shift;
 
             my $errorMsg
                 = ref($Result)
-                    ? $Result->faultstring()
-                    : $SOAP->transport->status();
+                ? $Result->faultstring()
+                : $SOAP->transport->status();
             die "*** SERVER-MSG: $errorMsg\n";
-        });
+            }
+        );
 
-    $SessionID = $SOAP->StartSession({
-        ARGV            => \@ARGV,
-        ProtocolVersion => $ProtocolVersion,
-    })->result;
-    if (!$SessionID) {
+    $SessionID = $SOAP->StartSession(
+        {
+            ARGV            => \@ARGV,
+            ProtocolVersion => $ProtocolVersion,
+        }
+    )->result;
+    if ( !$SessionID ) {
         die "*** Got no session - could not connect to CodePolicy server.\n";
     }
     print STDERR "ok - remote session ID is $SessionID\n";
@@ -361,7 +376,7 @@ sub Connect {
 sub Disconnect {
     my $ID = $SessionID;
     $SessionID = undef;
-    $SOAP->EndSession( $ID );
+    $SOAP->EndSession($ID);
 
     return;
 }
@@ -369,28 +384,29 @@ sub Disconnect {
 sub UploadFiles {
     my ( $Mode, $Arg ) = @_;
 
-    my $File = $Mode eq 'Dir' ? undef : basename( $Arg );
-    my $Dir  = $Mode eq 'Dir' ? $Arg  : dirname( $Arg );
+    my $File = $Mode eq 'Dir' ? undef : basename($Arg);
+    my $Dir  = $Mode eq 'Dir' ? $Arg  : dirname($Arg);
 
-    my $ParentDir = dirname( $Dir );
-    my $SubDir    = basename( $Dir );
+    my $ParentDir = dirname($Dir);
+    my $SubDir    = basename($Dir);
     chdir $ParentDir or die "*** unable to chdir into '$ParentDir'! ($!)\n";
 
     print STDERR "uploading files...";
-    if ($Mode eq 'File') {
-        UploadFile( "$SubDir/$File" );
+    if ( $Mode eq 'File' ) {
+        UploadFile("$SubDir/$File");
+
         # now check for CVS/Entries and .svn/entries as either of those might be used on server
         # in order to automatically determine the name of the applicable profile
-        for my $EntriesFile ( qw( CVS/Entries .svn/entries ) ) {
-            if (-e "$SubDir/$EntriesFile") {
-                UploadFile( "$SubDir/$EntriesFile" );
+        for my $EntriesFile (qw( CVS/Entries .svn/entries )) {
+            if ( -e "$SubDir/$EntriesFile" ) {
+                UploadFile("$SubDir/$EntriesFile");
             }
         }
     }
-    elsif ($Mode eq 'Dir' || $Mode eq 'Module') {
+    elsif ( $Mode eq 'Dir' || $Mode eq 'Module' ) {
         my $wanted = sub {
             return if -d $File::Find::name;
-            UploadFile( $File::Find::name );
+            UploadFile($File::Find::name);
         };
         find( { wanted => $wanted, no_chdir => 1 }, $SubDir );
     }
@@ -404,24 +420,27 @@ sub UploadFiles {
 }
 
 sub UploadFile {
-    my ( $File ) = @_;
+    my ($File) = @_;
 
     my $Contents = SlurpFile($File);
-    my $MD5Sum = MD5ForFile($File);
+    my $MD5Sum   = MD5ForFile($File);
 
-    return $SOAP->UploadFile( $SessionID, {
-        Filename => $File,
-        Contents => encode_base64( $Contents ),
-        MD5Sum   => $MD5Sum
-    } )->result;
+    return $SOAP->UploadFile(
+        $SessionID,
+        {
+            Filename => $File,
+            Contents => encode_base64($Contents),
+            MD5Sum   => $MD5Sum
+        }
+    )->result;
 }
 
 sub DownloadFiles {
-    my ( $Files ) = @_;
+    my ($Files) = @_;
 
     print STDERR "downloading changed files...";
-    for my $File ( @{ $Files } ) {
-        DownloadFile( $File );
+    for my $File ( @{$Files} ) {
+        DownloadFile($File);
     }
     print STDERR "done\n";
 
@@ -429,7 +448,7 @@ sub DownloadFiles {
 }
 
 sub DownloadFile {
-    my ( $File ) = @_;
+    my ($File) = @_;
 
     my $FileInfo = $SOAP->DownloadFile( $SessionID, $File )->result;
     die "*** unable to download file '$File'!\n" if !$FileInfo;
@@ -443,12 +462,12 @@ sub DownloadFile {
 }
 
 sub SlurpFile {
-    my ( $File ) = @_;
+    my ($File) = @_;
 
     my $FH;
-    open($FH, '<', $File)
+    open( $FH, '<', $File )
         or die "*** could not open file '$File' for reading! ($!)\n";
-    if (wantarray()) {
+    if ( wantarray() ) {
         my @Lines = <$FH>;
         close($FH)
             or die "*** could not close file '$File'! ($!)\n";
@@ -466,14 +485,14 @@ sub OverwriteFile {
 
     my $FH;
     my $TempFile = "${File}_tmp_$$";
-    open($FH, '>', $TempFile)
+    open( $FH, '>', $TempFile )
         or die "*** could not open file '$TempFile' for writing! ($!)\n";
     print $FH $Content;
     close($FH)
         or die "*** could not close file '$TempFile'! ($!)\n";
-    if (defined $RequiredMD5Sum) {
+    if ( defined $RequiredMD5Sum ) {
         my $MD5Sum = MD5ForFile($TempFile);
-        if ($RequiredMD5Sum ne $MD5Sum) {
+        if ( $RequiredMD5Sum ne $MD5Sum ) {
             die "*** wrong MD5-sum for '$File' (server: $RequiredMD5Sum <=> client: $MD5Sum)!\n";
         }
     }
@@ -483,7 +502,7 @@ sub OverwriteFile {
 }
 
 sub MD5ForFile {
-    my ( $File ) = @_;
+    my ($File) = @_;
 
     my $Output = qx{md5sum $File};
     return if !$Output;
@@ -614,12 +633,12 @@ This Software is part of the OTRS project (http://otrs.org/).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
 the enclosed file COPYING for license information (GPL). If you
-did not receive this file, see http://www.gnu.org/licenses/gpl-2.0.txt.
+did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
 
 =cut
 
 =head1 VERSION
 
-$Revision: 1.4 $ $Date: 2008-02-28 15:04:06 $
+$Revision: 1.5 $ $Date: 2012-11-20 19:16:45 $
 
 =cut

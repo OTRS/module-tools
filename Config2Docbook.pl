@@ -3,7 +3,7 @@
 # Config2Docbook.pl - rebuild config
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: Config2Docbook.pl,v 1.2 2012-07-09 15:21:29 te Exp $
+# $Id: Config2Docbook.pl,v 1.3 2012-11-20 19:16:48 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
@@ -64,7 +64,7 @@ use warnings;
 use File::Basename;
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.2 $) [1];
+$VERSION = qw($Revision: 1.3 $) [1];
 
 use vars (qw($Self));
 use Getopt::Std;

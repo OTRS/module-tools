@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 # --
 # ExternalFilterCheck.pl - a tool to check all files with filter.pl of the cvs
-# Copyright (C) 2001-2009 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: ExternalFilterCheck.pl,v 1.3 2009-09-03 15:34:53 tr Exp $
+# $Id: ExternalFilterCheck.pl,v 1.4 2012-11-20 19:16:55 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
@@ -31,7 +31,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION $RealBin);
-$VERSION = '$Revision: 1.3 $';
+$VERSION = '$Revision: 1.4 $';
 $VERSION =~ s/^\$.*:\W(.*)\W.+?$/$1/;
 
 use Getopt::Std;
@@ -44,7 +44,7 @@ my $CheckDirectory = '';
 getopt( 'hfdn', \%Opts );
 if ( $Opts{h} || !$Opts{f} || !$Opts{d} ) {
     print "ExternalFilterCheck.pl <Revision $VERSION> - OTRS check all files with filter.pl\n";
-    print "Copyright (C) 2001-2009 OTRS AG, http://otrs.org/\n";
+    print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n";
     print "usage: ExternalFilterCheck.pl -f /path/to/filter.pl -d /path/to/wanteddirectory -ew\n";
     print "       -e -> show errors\n";
     print "       -w -> show warrnings\n";

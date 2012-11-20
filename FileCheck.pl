@@ -3,7 +3,7 @@
 # module-tools/FileCheck.pl - searchs for mistakes in the list of files registered in SOPM
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: FileCheck.pl,v 1.7 2012-06-30 18:26:35 cr Exp $
+# $Id: FileCheck.pl,v 1.8 2012-11-20 19:16:57 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -17,8 +17,8 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-# or see L<http://www.gnu.org/licenses/agpl.txt>.
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+# or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
 use strict;

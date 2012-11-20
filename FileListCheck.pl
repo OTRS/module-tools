@@ -4,7 +4,7 @@
 #   - script for checking the file list in the .sopm file
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: FileListCheck.pl,v 1.4 2012-09-20 08:38:37 mb Exp $
+# $Id: FileListCheck.pl,v 1.5 2012-11-20 19:16:58 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -18,7 +18,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
