@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.28 2012-10-17 01:01:16 sb Exp $
+# $Id: module_check.pl,v 1.29 2012-11-22 13:34:24 ub Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -48,7 +48,7 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.28 $) [1];
+$VERSION = qw($Revision: 1.29 $) [1];
 
 # get options
 my %Opts = ();
@@ -94,6 +94,9 @@ sub CheckFile {
 
     # skip directories
     return if -d $ModuleFile;
+
+    # skip CVS directories
+    return if $ModuleDir =~ m{ /CVS ( \s* | / ) }xms;
 
     # check only Perl- and Template-files
     return if $ModuleFile !~ m{ [.](pl|pm|dtl|t) \s* \z }ixms;
@@ -309,16 +312,16 @@ sub ContentClean {
 
     # delete the different version lines
 
-    # example1: $VERSION = qw($Revision: 1.28 $) [1];
+    # example1: $VERSION = qw($Revision: 1.29 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
 
-    # example2: $VERSION = '$Revision: 1.28 $';
+    # example2: $VERSION = '$Revision: 1.29 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
 
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.28 $ $Date: 2012-10-17 01:01:16 $
+    #$Revision: 1.29 $ $Date: 2012-11-22 13:34:24 $
     #
     #=cut
     $Content =~ s{
