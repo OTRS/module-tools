@@ -3,7 +3,7 @@
 # Config2Docbook.pl - rebuild config
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: Config2Docbook.pl,v 1.3 2012-11-20 19:16:48 mh Exp $
+# $Id: Config2Docbook.pl,v 1.4 2012-11-22 23:20:41 cr Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -64,7 +64,7 @@ use warnings;
 use File::Basename;
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.3 $) [1];
+$VERSION = qw($Revision: 1.4 $) [1];
 
 use vars (qw($Self));
 use Getopt::Std;
@@ -264,11 +264,27 @@ sub _CreateDocbookConfigChapter {
 
             for my $Setting ( @{ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} } ) {
 
+                # TODO: Lang shoud be a parameter
+                my $DescriptionContent;
+
+                if ( ref $Setting->{Description} eq 'ARRAY' ) {
+                    DESCRIPTION:
+                    for my $Description ( @{ $Setting->{Description} } ) {
+                        next DESCRIPTION if $Description->{Lang} ne 'en';
+
+                        $DescriptionContent = $Description->{content};
+                        last DESCRIPTION;
+                    }
+                }
+                else {
+                    $DescriptionContent = $Setting->{Description}->{content};
+                }
+
                 push @ConvertedSettings, {
                     title => $Setting->{Name} . ".",
                     para  => [
                         "Group: $Setting->{Group}, Subgroup: $Setting->{SubGroup}.",
-                        $Setting->{Description}->{content},
+                        $DescriptionContent,
                     ],
                 };
 
@@ -279,11 +295,27 @@ sub _CreateDocbookConfigChapter {
         else {
             my $Setting = $Param{ConfigSettings}->{$SettingFile}->{ConfigItem};
 
+            # TODO: Lang shoud be a parameter
+            my $DescriptionContent;
+
+            if ( ref $Setting->{Description} eq 'ARRAY' ) {
+                DESCRIPTION:
+                for my $Description ( @{ $Setting->{Description} } ) {
+                    next DESCRIPTION if $Description->{Lang} ne 'en';
+
+                    $DescriptionContent = $Description->{content};
+                    last DESCRIPTION;
+                }
+            }
+            else {
+                $DescriptionContent = $Setting->{Description}->{content};
+            }
+
             push @ConvertedSettings, {
                 title => $Setting->{Name} . ".",
                 para  => [
                     "Group: $Setting->{Group}, Subgroup: $Setting->{SubGroup}.",
-                    $Setting->{Description}->{content},
+                    $DescriptionContent,
                 ],
             };
 
