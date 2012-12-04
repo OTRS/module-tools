@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: InstallTestsystem.pl,v 1.1 2012-11-27 15:39:24 mab Exp $
+# $Id: InstallTestsystem.pl,v 1.2 2012-12-04 13:14:09 mab Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -45,7 +45,7 @@ use File::Find;
 use Getopt::Std;
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.1 $) [1];
+$VERSION = qw($Revision: 1.2 $) [1];
 
 # get options
 my %Opts = ();
@@ -197,7 +197,9 @@ $DBH->do('FLUSH PRIVILEGES');
 # create logfile
 print STDERR "--- Creating logfile...\n";
 system("sudo touch $InstallDir/otrs.log");
-system("sudo chown $Config{PermissionsOTRSUser} $InstallDir/otrs.log");
+
+# make sure we've got the correct rights set (e.g. in case you've downloaded the files as root)
+system("sudo chown -R $Config{PermissionsOTRSUser}:$Config{PermissionsOTRSGroup} $InstallDir");
 
 # link Fred
 print STDERR "--- Linking Fred...\n";
