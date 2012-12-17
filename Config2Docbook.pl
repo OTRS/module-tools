@@ -3,7 +3,7 @@
 # Config2Docbook.pl - rebuild config
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: Config2Docbook.pl,v 1.4 2012-11-22 23:20:41 cr Exp $
+# $Id: Config2Docbook.pl,v 1.5 2012-12-17 17:42:37 cr Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -64,7 +64,7 @@ use warnings;
 use File::Basename;
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.4 $) [1];
+$VERSION = qw($Revision: 1.5 $) [1];
 
 use vars (qw($Self));
 use Getopt::Std;
@@ -173,7 +173,7 @@ sub _help {
     print "Config2Docbook.pl <Revision $VERSION> - Convert sysc config settings to Docbook"
         . " format\n";
     print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n";
-    print "usage: Config2Docbook.pl -m <path to module> -o <Ouput filename> (optional)\n";
+    print "usage: Config2Docbook.pl -m <path to module> -o <Output filename> (optional)\n";
 }
 
 sub _ParseConfigFile {
