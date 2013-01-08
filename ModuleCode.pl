@@ -3,7 +3,7 @@
 # bin/ModuleCode.pl - to install the packagesetup CodeInstall()
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
 # --
-# $Id: ModuleCode.pl,v 1.1 2013-01-03 01:29:32 cr Exp $
+# $Id: ModuleCode.pl,v 1.2 2013-01-08 19:26:45 mb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -33,7 +33,7 @@ use lib dirname($RealBin) . "/Kernel/cpan-lib";
 use Getopt::Std;
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.1 $) [1];
+$VERSION = qw($Revision: 1.2 $) [1];
 
 use Kernel::Config;
 use Kernel::System::Encode;
@@ -47,7 +47,7 @@ use Kernel::System::Package;
 my %Opt;
 getopt( 'h', \%Opt );
 
-if ( exists $Opt{h} ) {
+if ( exists $Opt{h} || !$ARGV[1] ) {
     Usage();
     exit;
 }
@@ -56,7 +56,7 @@ if ( exists $Opt{h} ) {
 my $UserAction = shift;
 my $Action;
 
-POSIBLEACTION:
+POSSIBLEACTION:
 for my $PossibleAction (qw(Install Reinstall Upgrade Uninstall)) {
     if ( $UserAction =~ m{\A \Q$PossibleAction\E \z}msxi ) {
 
@@ -65,12 +65,13 @@ for my $PossibleAction (qw(Install Reinstall Upgrade Uninstall)) {
 
         #add Code Prefix
         $Action = 'Code' . $Action;
-        last POSIBLEACTION;
+        last POSSIBLEACTION;
     }
 }
 
 if ( !$Action ) {
-    print "Action $UserAction is invalid!\n";
+    print "Action '$UserAction' is invalid!\n";
+    Usage();
     exit 0;
 }
 
@@ -84,6 +85,7 @@ if ( !-e $Module ) {
 # call the script with the type as the third argument (if any)
 my $UserType = shift;
 my $Type;
+
 if ($UserType) {
     TYPE:
     for my $PossibleType (qw(post pre)) {
@@ -92,11 +94,12 @@ if ($UserType) {
 
             # change to correct case
             $Type = lc $UserType;
-            last POSIBLEACTION;
+            last TYPE;
         }
     }
-    if ($Type) {
-        print "The type $UserType is invalid!\n";
+    if ( !$Type ) {
+        print "Type '$UserType' is invalid!\n";
+        Usage();
         exit 0;
     }
 }
