@@ -3,7 +3,7 @@
 # bin/ModuleCode.pl - to install the packagesetup CodeInstall()
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
 # --
-# $Id: ModuleCode.pl,v 1.3 2013-01-08 19:36:16 cr Exp $
+# $Id: ModuleCode.pl,v 1.4 2013-01-15 18:06:25 cr Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -33,7 +33,7 @@ use lib dirname($RealBin) . "/Kernel/cpan-lib";
 use Getopt::Std;
 
 use vars qw($VERSION);
-$VERSION = qw($Revision: 1.3 $) [1];
+$VERSION = qw($Revision: 1.4 $) [1];
 
 use Kernel::Config;
 use Kernel::System::Encode;
@@ -107,7 +107,7 @@ if ($UserType) {
 # otherwise set default type
 else {
     $Type = 'post';
-    if ( $Action =~ m{\A CodeUnInstall }msx ) {
+    if ( $Action =~ m{\A CodeUninstall }msx ) {
         $Type = 'pre';
     }
 }
