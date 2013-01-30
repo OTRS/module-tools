@@ -2,9 +2,9 @@
 # --
 # module-tools/FileListCheck.pl
 #   - script for checking the file list in the .sopm file
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
 # --
-# $Id: FileListCheck.pl,v 1.5 2012-11-20 19:16:58 mh Exp $
+# $Id: FileListCheck.pl,v 1.6 2013-01-30 13:49:54 mb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -72,8 +72,13 @@ die "Couldn't find file '$SOPMFileName' in $ModuleDirectory - wrong directory?"
     if !-f $SOPMFilePath;
 
 # get encoding of XML file
-my $XMLHeadLine = `head -n1 $SOPMFilePath`;
-my ($SOPMEncoding) = $XMLHeadLine =~ m{ encoding="( (?: iso | utf ) - .* )" }xms;
+my $SOPMEncoding;
+open my $EncFH, '<', $SOPMFilePath;
+LINE:
+while ( my $Line = <$EncFH> ) {
+    ($SOPMEncoding) = $Line =~ m{ encoding="( (?: iso | utf ) - .* )" }xms;
+    last LINE;
+}
 
 # set default encoding to UTF8
 $SOPMEncoding ||= 'utf8';
@@ -106,6 +111,8 @@ my $ModuleFinder = sub {
 
     return if !-f $FileName;
     return if $FileName =~ m{\.project}xms;
+    return if $FileName =~ m{\.includepath}xms;
+    return if $FileName =~ m{\.settings}xms;
     return if $FileName =~ m{SVN}xms;
     return if $FileName =~ m{\.svn}xms;
     return if $FileName =~ m{CVS}xms;
