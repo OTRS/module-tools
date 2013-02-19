@@ -3,7 +3,7 @@
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # --
-# $Id: module_check.pl,v 1.30 2012-11-22 13:35:47 ub Exp $
+# $Id: module_check.pl,v 1.30 2012/11/22 13:35:47 ub Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -96,7 +96,7 @@ sub CheckFile {
     return if -d $ModuleFile;
 
     # skip CVS directories
-    return if $ModuleDir =~ m{ /CVS /? }xms;
+    return if $ModuleDir =~ m{ /CVS|\.git /? }xms;
 
     # check only Perl- and Template-files
     return if $ModuleFile !~ m{ [.](pl|pm|dtl|t) \s* \z }ixms;
@@ -250,16 +250,11 @@ sub ModuleContentPrepare {
     # put formerly commented code in place
     $Content =~ s{ ^ ---PLACEHOLDER--- $ \s }{ shift @NewCodeBlocks }xmseg;
 
-    # delete ID line and remember for possible occurance in perldoc
-    $Content =~ s{ ^ \# [ ] ( \$Id: [^\n]+ ) \n }{}xms;
-    my $ModuleTagLine = $1;
 
-    # replace OldId with Id and remember Id-Line for possible occurance in perldoc
-    $Content =~ s{ ^ ( \# [ ] \$ ) Old ( Id: [^\n]+ ) }{$1$2}xms;
-    my $OrgTagLine = '$' . $2;
-
-    # replace possible occurances of $Id: in perldoc
-    $Content =~ s{ ^ \Q$ModuleTagLine\E }{$OrgTagLine}xmsg;
+    # delete Origin line
+    # Example:
+    # Origin: AgentTicketZoom.pm
+    $Content =~ s{ ^ \# [ ] ( Origin: [^\n]+ ) \n ( ^ \# [ ] -- \n )? }{}xms;
 
     # clean the content
     $Content = ContentClean( Content => $Content );
@@ -285,7 +280,9 @@ sub OriginalFilenameGet {
 
         # Example:
         # $OldId: AgentTicketNote.pm,v 1.34.2.4 2008/03/25 13:27:05 ub Exp $
-        if ( $Line =~ m{ \A \# [ ] \$OldId: [ ] (.+?) ,v [ ] }ixms ) {
+        # or:
+        # Origin: AgentTicketZoom.pm
+        if ( $Line =~ m{ \A \# [ ] \$OldId: [ ] (.+?) ,v [ ] }ixms || $Line =~ m{ \A \# [ ] Origin: [ ] (\S+) }ixms ) {
             $Filename = $1;
             last LINE;
         }
@@ -321,7 +318,7 @@ sub ContentClean {
     # example3:
     #=head1 VERSION
     #
-    #$Revision: 1.30 $ $Date: 2012-11-22 13:35:47 $
+    #$Revision: 1.30 $ $Date: 2012/11/22 13:35:47 $
     #
     #=cut
     $Content =~ s{
