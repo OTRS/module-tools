@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 # --
-# module-tools/CleanupIDs.pl - script to remove $Ids used for CVS
+# module-tools/RemoveCVSIDs.pl - script to remove $Ids used for CVS
 # TODO: ( and to convert $OldId and $OldId2 etc to Origin: labels)
 #
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
@@ -23,11 +23,11 @@
 
 =head1 NAME
 
-CleanupIDs.pl - script to remove $Ids used for CVS
+RemoveCVSIDs.pl - script to remove $Ids used for CVS
 
 =head1 SYNOPSIS
 
-CleanupIDs.pl -p <Framework-Path>
+RemoveCVSIDs.pl -p <Framework-Path>
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,7 @@ if (!$Opts{'p'} ) {
 # show the help screen
 if ( $Opts{'h'} ) {
     print "Copyright (C) 2001-2013 OTRS AG, http://otrs.org/\n";
-    print "usage: CleanupIDs.pl -p <Path>\n\n";
+    print "usage: RemoveCVSIDs.pl -p <Path>\n\n";
     exit 1;
 }
 
