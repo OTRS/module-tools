@@ -239,7 +239,7 @@ sub GetDirectoryFileList {
                 ListOfFiles => \@FileList,
             );
         }
-        return @FileList;
+        return sort @FileList;
     }
     else {
         return 0;
@@ -252,7 +252,7 @@ sub PrintFiles() {
     print "\n+ List of files in $Param{Source} +\n";
     print "---------\n";
     my $Counter = 0;
-    for my $file ( @{ $Param{ListOfFiles} } ) {
+    for my $file ( sort @{ $Param{ListOfFiles} } ) {
         print "$file \n";
         $Counter++;
     }
@@ -313,7 +313,7 @@ sub DiffList {
                 . "Please check for syntax errors\n"
                 . "----------------\n";
             my $Counter = 0;
-            for my $file (@SOPMvsDIR) {
+            for my $file (sort @SOPMvsDIR) {
                 print "  " . $file . "\n";
                 $Counter++;
             }
@@ -330,7 +330,7 @@ sub DiffList {
                 . "----------------\n";
 
             my $Counter = 0;
-            for my $file (@DIRvsSOPM) {
+            for my $file (sort @DIRvsSOPM) {
                 print "  $file\n";
                 $Counter++;
             }
