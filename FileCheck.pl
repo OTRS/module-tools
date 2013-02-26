@@ -1,9 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # module-tools/FileCheck.pl - searchs for mistakes in the list of files registered in SOPM
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: FileCheck.pl,v 1.8 2012-11-20 19:16:57 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by

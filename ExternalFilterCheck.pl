@@ -1,9 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # ExternalFilterCheck.pl - a tool to check all files with filter.pl of the cvs
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: ExternalFilterCheck.pl,v 1.4 2012-11-20 19:16:55 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by

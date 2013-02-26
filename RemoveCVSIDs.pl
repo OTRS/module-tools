@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # module-tools/RemoveCVSIDs.pl - script to remove $Ids used for CVS
 # TODO: ( and to convert $OldId and $OldId2 etc to Origin: labels)

@@ -1,9 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # bin/ModuleCode.pl - to install the packagesetup CodeInstall()
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
-# --
-# $Id: ModuleCode.pl,v 1.4 2013-01-15 18:06:25 cr Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by

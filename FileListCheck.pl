@@ -1,10 +1,8 @@
-#!/usr/bin/perl -wl
+#!/usr/bin/perll
 # --
 # module-tools/FileListCheck.pl
 #   - script for checking the file list in the .sopm file
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
-# --
-# $Id: FileListCheck.pl,v 1.6 2013-01-30 13:49:54 mb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by

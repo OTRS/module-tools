@@ -1,10 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # module-tools/InstallTestsystem.pl
 #
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: InstallTestsystem.pl,v 1.2 2012-12-04 13:14:09 mab Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
