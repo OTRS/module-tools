@@ -39,7 +39,7 @@ use strict;
 use warnings;
 
 use Getopt::Std;
-use Text::Similarity::Overlaps;
+use String::Similarity;
 
 use vars qw($VERSION);
 $VERSION = qw($Revision: 1.30 $) [1];
@@ -94,13 +94,10 @@ exit 0 if $DirectMatch;
 
 print "No direct matches found, checking similiarity index...\n";
 
-my $SimilarityChecker = Text::Similarity::Overlaps->new ({normalize => 0, verbose => 0});
-defined $SimilarityChecker || die "Construction of Text::Similarity::Overlaps failed";
-
 my %SimilarityIndex;
 for my $FileRevision (@FileRevisions) {
-    my ($Score, %AllScores) =  $SimilarityChecker->getSimilarityStrings($TargetFileContents, $FileContents{$FileRevision});
-    $SimilarityIndex{ $FileRevision } = $AllScores{F};
+    my $Similarity =  similarity($TargetFileContents, $FileContents{$FileRevision});
+    $SimilarityIndex{ $FileRevision } = $Similarity;
 }
 
 my @SimilarVersions = sort { $SimilarityIndex{$b} <=> $SimilarityIndex{$a} } keys %SimilarityIndex;
