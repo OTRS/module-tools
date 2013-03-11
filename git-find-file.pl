@@ -100,7 +100,7 @@ defined $SimilarityChecker || die "Construction of Text::Similarity::Overlaps fa
 my %SimilarityIndex;
 for my $FileRevision (@FileRevisions) {
     my ($Score, %AllScores) =  $SimilarityChecker->getSimilarityStrings($TargetFileContents, $FileContents{$FileRevision});
-    $SimilarityIndex{ $FileRevision } = $AllScores{precision};
+    $SimilarityIndex{ $FileRevision } = $AllScores{F};
 }
 
 my @SimilarVersions = sort { $SimilarityIndex{$b} <=> $SimilarityIndex{$a} } keys %SimilarityIndex;
