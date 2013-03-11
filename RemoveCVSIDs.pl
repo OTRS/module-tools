@@ -145,11 +145,17 @@ sub CleanupFile {
     # $Id:
     $Content =~ s{ ^ \# [ ] \$Id: $ \n }{}xmsg;
 
-    # remove $Date $ tag
-    $Content =~ s{ [ ]* \$Date: [^\$]+ \$ }{}xmsg;
+    ## remove $Date $ tag
+    #$Content =~ s{ [ ]* \$Date: [^\$]+ \$ }{}xmsg;
 
-#    # Set $Revision to '0.0.0'. This will be replaced on package build.
-#    $Content =~ s{ \$Revision: [^\$]+ \$ }{\$Revision: 0.0.0\$}xmsg;
+    # Remove VERSION assignment from Code
+    $Content =~ s{ ^\$VERSION [ ]* = [ ]* .*? \n}{}xmsg;
+
+    # Remove VERSION from POD
+    $Content =~ s{ ^=head1 [ ]* VERSION \n+ ^\$Revision: .*? \n+}{}xmsg;
+
+    # Remove @version tag from CSSDoc
+    $Content =~ s{^ [ ]+ [*] [ ]+ [@]version [ ]+ \$Revision: .*? \n}{}xmsg;
 
     # if nothing was changed, check the next file
     return 1 if $Content eq $OriginalContent;
