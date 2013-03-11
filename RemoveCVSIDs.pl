@@ -93,10 +93,14 @@ sub CleanupFile {
 
     # skip directories
     return if -d $File;
+    # skip linked files
+    return if -l $File;
+    # Only treat plain files
+    return if !-f $File;
 
     # skip special directories:
     # CVS, git, cpan-lib, images, etc...
-    return if $Dir =~ m{ / CVS | \.git | cpan-lib | thirdparty | images | img | icons | fonts /? }xms;
+    return if $Dir =~ m{ / CVS | \.git | cpan-lib | thirdparty | images | img | icons | fonts | -cache /? }xms;
 
     # exclude some files:
     # images, fonts, .gitignore, .cvsignore, and others
@@ -123,23 +127,29 @@ sub CleanupFile {
     #
     # JavaScript files
     # // $Id: Core.Agent.Admin.DynamicField.js,v 1.11 2012-08-06 12:33:24 mg Exp $
-    $Content =~ s{ ^ ( \# | // ) [ ] \$Id: [ ] .+? $ \n ( ^ ( \# | // ) [ ] -- $ \n )? }{}xms;
+    $Content =~ s{ ^ ( \# | // ) [ ] \$Id: [ ] .+? $ \n ( ^ ( \# | // ) [ ] -- $ \n )? }{}xmsg;
 
     # Postmaster-Test.box files
     # X-CVS: $Id: PostMaster-Test1.box,v 1.2 2007/04/12 23:55:55 martin Exp $
-    $Content =~ s{ ^ X-CVS: [ ] \$Id: [ ] .+? $ \n }{}xms;
+    $Content =~ s{ ^ X-CVS: [ ] \$Id: [ ] .+? $ \n }{}xmsg;
 
     # docbook and wsdl and other XML files
     # <!-- $Id: get-started.xml,v 1.1 2011-08-15 17:46:09 cr Exp $ -->
-    $Content =~ s{ ^ <!-- [ ] \$Id: [ ] .+? $ \n }{}xms;
+    $Content =~ s{ ^ <!-- [ ] \$Id: [ ] .+? $ \n }{}xmsg;
 
     # OTRS config files
     # <CVS>$Id: Framework.xml,v 1.519 2013-02-15 14:07:55 mg Exp $</CVS>
-    $Content =~ s{ ^ \s* <CVS> \$Id: [ ] .+? $ \n }{}xms;
+    $Content =~ s{ ^ \s* <CVS> \$Id: [ ] .+? $ \n }{}xmsg;
 
     # remove empty Ids
     # $Id:
-    $Content =~ s{ ^ \# [ ] \$Id: $ \n }{}xms;
+    $Content =~ s{ ^ \# [ ] \$Id: $ \n }{}xmsg;
+
+    # remove $Date $ tag
+    $Content =~ s{ [ ]* \$Date: [^\$]+ \$ }{}xmsg;
+
+#    # Set $Revision to '0.0.0'. This will be replaced on package build.
+#    $Content =~ s{ \$Revision: [^\$]+ \$ }{\$Revision: 0.0.0\$}xmsg;
 
     # if nothing was changed, check the next file
     return 1 if $Content eq $OriginalContent;
