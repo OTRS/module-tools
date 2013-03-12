@@ -62,30 +62,40 @@ EOF
     exit 1;
 }
 
+# Change to git repository directory.
 chdir($Opts{r}) || die "Could not change working directory to $Opts{r}. $!";
 
+# Get all revisions for the requested file
 my @FileRevisions = split(/\n/, `git rev-list --all $Opts{f}`);
-
 print "Found " . (scalar @FileRevisions) . " existing revisions in git history.\n";
 
+# Get the file contents for all revisions.
 my %FileContents;
 for my $FileRevision (@FileRevisions) {
-    $FileContents{$FileRevision} = `git show $FileRevision:$Opts{f} 2>/dev/null`;
+    $FileContents{$FileRevision} = `git show $FileRevision:$Opts{f} 2>1`;
 }
 
-my $TargetFileHandle;
-if ( !open $TargetFileHandle, '<', $Opts{t} ) {
-   print "Can't open '$Opts{t}': $!\n";
-   exit 1;
-}
-
+# Get the content of the target file that should be found in the history
+open( my $TargetFileHandle, '<', $Opts{t} ) || die "Can't open '$Opts{t}': $!\n";
 my $TargetFileContents = do { local $/; <$TargetFileHandle> };
 close $TargetFileHandle;
+
 
 print "Checking for direct matches in git history...\n";
 my $DirectMatch;
 for my $FileRevision (@FileRevisions) {
-    if ($TargetFileContents eq $FileContents{$FileRevision}) {
+
+    # There is one thing that went wrong in the CVS->git migration.
+    # The format of dates in CVS keyword expansion was YYYY/MM/DD,
+    #   during the git migration it was changed to YYYY-MM-DD.
+    # Compare against both versions to be able to find a file that comes
+    #   from git or from older CVS directly.
+    my $FileContentCVS = $FileContents{$FileRevision};
+    $FileContentCVS =~ s{(\$ (?:Id:|Date:) .*? \d{4})-(\d{2})-(\d{2} .*? \$)}{$1/$2/$3}xmsg;
+
+    if ($TargetFileContents eq $FileContents{$FileRevision}
+        || $TargetFileContents eq $FileContentCVS
+    ) {
         print $FileRevision . "\n";
         $DirectMatch++;
     }
