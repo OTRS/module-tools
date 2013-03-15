@@ -154,7 +154,7 @@ if ( !-e $InstallDir . '/scripts/apache2-httpd.include.conf' ) {
 }
 
 # copy apache config file
-my $ApacheConfigFile = "$Config{ApacheCFGDir}$SystemName.apache2-httpd.include.conf";
+my $ApacheConfigFile = "$Config{ApacheCFGDir}$SystemName.conf";
 system(
     "sudo cp $InstallDir/scripts/apache2-httpd.include.conf $ApacheConfigFile"
 );
