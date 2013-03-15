@@ -173,6 +173,30 @@ open( MYOUTFILE, '>' . $ApacheConfigFile );
 print MYOUTFILE $ApacheConfigStr;
 close MYOUTFILE;
 
+
+# copy apache mod perl file
+my $ApacheModPerlFile = "$Config{ApacheCFGDir}$SystemName.apache2-perl-startup.pl";
+system(
+    "sudo cp $InstallDir/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
+);
+
+print STDERR "--- Editing Apache mod perl config...\n";
+open FILE, $ApacheModPerlFile or die "Couldn't open $!";
+my $ApacheModPerlConfigStr = join( "", <FILE> );
+close FILE;
+
+# set correct path
+$ApacheModPerlConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
+
+# enable lines for MySQL
+$ApacheModPerlConfigStr =~ s{^#(use DBD::mysql \(\);)$}{$1}msg;
+$ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::mysql;)$}{$1}msg;
+
+open( MYOUTFILE, '>' . $ApacheModPerlFile );
+print MYOUTFILE $ApacheModPerlConfigStr;
+close MYOUTFILE;
+
+
 # restart apache
 print STDERR "--- Restarting apache...\n";
 system("sudo $Config{ApacheRestartCommand}");
