@@ -1,9 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # module-tools/module_check.pl - script to check OTRS modules
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: module_check.pl,v 1.30 2012/11/22 13:35:47 ub Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by

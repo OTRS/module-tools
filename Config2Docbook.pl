@@ -1,9 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # Config2Docbook.pl - rebuild config
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: Config2Docbook.pl,v 1.5 2012-12-17 17:42:37 cr Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -327,7 +325,7 @@ sub _CreateDocbookConfigChapter {
     $Docbook{chapter}->{sect1} = \@ConvertedSettings;
 
     #output
-    print "\nGenerating Docdook structure...";
+    print "\nGenerating Docbook structure...";
 
     # convert perl structure into XML structure
     my $ConfigChapter = eval {

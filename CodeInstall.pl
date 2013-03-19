@@ -1,9 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # bin/CodeInstall.pl - to install the packagesetup CodeInstall()
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: CodeInstall.pl,v 1.3 2012-11-22 07:58:02 ub Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by

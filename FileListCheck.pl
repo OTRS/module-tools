@@ -1,10 +1,8 @@
-#!/usr/bin/perl -wl
+#!/usr/bin/perll
 # --
 # module-tools/FileListCheck.pl
 #   - script for checking the file list in the .sopm file
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
-# --
-# $Id: FileListCheck.pl,v 1.6 2013-01-30 13:49:54 mb Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -47,7 +45,6 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Basename;
 use File::Find;
-use Data::Dumper;
 
 # check if help got requested
 my $OptHelp;
@@ -135,9 +132,9 @@ map { $ModuleFileInFileList{$_} = 1 } @FileList;
 my @MissingFileListEntries = grep { $ModuleFileInFileList{$_} == 0 } keys %ModuleFileInFileList;
 
 # generate output
-map { print "File '$_' is listed in SOPM, but missing in file system!" } @MissingFiles;
-map { print "File '$_' is in the file system, but missing in the SOPM!" } @MissingFileListEntries;
-print '###############################';
-print '# Insert this into your sopm! #';
-print '###############################';
-map { print "        <File Permission=\"644\" Location=\"$_\"\/>" } sort @MissingFileListEntries;
+map { print "File '$_' is listed in SOPM, but missing in file system!\n" } @MissingFiles;
+map { print "File '$_' is in the file system, but missing in the SOPM!\n" } @MissingFileListEntries;
+print "###############################\n";
+print "# Insert this into your sopm! #\n";
+print "###############################\n";
+map { print "        <File Permission=\"644\" Location=\"$_\"\/>\n" } sort @MissingFileListEntries;

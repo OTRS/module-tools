@@ -1,9 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # CodePolicy.pl - a tool to remotely execute the OTRS code policy against local code
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: CodePolicy.pl,v 1.5 2012-11-20 19:16:45 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

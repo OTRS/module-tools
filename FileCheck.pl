@@ -1,9 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # module-tools/FileCheck.pl - searchs for mistakes in the list of files registered in SOPM
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: FileCheck.pl,v 1.8 2012-11-20 19:16:57 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -239,7 +237,7 @@ sub GetDirectoryFileList {
                 ListOfFiles => \@FileList,
             );
         }
-        return @FileList;
+        return sort @FileList;
     }
     else {
         return 0;
@@ -252,7 +250,7 @@ sub PrintFiles() {
     print "\n+ List of files in $Param{Source} +\n";
     print "---------\n";
     my $Counter = 0;
-    for my $file ( @{ $Param{ListOfFiles} } ) {
+    for my $file ( sort @{ $Param{ListOfFiles} } ) {
         print "$file \n";
         $Counter++;
     }
@@ -313,7 +311,7 @@ sub DiffList {
                 . "Please check for syntax errors\n"
                 . "----------------\n";
             my $Counter = 0;
-            for my $file (@SOPMvsDIR) {
+            for my $file (sort @SOPMvsDIR) {
                 print "  " . $file . "\n";
                 $Counter++;
             }
@@ -330,7 +328,7 @@ sub DiffList {
                 . "----------------\n";
 
             my $Counter = 0;
-            for my $file (@DIRvsSOPM) {
+            for my $file (sort @DIRvsSOPM) {
                 print "  $file\n";
                 $Counter++;
             }

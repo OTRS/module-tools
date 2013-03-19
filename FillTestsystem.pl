@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # module-tools/FillTestsystem.pl
 #   - script for adding test data to a OTRS instance, including
@@ -6,8 +6,6 @@
 #     will be enabled and services and slas can be connected.
 #
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: FillTestsystem.pl,v 1.2 2012-11-20 19:17:01 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by

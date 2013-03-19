@@ -1,10 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # --
 # module-tools/module-linker.pl
 #   - script for linking OTRS modules into framework root
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: module-linker.pl,v 1.3 2012-11-20 19:17:06 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by

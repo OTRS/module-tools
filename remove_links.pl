@@ -1,6 +1,5 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-# $Id: remove_links.pl,v 1.3 2012-03-02 12:27:39 mg Exp $
 
 use strict;
 

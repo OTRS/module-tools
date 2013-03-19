@@ -1,10 +1,8 @@
-#!/usr/bin/perl -wl
+#!/usr/bin/perll
 # --
 # module-tools/CheckChangedFiles.pl
 #   - script for get changed file between different releases of OTRS
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
-# --
-# $Id: CheckChangedFiles.pl,v 1.6 2012-11-20 19:16:39 mh Exp $
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
