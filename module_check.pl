@@ -221,8 +221,8 @@ sub ModuleContentPrepare {
         ^ [ \t]* \# [ ] [^\n]+ \n
         ^ [ \t]* \# [ ] --- [ \t]* \n
         ( .+? )
-        ^ [ \t]* \# [ ] --- [ \t]*
-    }{---PLACEHOLDER---}xms
+        ^ [ \t]* \# [ ] --- [ \t]* \n
+    }{---PLACEHOLDER---\n}xms
     ) {
         my $Block = $1;
         my $NewCode = '';
