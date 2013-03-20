@@ -308,10 +308,11 @@ sub ContentClean {
     # delete the different version lines
 
     # example1: $VERSION = qw($Revision: 1.30 $) [1];
-    $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ }{}ixms;
+    $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ \n }{}ixms;
 
     # example2: $VERSION = '$Revision: 1.30 $';
-    $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ }{}ixms;
+    $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ \n }{}ixms;
+
 
     # example3:
     #=head1 VERSION
@@ -326,6 +327,12 @@ sub ContentClean {
         ^                       $ \s
         ^ =cut                  $
     }{}ixms;
+
+    # delete the 'use vars qw($VERSION);' line
+    $Content =~ s{ ( ^ $ \n )?  ^ use [ ] vars [ ] qw\(\$VERSION\); $ \n }{}ixms;
+
+    # delete the $Id, $OldId, $OldId2 lines, followed by an optional divider comment line
+    $Content =~ s{ ^ \# [ ] \$(Old)?Id(2)?: .+? \$ $ \n ( ^ \# [ ] -- $ \n )? }{}gixms;
 
     # delete copyright line
     $Content =~ s{ ^ \# [ ] Copyright [ ] \( C \) .+?  http://otrs\.(org|com)/ $ }{}ixms;
