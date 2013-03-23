@@ -55,11 +55,14 @@ if ( !$InstallDir || !-e $InstallDir ) {
     exit 2;
 }
 
+# remove possible slash at the end
+$InstallDir =~ s{ / \z }{}xms;
+
 # Configuration
 my %Config = (
 
     # the path to your workspace directory, w/ leading and trailing slashes
-    'EnvironmentRoot' => '/ws/',
+    'EnvironmentRoot' => '/devel/',
 
     # the path to your module tools directory, w/ leading and trailing slashes
     'ModuleToolsRoot' => '/ws/module-tools/',
@@ -146,7 +149,7 @@ open( MYOUTFILE, '>' . $InstallDir . '/Kernel/Config.pm' );
 print MYOUTFILE $ConfigStr;
 close MYOUTFILE;
 
-# edit apache config
+# check apache config
 if ( !-e $InstallDir . '/scripts/apache2-httpd.include.conf' ) {
 
     print STDERR "/scripts/apache2-httpd.include.conf cannot be opened\n";
@@ -159,6 +162,12 @@ system(
     "sudo cp $InstallDir/scripts/apache2-httpd.include.conf $ApacheConfigFile"
 );
 
+# copy apache mod perl file
+my $ApacheModPerlFile = "$Config{ApacheCFGDir}$SystemName.apache2-perl-startup.pl";
+system(
+    "sudo cp $InstallDir/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
+);
+
 print STDERR "--- Editing Apache config...\n";
 open FILE, $ApacheConfigFile or die "Couldn't open $!";
 my $ApacheConfigStr = join( "", <FILE> );
@@ -168,17 +177,12 @@ $ApacheConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
 $ApacheConfigStr =~ s{/otrs/}{/$SystemName/}xmsg;
 $ApacheConfigStr =~ s{/otrs-web/}{/$SystemName-web/}xmsg;
 $ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perlOFF.c>}xmsg;
+$ApacheConfigStr =~ s{Perlrequire \s+ /opt/otrs/scripts/apache2-perl-startup\.pl}{Perlrequire $ApacheModPerlFile}xms;
+$ApacheConfigStr =~ s{<Location \s+ /otrs>}{<Location /$SystemName>}xms;
 
 open( MYOUTFILE, '>' . $ApacheConfigFile );
 print MYOUTFILE $ApacheConfigStr;
 close MYOUTFILE;
-
-
-# copy apache mod perl file
-my $ApacheModPerlFile = "$Config{ApacheCFGDir}$SystemName.apache2-perl-startup.pl";
-system(
-    "sudo cp $InstallDir/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
-);
 
 print STDERR "--- Editing Apache mod perl config...\n";
 open FILE, $ApacheModPerlFile or die "Couldn't open $!";
