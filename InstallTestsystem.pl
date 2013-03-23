@@ -167,7 +167,7 @@ close FILE;
 $ApacheConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
 $ApacheConfigStr =~ s{/otrs/}{/$SystemName/}xmsg;
 $ApacheConfigStr =~ s{/otrs-web/}{/$SystemName-web/}xmsg;
-$ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perl.cOFF>}xmsg;
+$ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perlOFF.c>}xmsg;
 
 open( MYOUTFILE, '>' . $ApacheConfigFile );
 print MYOUTFILE $ApacheConfigStr;
