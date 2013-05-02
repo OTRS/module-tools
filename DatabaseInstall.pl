@@ -19,6 +19,20 @@
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
+=head1 NAME
+
+DatabaseInstall.pl - script to setup database tables of linked modules for development
+
+=head1 SYNOPSIS
+
+CodePolicy.pl -m MyModule.sopm -a [install|uninstall]
+
+=head1 DESCRIPTION
+
+Please send any questions, suggestions & complaints to <dev-support@otrs.com>
+
+=cut
+
 use strict;
 use warnings;
 
@@ -28,7 +42,8 @@ use FindBin qw($RealBin);
 use lib dirname($RealBin);
 use lib dirname($RealBin) . "/Kernel/cpan-lib";
 
-use Getopt::Std;
+use Getopt::Long;
+use Pod::Usage;
 
 use vars qw($VERSION);
 $VERSION = qw($Revision: 1.2 $) [1];
@@ -41,9 +56,24 @@ use Kernel::System::DB;
 use Kernel::System::Time;
 use Kernel::System::Package;
 
+my ($OptHelp, $Module, $Action);
+
+GetOptions(
+    'h'   => \$OptHelp,
+    'm=s' => \$Module,
+    'a=s' => \$Action
+);
+
+if ($OptHelp) {
+    pod2usage(-verbose => 0);
+}
+
+if ($Action ne 'uninstall') {
+    $Action = 'install';
+}
+
 # call the script with the module name as first argument
-my $Module = shift;
-if ( !-e $Module ) {
+if ( !-e "$Module" ) {
     print "Can not find file $Module!\n";
     exit 0;
 }
@@ -69,8 +99,11 @@ my $PackageContent = $CommonObject{MainObject}->FileRead(
 
 my %Structure = $CommonObject{PackageObject}->PackageParse( String => $PackageContent );
 
-if ( $Structure{DatabaseInstall} && $Structure{DatabaseInstall}->{post} ) {
+if ($Action eq 'install' && $Structure{DatabaseInstall} && $Structure{DatabaseInstall}->{post} ) {
     $CommonObject{PackageObject}->_Database( Database => $Structure{DatabaseInstall}->{post} );
+}
+elsif ($Action eq 'uninstall' && $Structure{DatabaseUninstall} && $Structure{DatabaseUninstall}->{post} ) {
+    $CommonObject{PackageObject}->_Database( Database => $Structure{DatabaseUninstall}->{post} );
 }
 
 print "... done\n"

@@ -53,7 +53,7 @@ GetOptions(
     'h' => \$OptHelp,
     's' => \$OptSymlink,
 );
-pod2usage( -verbose => 2 ) if $OptHelp;
+pod2usage( -verbose => 0 ) if $OptHelp;
 
 # check if directory exists
 my $ModuleDirectory = shift;

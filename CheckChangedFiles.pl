@@ -58,7 +58,7 @@ GetOptions(
     'm=s' => \$ModulePath,
     'r'   => \$ReducedCheck,
 );
-pod2usage( -verbose => 2 ) if $OptHelp;
+pod2usage( -verbose => 0 ) if $OptHelp;
 
 # define whitelist for reduceded checks
 my @ReducedChecks;
