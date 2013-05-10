@@ -1,4 +1,4 @@
-#!/usr/bin/perll
+#!/usr/bin/perl
 # --
 # module-tools/CheckChangedFiles.pl
 #   - script for get changed file between different releases of OTRS
