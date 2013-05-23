@@ -1,4 +1,4 @@
-#!/usr/bin/perll
+#!/usr/bin/perl
 # --
 # module-tools/FileListCheck.pl
 #   - script for checking the file list in the .sopm file
