@@ -60,7 +60,7 @@ my ($OptHelp);
 GetOptions( 'h' => \$OptHelp ) || pod2usage( -verbose => 1, message => 'invalid params' );
 
 if ($OptHelp) {
-    pod2usage( -verbose => 2 );    # this will exit the script
+    pod2usage( -verbose => 0 );    # this will exit the script
 }
 
 # Now get the work done

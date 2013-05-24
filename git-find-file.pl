@@ -25,7 +25,7 @@ git-find-file.pl - script to to locate a file in the git history
 
 =head1 SYNOPSIS
 
-git-find-file.pl -r <git repository path> -f <relative filename in repository> -t <target file to locate>
+git-find-file.pl -f <filename in repository> -t <target file to locate>
 
 =head1 DESCRIPTION
 
@@ -40,16 +40,17 @@ use warnings;
 
 use Getopt::Std;
 use String::Similarity;
+use File::Spec;
 
 use vars qw($VERSION);
 $VERSION = qw($Revision: 1.30 $) [1];
 
 # get options
 my %Opts = ();
-getopt('rfth', \%Opts);
+getopt('fth', \%Opts);
 
 # set default
-if (!$Opts{'r'} || !$Opts{f} || !$Opts{t}) {
+if (!$Opts{f} || !$Opts{t}) {
     $Opts{'h'} = 1;
 }
 
@@ -57,35 +58,66 @@ if (!$Opts{'r'} || !$Opts{f} || !$Opts{t}) {
 if ( $Opts{'h'} ) {
     print <<EOF;
 Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
-usage: git-find-file.pl -r <git repository path> -f <relative filename in repository> -t <target file to locate>
+usage: git-find-file.pl -f <filename in repository> -t <target file to locate>
 EOF
     exit 1;
 }
 
-chdir($Opts{r}) || die "Could not change working directory to $Opts{r}. $!";
+# Try to split $Opts{f} into the git repository path and the relative filename
+#   inside of this repository.
+my @Directories = split('/', $Opts{f});
+splice(@Directories, 0, 1) if $Directories[0] eq '';
 
-my @FileRevisions = split(/\n/, `git rev-list --all $Opts{f}`);
+my ($RepositoryDirectory, $RelativeFilename);
 
+COUNTER:
+for my $Counter (1 .. scalar @Directories) {
+    my $Directory = "/" . File::Spec->catfile(@Directories[0 .. $Counter - 1]);
+    if (-d "$Directory/.git") {
+        $RepositoryDirectory = $Directory;
+        $RelativeFilename = File::Spec->catfile(@Directories[$Counter .. $#Directories]);
+        last COUNTER;
+    }
+}
+
+if (!$RepositoryDirectory) {
+    die "Could not find a git repository in path $Opts{f}.\n";
+}
+
+# Change to git repository directory.
+chdir($RepositoryDirectory) || die "Could not change working directory to RepositoryDirectory. $!";
+
+# Get all revisions for the requested file
+my @FileRevisions = split(/\n/, `git rev-list --all $RelativeFilename`);
 print "Found " . (scalar @FileRevisions) . " existing revisions in git history.\n";
 
+# Get the file contents for all revisions.
 my %FileContents;
 for my $FileRevision (@FileRevisions) {
-    $FileContents{$FileRevision} = `git show $FileRevision:$Opts{f} 2>/dev/null`;
+    $FileContents{$FileRevision} = `git show $FileRevision:$RelativeFilename 2>1`;
 }
 
-my $TargetFileHandle;
-if ( !open $TargetFileHandle, '<', $Opts{t} ) {
-   print "Can't open '$Opts{t}': $!\n";
-   exit 1;
-}
-
+# Get the content of the target file that should be found in the history
+open( my $TargetFileHandle, '<', $Opts{t} ) || die "Can't open '$Opts{t}': $!\n";
 my $TargetFileContents = do { local $/; <$TargetFileHandle> };
 close $TargetFileHandle;
+
 
 print "Checking for direct matches in git history...\n";
 my $DirectMatch;
 for my $FileRevision (@FileRevisions) {
-    if ($TargetFileContents eq $FileContents{$FileRevision}) {
+
+    # There is one thing that went wrong in the CVS->git migration.
+    # The format of dates in CVS keyword expansion was YYYY/MM/DD,
+    #   during the git migration it was changed to YYYY-MM-DD.
+    # Compare against both versions to be able to find a file that comes
+    #   from git or from older CVS directly.
+    my $FileContentCVS = $FileContents{$FileRevision};
+    $FileContentCVS =~ s{(\$ (?:Id:|Date:) .*? \d{4})-(\d{2})-(\d{2} .*? \$)}{$1/$2/$3}xmsg;
+
+    if ($TargetFileContents eq $FileContents{$FileRevision}
+        || $TargetFileContents eq $FileContentCVS
+    ) {
         print $FileRevision . "\n";
         $DirectMatch++;
     }

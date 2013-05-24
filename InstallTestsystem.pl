@@ -55,21 +55,34 @@ if ( !$InstallDir || !-e $InstallDir ) {
     exit 2;
 }
 
+# remove possible slash at the end
+$InstallDir =~ s{ / \z }{}xms;
+
 # Configuration
 my %Config = (
-    'EnvironmentRoot' =>
-        '/ws/',    # the path to your workspace directory, w/ leading and trailing slashes
-    'ModuleToolsRoot' => '/ws/module-tools/'
-    ,              # the path to your module tools directory, w/ leading and trailing slashes
-    'DatabaseUserName' => 'root'
-    , # user name for mysql (should be the same that you usually use to install a local OTRS instance)
-    'DatabasePassword'     => '',                     # password for your mysql user
+
+    # the path to your workspace directory, w/ leading and trailing slashes
+    'EnvironmentRoot' => '/devel/',
+
+    # the path to your module tools directory, w/ leading and trailing slashes
+    'ModuleToolsRoot' => '/ws/module-tools/',
+
+    # user name for mysql (should be the same that you usually use to install a local OTRS instance)
+    'DatabaseUserName'     => 'root',
+
+    # password for your mysql user
+    'DatabasePassword'     => '',
+
     'PermissionsOTRSUser'  => '_www',                 # OTRS user
     'PermissionsOTRSGroup' => '_www',                 # OTRS group
     'PermissionsWebUser'   => '_www',                 # otrs-web user
     'PermissionsWebGroup'  => '_www',                 # otrs-web group
-    'ApacheCFGDir'         => '/etc/apache2/other/'
-    ,    # the apache config of the system you're going to install will be copied to this location
+
+    # the apache config of the system you're going to install will be copied to this location
+    'ApacheCFGDir'         => '/etc/apache2/other/',
+
+    # the command to restart apache (could be different on other systems)
+    'ApacheRestartCommand' => 'apachectl graceful',
 );
 
 my $SystemName = $InstallDir;
@@ -78,7 +91,7 @@ $SystemName =~ s{/}{}xmsg;
 
 # Determine a string that is used for database user name, database name and database password
 my $DatabaseSystemName = $SystemName;
-$DatabaseSystemName =~ s{-}{_}xmsg;    # replace - by _ (hyphens not allowed in database name)
+$DatabaseSystemName =~ s{-}{_}xmsg;                         # replace - by _ (hyphens not allowed in database name)
 $DatabaseSystemName = substr( $DatabaseSystemName, 0, 16 ); # shorten the string (mysql requirement)
 
 # edit Config.pm
@@ -98,7 +111,8 @@ $ConfigStr =~ s{('otrs'|'some-pass')}{'$DatabaseSystemName'}xmsg;
 
 # inject some more data
 my $ConfigInjectStr = <<"EOD";
-\$Self->{'SecureMode'} = 1;
+
+    \$Self->{'SecureMode'} = 1;
     \$Self->{'SystemID'}            = '54';
     \$Self->{'SessionName'}         = '$SystemName';
     \$Self->{'ProductName'}         = '$SystemName';
@@ -107,13 +121,16 @@ my $ConfigInjectStr = <<"EOD";
     \$Self->{'CheckEmailAddresses'} = 0;
     \$Self->{'CheckMXRecord'}       = 0;
     \$Self->{'Organization'}        = '';
-    \$Self->{'LogModule::LogFile'}  = '$Config{EnvironmentRoot}$SystemName/otrs.log';
     \$Self->{'LogModule'}           = 'Kernel::System::Log::File';
+    \$Self->{'LogModule::LogFile'}  = '$Config{EnvironmentRoot}$SystemName/otrs.log';
     \$Self->{'FQDN'}                = 'localhost';
     \$Self->{'DefaultLanguage'}     = 'de';
     \$Self->{'DefaultCharset'}      = 'utf-8';
     \$Self->{'AdminEmail'}          = 'root\@localhost';
     \$Self->{'Package::Timeout'}    = '120';
+
+    \$Self->{'CheckEmailAddresses'} = 0;
+    \$Self->{'CheckMXRecord'}       = 0;
 
     # Fred
     \$Self->{'Fred::BackgroundColor'} = '#006ea5';
@@ -132,35 +149,61 @@ open( MYOUTFILE, '>' . $InstallDir . '/Kernel/Config.pm' );
 print MYOUTFILE $ConfigStr;
 close MYOUTFILE;
 
-# edit apache config
+# check apache config
 if ( !-e $InstallDir . '/scripts/apache2-httpd.include.conf' ) {
 
     print STDERR "/scripts/apache2-httpd.include.conf cannot be opened\n";
     exit 2;
 }
 
-print STDERR "--- Editing and copying Apache config...\n";
-open FILE, $InstallDir . '/scripts/apache2-httpd.include.conf' or die "Couldn't open $!";
+# copy apache config file
+my $ApacheConfigFile = "$Config{ApacheCFGDir}$SystemName.conf";
+system(
+    "sudo cp $InstallDir/scripts/apache2-httpd.include.conf $ApacheConfigFile"
+);
+
+# copy apache mod perl file
+my $ApacheModPerlFile = "$Config{ApacheCFGDir}$SystemName.apache2-perl-startup.pl";
+system(
+    "sudo cp $InstallDir/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
+);
+
+print STDERR "--- Editing Apache config...\n";
+open FILE, $ApacheConfigFile or die "Couldn't open $!";
 my $ApacheConfigStr = join( "", <FILE> );
 close FILE;
 
 $ApacheConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
 $ApacheConfigStr =~ s{/otrs/}{/$SystemName/}xmsg;
 $ApacheConfigStr =~ s{/otrs-web/}{/$SystemName-web/}xmsg;
-$ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perl.cOFF>}xmsg;
+$ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perlOFF.c>}xmsg;
+$ApacheConfigStr =~ s{Perlrequire \s+ /opt/otrs/scripts/apache2-perl-startup\.pl}{Perlrequire $ApacheModPerlFile}xms;
+$ApacheConfigStr =~ s{<Location \s+ /otrs>}{<Location /$SystemName>}xms;
 
-open( MYOUTFILE, '>' . $InstallDir . '/scripts/apache2-httpd.include.conf' );
+open( MYOUTFILE, '>' . $ApacheConfigFile );
 print MYOUTFILE $ApacheConfigStr;
 close MYOUTFILE;
 
-# copy apache config file
-system(
-    "sudo cp $InstallDir/scripts/apache2-httpd.include.conf $Config{ApacheCFGDir}$SystemName.conf"
-);
+print STDERR "--- Editing Apache mod perl config...\n";
+open FILE, $ApacheModPerlFile or die "Couldn't open $!";
+my $ApacheModPerlConfigStr = join( "", <FILE> );
+close FILE;
+
+# set correct path
+$ApacheModPerlConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
+
+# enable lines for MySQL
+$ApacheModPerlConfigStr =~ s{^#(use DBD::mysql \(\);)$}{$1}msg;
+$ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::mysql;)$}{$1}msg;
+
+open( MYOUTFILE, '>' . $ApacheModPerlFile );
+print MYOUTFILE $ApacheModPerlConfigStr;
+close MYOUTFILE;
+
 
 # restart apache
 print STDERR "--- Restarting apache...\n";
-system('sudo apachectl graceful');
+system("sudo $Config{ApacheRestartCommand}");
 
 # install database
 print STDERR "--- Creating tables and inserting data...\n";
