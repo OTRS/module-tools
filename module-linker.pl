@@ -249,8 +249,4 @@ This software comes with ABSOLUTELY NO WARRANTY. For details, see
 the enclosed file COPYING for license information (GPL). If you
 did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
 
-=head1 VERSION
-
-$Revision: 1.3 $
-
 =cut

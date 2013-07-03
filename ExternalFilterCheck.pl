@@ -28,9 +28,7 @@ use lib dirname($RealBin) . "/Kernel/cpan-lib";
 use strict;
 use warnings;
 
-use vars qw($VERSION $RealBin);
-$VERSION = '$Revision: 1.4 $';
-$VERSION =~ s/^\$.*:\W(.*)\W.+?$/$1/;
+use vars qw($RealBin);
 
 use Getopt::Std;
 

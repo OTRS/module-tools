@@ -45,9 +45,6 @@ use File::Find;
 
 use File::Temp qw( tempfile );
 
-use vars qw($VERSION);
-$VERSION = qw($Revision: 1.30 $) [1];
-
 # get options
 my %Opts = ();
 getopt('omd', \%Opts);

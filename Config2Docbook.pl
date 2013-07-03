@@ -61,9 +61,6 @@ use warnings;
 
 use File::Basename;
 
-use vars qw($VERSION);
-$VERSION = qw($Revision: 1.5 $) [1];
-
 use vars (qw($Self));
 use Getopt::Std;
 

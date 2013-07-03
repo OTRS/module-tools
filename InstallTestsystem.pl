@@ -42,9 +42,6 @@ use DBI;
 use File::Find;
 use Getopt::Std;
 
-use vars qw($VERSION);
-$VERSION = qw($Revision: 1.2 $) [1];
-
 # get options
 my %Opts = ();
 getopt( 'p', \%Opts );
