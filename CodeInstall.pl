@@ -43,6 +43,7 @@ use Kernel::System::Package;
 
 # call the script with the module name as first argument
 my $Module = shift;
+die "Usage: $0 Module.sopm\n" if !defined $Module;
 if ( !-e $Module ) {
     print "Can not find file $Module!\n";
     exit 0;
