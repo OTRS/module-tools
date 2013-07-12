@@ -58,8 +58,8 @@ for my $SchemaFile (qw ( otrs-schema otrs-initial_insert )) {
 
     my $Path = "$InstallDir/scripts/database/";
 
-    if ( !-f $InstallDir . '/scripts/database/' . $SchemaFile . '.xml' ) {
-        print $InstallDir . '/scripts/database/' . $SchemaFile . ".xml not found\n",
+    if ( !-f $Path . $SchemaFile . '.xml' ) {
+        print $Path . $SchemaFile . ".xml not found\n",
     }
 
     my $XML = $CommonObject{MainObject}->FileRead(

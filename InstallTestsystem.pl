@@ -59,7 +59,7 @@ $InstallDir =~ s{ / \z }{}xms;
 my %Config = (
 
     # the path to your workspace directory, w/ leading and trailing slashes
-    'EnvironmentRoot' => '/devel/',
+    'EnvironmentRoot' => '/ws/',
 
     # the path to your module tools directory, w/ leading and trailing slashes
     'ModuleToolsRoot' => '/ws/module-tools/',
@@ -212,16 +212,16 @@ my $DBH = DBI->connect(
 $DBH->do("CREATE DATABASE $DatabaseSystemName charset utf8");
 $DBH->do("use $DatabaseSystemName");
 
-# copy the InstallTestsystemDatabase.pl script in otrs/bin folder, execute it, and delete it
-system("cp $Config{ModuleToolsRoot}InstallTestsystemDatabase.pl $InstallDir/bin/");
-system("perl $InstallDir/bin/InstallTestsystemDatabase.pl $InstallDir");
-system("rm $InstallDir/bin/InstallTestsystemDatabase.pl");
-
 print STDERR "--- Creating database user and privileges...\n";
 $DBH->do(
     "GRANT ALL PRIVILEGES ON $DatabaseSystemName.* TO $DatabaseSystemName\@localhost IDENTIFIED BY '$DatabaseSystemName' WITH GRANT OPTION;"
 );
 $DBH->do('FLUSH PRIVILEGES');
+
+# copy the InstallTestsystemDatabase.pl script in otrs/bin folder, execute it, and delete it
+system("cp $Config{ModuleToolsRoot}InstallTestsystemDatabase.pl $InstallDir/bin/");
+system("perl $InstallDir/bin/InstallTestsystemDatabase.pl $InstallDir");
+system("rm $InstallDir/bin/InstallTestsystemDatabase.pl");
 
 # make sure we've got the correct rights set (e.g. in case you've downloaded the files as root)
 system("sudo chown -R $Config{PermissionsOTRSUser}:$Config{PermissionsOTRSGroup} $InstallDir");
