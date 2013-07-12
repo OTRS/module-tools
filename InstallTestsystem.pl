@@ -119,7 +119,7 @@ my $ConfigInjectStr = <<"EOD";
     \$Self->{'CheckMXRecord'}       = 0;
     \$Self->{'Organization'}        = '';
     \$Self->{'LogModule'}           = 'Kernel::System::Log::File';
-    \$Self->{'LogModule::LogFile'}  = '$Config{EnvironmentRoot}$SystemName/otrs.log';
+    \$Self->{'LogModule::LogFile'}  = '$Config{EnvironmentRoot}$SystemName/var/log/otrs.log';
     \$Self->{'FQDN'}                = 'localhost';
     \$Self->{'DefaultLanguage'}     = 'de';
     \$Self->{'DefaultCharset'}      = 'utf-8';
@@ -222,10 +222,6 @@ $DBH->do(
     "GRANT ALL PRIVILEGES ON $DatabaseSystemName.* TO $DatabaseSystemName\@localhost IDENTIFIED BY '$DatabaseSystemName' WITH GRANT OPTION;"
 );
 $DBH->do('FLUSH PRIVILEGES');
-
-# create logfile
-print STDERR "--- Creating logfile...\n";
-system("sudo touch $InstallDir/otrs.log");
 
 # make sure we've got the correct rights set (e.g. in case you've downloaded the files as root)
 system("sudo chown -R $Config{PermissionsOTRSUser}:$Config{PermissionsOTRSGroup} $InstallDir");
