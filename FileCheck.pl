@@ -149,7 +149,7 @@ sub GetDirectoryFileList {
         , '.filecheckdirignore'
     );
 
-    my @IgnoreDirs = ( 'CVS', '.settings', );
+    my @IgnoreDirs = ( 'CVS', '.settings', '.git', );
 
     my $Dir = $Param{ModuleDirectory};
 
