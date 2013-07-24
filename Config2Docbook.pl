@@ -165,7 +165,7 @@ if ( !$WriteFileSuccess ) {
 sub _help {
     my %Param = @_;
 
-    print "Config2Docbook.pl <Revision $VERSION> - Convert sysc config settings to Docbook"
+    print "Config2Docbook.pl - Convert sysc config settings to Docbook"
         . " format\n";
     print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n";
     print "usage: Config2Docbook.pl -m <path to module> -o <Output filename> (optional)\n";

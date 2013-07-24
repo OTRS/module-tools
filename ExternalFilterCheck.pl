@@ -39,7 +39,7 @@ my $CheckDirectory = '';
 
 getopt( 'hfdn', \%Opts );
 if ( $Opts{h} || !$Opts{f} || !$Opts{d} ) {
-    print "ExternalFilterCheck.pl <Revision $VERSION> - OTRS check all files with filter.pl\n";
+    print "ExternalFilterCheck.pl - OTRS check all files with filter.pl\n";
     print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n";
     print "usage: ExternalFilterCheck.pl -f /path/to/filter.pl -d /path/to/wanteddirectory -ew\n";
     print "       -e -> show errors\n";
