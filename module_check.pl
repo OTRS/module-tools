@@ -278,8 +278,6 @@ sub OriginalFilenameGet {
         # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
         if ( $Line =~ m{ \A \# [ ] \$OldId: [ ] (.+?) ,v [ ] }ixms || $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / ([^/]+) }ixms ) {
 
-            print "FILENAME: $1 \n";
-
             $Filename = $1;
             last LINE;
         }
