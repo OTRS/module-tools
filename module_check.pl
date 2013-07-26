@@ -245,11 +245,10 @@ sub ModuleContentPrepare {
     # put formerly commented code in place
     $Content =~ s{ ^ ---PLACEHOLDER--- $ \s }{ shift @NewCodeBlocks }xmseg;
 
-
-    # delete Origin line
+    # delete $origin line
     # Example:
-    # Origin: AgentTicketZoom.pm
-    $Content =~ s{ ^ \# [ ] ( Origin: [^\n]+ ) \n ( ^ \# [ ] -- \n )? }{}xms;
+    # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
+    $Content =~ s{ ^ \# [ ] ( \$origin: [^\n]+ ) \n ( ^ \# [ ] -- \n )? }{}xms;
 
     # clean the content
     $Content = ContentClean( Content => $Content );
@@ -276,8 +275,11 @@ sub OriginalFilenameGet {
         # Example:
         # $OldId: AgentTicketNote.pm,v 1.34.2.4 2008/03/25 13:27:05 ub Exp $
         # or:
-        # Origin: AgentTicketZoom.pm
-        if ( $Line =~ m{ \A \# [ ] \$OldId: [ ] (.+?) ,v [ ] }ixms || $Line =~ m{ \A \# [ ] Origin: [ ] (\S+) }ixms ) {
+        # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
+        if ( $Line =~ m{ \A \# [ ] \$OldId: [ ] (.+?) ,v [ ] }ixms || $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / ([^/]+) }ixms ) {
+
+            print "FILENAME: $1 \n";
+
             $Filename = $1;
             last LINE;
         }
