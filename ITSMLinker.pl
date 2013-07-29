@@ -34,9 +34,9 @@ if ( !$Opts{'a'} || !$Opts{'v'} || !$Opts{'m'} || !$Opts{'o'} ) {
 }
 if ( $Opts{'h'} ) {
     print "ITSMLinker.pl -  to link / unlink all ITSM modules into a OTRS system\n";
-    print "Copyright (C) 2001-2013 OTRS AG, http://otrs.org/\n";
+    print "Copyright (C) 2001-2013 OTRS AG, http://otrs.org/\n\n";
     print "usage: ITSMLinker.pl -a <install|uninstall> -v <ITSM branch version number> -m <Module-Path> -o <OTRS-path>\n";
-    print "example: ITSMLinker.pl -a install -v 3.3 -m /devel -o otrs33-itsm\n\n";
+    print "example: ITSMLinker.pl -a install -v 3.3 -m /devel -o /devel/otrs33-itsm\n\n";
     exit 1;
 }
 
@@ -61,9 +61,8 @@ $Opts{'v'} = '_' . $Opts{'v'};
 for my $Module (@ITSMModules) {
 
     $Module = $Opts{'m'} . '/' . $Module . $Opts{'v'};
-    my $OTRSPath = $Opts{'m'} . '/' . $Opts{'o'};
 
-    system("perl $Opts{'m'}/module-tools/module-linker.pl $Opts{'a'} $Module $OTRSPath");
+    system("perl $Opts{'m'}/module-tools/module-linker.pl $Opts{'a'} $Module $Opts{'o'}");
 }
 
 
