@@ -45,9 +45,6 @@ use File::Find;
 
 use File::Temp qw( tempfile );
 
-use vars qw($VERSION);
-$VERSION = qw($Revision: 1.30 $) [1];
-
 # get options
 my %Opts = ();
 getopt('omd', \%Opts);
@@ -57,7 +54,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
     $Opts{'h'} = 1;
 }
 if ( $Opts{'h'} ) {
-    print "module_check.pl <Revision $VERSION> - Check OTRS modules\n";
+    print "module_check.pl - Check OTRS modules\n";
     print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n";
     print "usage: module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]\n\n";
     exit 1;
@@ -248,11 +245,10 @@ sub ModuleContentPrepare {
     # put formerly commented code in place
     $Content =~ s{ ^ ---PLACEHOLDER--- $ \s }{ shift @NewCodeBlocks }xmseg;
 
-
-    # delete Origin line
+    # delete $origin line
     # Example:
-    # Origin: AgentTicketZoom.pm
-    $Content =~ s{ ^ \# [ ] ( Origin: [^\n]+ ) \n ( ^ \# [ ] -- \n )? }{}xms;
+    # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
+    $Content =~ s{ ^ \# [ ] ( \$origin: [^\n]+ ) \n ( ^ \# [ ] -- \n )? }{}xms;
 
     # clean the content
     $Content = ContentClean( Content => $Content );
@@ -279,8 +275,9 @@ sub OriginalFilenameGet {
         # Example:
         # $OldId: AgentTicketNote.pm,v 1.34.2.4 2008/03/25 13:27:05 ub Exp $
         # or:
-        # Origin: AgentTicketZoom.pm
-        if ( $Line =~ m{ \A \# [ ] \$OldId: [ ] (.+?) ,v [ ] }ixms || $Line =~ m{ \A \# [ ] Origin: [ ] (\S+) }ixms ) {
+        # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
+        if ( $Line =~ m{ \A \# [ ] \$OldId: [ ] (.+?) ,v [ ] }ixms || $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / ([^/]+) }ixms ) {
+
             $Filename = $1;
             last LINE;
         }

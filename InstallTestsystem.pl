@@ -42,9 +42,6 @@ use DBI;
 use File::Find;
 use Getopt::Std;
 
-use vars qw($VERSION);
-$VERSION = qw($Revision: 1.2 $) [1];
-
 # get options
 my %Opts = ();
 getopt( 'p', \%Opts );
@@ -62,7 +59,7 @@ $InstallDir =~ s{ / \z }{}xms;
 my %Config = (
 
     # the path to your workspace directory, w/ leading and trailing slashes
-    'EnvironmentRoot' => '/devel/',
+    'EnvironmentRoot' => '/ws/',
 
     # the path to your module tools directory, w/ leading and trailing slashes
     'ModuleToolsRoot' => '/ws/module-tools/',
@@ -122,7 +119,7 @@ my $ConfigInjectStr = <<"EOD";
     \$Self->{'CheckMXRecord'}       = 0;
     \$Self->{'Organization'}        = '';
     \$Self->{'LogModule'}           = 'Kernel::System::Log::File';
-    \$Self->{'LogModule::LogFile'}  = '$Config{EnvironmentRoot}$SystemName/otrs.log';
+    \$Self->{'LogModule::LogFile'}  = '$Config{EnvironmentRoot}$SystemName/var/log/otrs.log';
     \$Self->{'FQDN'}                = 'localhost';
     \$Self->{'DefaultLanguage'}     = 'de';
     \$Self->{'DefaultCharset'}      = 'utf-8';
@@ -200,13 +197,12 @@ open( MYOUTFILE, '>' . $ApacheModPerlFile );
 print MYOUTFILE $ApacheModPerlConfigStr;
 close MYOUTFILE;
 
-
 # restart apache
 print STDERR "--- Restarting apache...\n";
 system("sudo $Config{ApacheRestartCommand}");
 
 # install database
-print STDERR "--- Creating tables and inserting data...\n";
+print STDERR "--- Creating Database...\n";
 my $DSN = 'DBI:mysql:';
 my $DBH = DBI->connect(
     $DSN,
@@ -216,28 +212,16 @@ my $DBH = DBI->connect(
 $DBH->do("CREATE DATABASE $DatabaseSystemName charset utf8");
 $DBH->do("use $DatabaseSystemName");
 
-my @SQL = ParseSQLFile( $InstallDir . "/scripts/database/otrs-schema.mysql.sql" );
-for (@SQL) {
-    $DBH->do($_);
-}
-@SQL = ParseSQLFile( $InstallDir . "/scripts/database/otrs-initial_insert.mysql.sql" );
-for (@SQL) {
-    $DBH->do($_);
-}
-@SQL = ParseSQLFile( $InstallDir . "/scripts/database/otrs-schema-post.mysql.sql" );
-for (@SQL) {
-    $DBH->do($_);
-}
-
 print STDERR "--- Creating database user and privileges...\n";
 $DBH->do(
     "GRANT ALL PRIVILEGES ON $DatabaseSystemName.* TO $DatabaseSystemName\@localhost IDENTIFIED BY '$DatabaseSystemName' WITH GRANT OPTION;"
 );
 $DBH->do('FLUSH PRIVILEGES');
 
-# create logfile
-print STDERR "--- Creating logfile...\n";
-system("sudo touch $InstallDir/otrs.log");
+# copy the InstallTestsystemDatabase.pl script in otrs/bin folder, execute it, and delete it
+system("cp $Config{ModuleToolsRoot}InstallTestsystemDatabase.pl $InstallDir/bin/");
+system("perl $InstallDir/bin/InstallTestsystemDatabase.pl $InstallDir");
+system("rm $InstallDir/bin/InstallTestsystemDatabase.pl");
 
 # make sure we've got the correct rights set (e.g. in case you've downloaded the files as root)
 system("sudo chown -R $Config{PermissionsOTRSUser}:$Config{PermissionsOTRSGroup} $InstallDir");
@@ -281,34 +265,6 @@ system(
 print STDERR "############################################\n";
 
 print STDERR "Finished.\n";
-
-sub ParseSQLFile {
-    my $File = shift;
-
-    my @SQL;
-    if ( open( my $In, '<', $File ) ) {
-        my $SQLEnd    = 0;
-        my $SQLSingel = '';
-        while (<$In>) {
-            if ( $_ !~ /^(#|--)/ ) {
-                if ( $_ =~ /^(.*)(;|;\s)$/ || $_ =~ /^(\));/ ) {
-                    $SQLSingel .= $1;
-                    $SQLEnd = 1;
-                }
-                else {
-                    $SQLSingel .= $_;
-                }
-            }
-            if ($SQLEnd) {
-                push @SQL, $SQLSingel;
-                $SQLEnd    = 0;
-                $SQLSingel = '';
-            }
-        }
-        close $In;
-    }
-    return @SQL;
-}
 
 sub Usage {
     my ($Message) = @_;

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # --
 # bin/DatabaseInstall.pl - to install the packages DatabaseInstall()
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -25,7 +25,7 @@ DatabaseInstall.pl - script to setup database tables of linked modules for devel
 
 =head1 SYNOPSIS
 
-CodePolicy.pl -m MyModule.sopm -a [install|uninstall]
+DatabaseInstall.pl -m MyModule.sopm -a [install|uninstall]
 
 =head1 DESCRIPTION
 
@@ -45,9 +45,6 @@ use lib dirname($RealBin) . "/Kernel/cpan-lib";
 use Getopt::Long;
 use Pod::Usage;
 
-use vars qw($VERSION);
-$VERSION = qw($Revision: 1.2 $) [1];
-
 use Kernel::Config;
 use Kernel::System::Encode;
 use Kernel::System::Log;
@@ -56,7 +53,7 @@ use Kernel::System::DB;
 use Kernel::System::Time;
 use Kernel::System::Package;
 
-my ($OptHelp, $Module, $Action);
+my ( $OptHelp, $Module, $Action );
 
 GetOptions(
     'h'   => \$OptHelp,
@@ -64,15 +61,15 @@ GetOptions(
     'a=s' => \$Action
 );
 
-if ($OptHelp) {
-    pod2usage(-verbose => 0);
+if ( $OptHelp || !$Module ) {
+    pod2usage( -verbose => 0 );
 }
 
-if ($Action ne 'uninstall') {
+if ( !defined $Action || $Action ne 'uninstall' ) {
     $Action = 'install';
 }
 
-# call the script with the module name as first argument
+# check if .sopm file exists
 if ( !-e "$Module" ) {
     print "Can not find file $Module!\n";
     exit 0;
@@ -99,10 +96,13 @@ my $PackageContent = $CommonObject{MainObject}->FileRead(
 
 my %Structure = $CommonObject{PackageObject}->PackageParse( String => $PackageContent );
 
-if ($Action eq 'install' && $Structure{DatabaseInstall} && $Structure{DatabaseInstall}->{post} ) {
+if ( $Action eq 'install' && $Structure{DatabaseInstall} && $Structure{DatabaseInstall}->{post} ) {
     $CommonObject{PackageObject}->_Database( Database => $Structure{DatabaseInstall}->{post} );
 }
-elsif ($Action eq 'uninstall' && $Structure{DatabaseUninstall} && $Structure{DatabaseUninstall}->{post} ) {
+elsif ($Action eq 'uninstall'
+    && $Structure{DatabaseUninstall}
+    && $Structure{DatabaseUninstall}->{post} )
+{
     $CommonObject{PackageObject}->_Database( Database => $Structure{DatabaseUninstall}->{post} );
 }
 
