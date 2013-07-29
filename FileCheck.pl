@@ -144,12 +144,12 @@ sub GetDirectoryFileList {
     }
 
     # files and directories to ignore
-    my @IgnoreFiles = (
-        '.cvsignore', '.project', '.includepath', '.*\.sopm', '\.tmp.*', '.filecheckignore'
-        , '.filecheckdirignore'
+    my @IgnoreFiles = qw(
+        .cvsignore .project .includepath .*\.sopm \.tmp.* .filecheckignore
+        .filecheckdirignore .gitignore
     );
 
-    my @IgnoreDirs = ( 'CVS', '.settings', );
+    my @IgnoreDirs = qw( CVS .settings .git );
 
     my $Dir = $Param{ModuleDirectory};
 
