@@ -89,6 +89,7 @@ $SystemName =~ s{/}{}xmsg;
 # Determine a string that is used for database user name, database name and database password
 my $DatabaseSystemName = $SystemName;
 $DatabaseSystemName =~ s{-}{_}xmsg;                         # replace - by _ (hyphens not allowed in database name)
+$DatabaseSystemName =~ s{.}{_}xmsg;                         # replace - by _ (hyphens not allowed in database name)
 $DatabaseSystemName = substr( $DatabaseSystemName, 0, 16 ); # shorten the string (mysql requirement)
 
 # edit Config.pm
@@ -177,7 +178,7 @@ $ApacheConfigStr =~ s{/otrs-web/}{/$SystemName-web/}xmsg;
 $ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perlOFF.c>}xmsg;
 $ApacheConfigStr =~ s{<Location \s+ /otrs>}{<Location /$SystemName>}xms;
 
-open( MYOUTFILE, '>' . $ApacheConfigFile );
+open( MYOUTFILE, '>' . $ApacheConfigFile ) or die "Couldn't open $!";
 print MYOUTFILE $ApacheConfigStr;
 close MYOUTFILE;
 
@@ -193,7 +194,7 @@ $ApacheModPerlConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
 $ApacheModPerlConfigStr =~ s{^#(use DBD::mysql \(\);)$}{$1}msg;
 $ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::mysql;)$}{$1}msg;
 
-open( MYOUTFILE, '>' . $ApacheModPerlFile );
+open( MYOUTFILE, '>' . $ApacheModPerlFile ) or die "Couldn't open $!";
 print MYOUTFILE $ApacheModPerlConfigStr;
 close MYOUTFILE;
 
