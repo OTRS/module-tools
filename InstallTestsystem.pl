@@ -170,11 +170,11 @@ open FILE, $ApacheConfigFile or die "Couldn't open $!";
 my $ApacheConfigStr = join( "", <FILE> );
 close FILE;
 
+$ApacheConfigStr =~ s{Perlrequire \s+ /opt/otrs/scripts/apache2-perl-startup\.pl}{Perlrequire $ApacheModPerlFile}xms;
 $ApacheConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
 $ApacheConfigStr =~ s{/otrs/}{/$SystemName/}xmsg;
 $ApacheConfigStr =~ s{/otrs-web/}{/$SystemName-web/}xmsg;
 $ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perlOFF.c>}xmsg;
-$ApacheConfigStr =~ s{Perlrequire \s+ /opt/otrs/scripts/apache2-perl-startup\.pl}{Perlrequire $ApacheModPerlFile}xms;
 $ApacheConfigStr =~ s{<Location \s+ /otrs>}{<Location /$SystemName>}xms;
 
 open( MYOUTFILE, '>' . $ApacheConfigFile );
