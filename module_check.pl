@@ -54,9 +54,10 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
     $Opts{'h'} = 1;
 }
 if ( $Opts{'h'} ) {
-    print "module_check.pl - Check OTRS modules\n";
-    print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n";
-    print "usage: module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]\n\n";
+    print "\nmodule_check.pl - Check OTRS modules\n";
+    print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n\n";
+    print "usage:\n   module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]\n\n";
+    print "example:\n   /workspace/module-tools/module_check.pl -o /workspace/otrs-git/ -m /workspace/ITSMCore_3_3/\n\n";
     exit 1;
 }
 
