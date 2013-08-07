@@ -89,7 +89,7 @@ $SystemName =~ s{/}{}xmsg;
 # Determine a string that is used for database user name, database name and database password
 my $DatabaseSystemName = $SystemName;
 $DatabaseSystemName =~ s{-}{_}xmsg;                         # replace - by _ (hyphens not allowed in database name)
-$DatabaseSystemName =~ s{.}{_}xmsg;                         # replace - by _ (hyphens not allowed in database name)
+$DatabaseSystemName =~ s{\.}{_}xmsg;                        # replace - by _ (hyphens not allowed in database name)
 $DatabaseSystemName = substr( $DatabaseSystemName, 0, 16 ); # shorten the string (mysql requirement)
 
 # edit Config.pm
