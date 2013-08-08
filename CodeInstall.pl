@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # --
 # bin/CodeInstall.pl - to install the packagesetup CodeInstall()
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -19,6 +19,20 @@
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
+=head1 NAME
+
+CodeInstall.pl - script to run package install and uninstall code for development
+
+=head1 SYNOPSIS
+
+CodeInstall.pl -m MyModule.sopm -a [install|uninstall]
+
+=head1 DESCRIPTION
+
+Please send any questions, suggestions & complaints to <dev-support@otrs.com>
+
+=cut
+
 use strict;
 use warnings;
 
@@ -28,7 +42,8 @@ use FindBin qw($RealBin);
 use lib dirname($RealBin);
 use lib dirname($RealBin) . "/Kernel/cpan-lib";
 
-use Getopt::Std;
+use Getopt::Long;
+use Pod::Usage;
 
 use Kernel::Config;
 use Kernel::System::Encode;
@@ -38,10 +53,24 @@ use Kernel::System::DB;
 use Kernel::System::Time;
 use Kernel::System::Package;
 
-# call the script with the module name as first argument
-my $Module = shift;
-die "Usage: $0 Module.sopm\n" if !defined $Module;
-if ( !-e $Module ) {
+my ( $OptHelp, $Module, $Action );
+
+GetOptions(
+    'h'   => \$OptHelp,
+    'm=s' => \$Module,
+    'a=s' => \$Action
+);
+
+if ( $OptHelp || !$Module ) {
+    pod2usage( -verbose => 0 );
+}
+
+if ( !defined $Action || $Action ne 'uninstall' ) {
+    $Action = 'install';
+}
+
+# check if .sopm file exists
+if ( !-e "$Module" ) {
     print "Can not find file $Module!\n";
     exit 0;
 }
@@ -67,10 +96,19 @@ my $PackageContent = $CommonObject{MainObject}->FileRead(
 
 my %Structure = $CommonObject{PackageObject}->PackageParse( String => $PackageContent );
 
-if ( $Structure{CodeInstall} ) {
+# code install is usually 'post'
+if ( $Action eq 'install' && $Structure{CodeInstall} ) {
     $CommonObject{PackageObject}->_Code(
         Code      => $Structure{CodeInstall},
         Type      => 'post',
+        Structure => \%Structure,
+    );
+}
+# code uninstall is usually 'pre'
+elsif ($Action eq 'uninstall' && $Structure{CodeUninstall} ) {
+    $CommonObject{PackageObject}->_Code(
+        Code      => $Structure{CodeUninstall},
+        Type      => 'pre',
         Structure => \%Structure,
     );
 }
