@@ -90,9 +90,11 @@ sub CleanupFile {
 
     # skip directories
     return if -d $File;
+
     # skip linked files
     return if -l $File;
-    # Only treat plain files
+
+    # only treat plain files
     return if !-f $File;
 
     # skip special directories:
@@ -101,7 +103,7 @@ sub CleanupFile {
 
     # exclude some files:
     # images, fonts, .gitignore, .cvsignore, and others
-    return if $File =~ m{ [.] ( png | psd | jpg | jpeg | gif | tiff | ttf | gitignore | cvsignore | odg | mwb | screen | story | pdf) \s* \z }ixms;
+    return if $File =~ m{ [.] ( png | psd | jpg | jpeg | gif | tiff | ttf | gitignore | cvsignore | project | odg | mwb | screen | story | pdf | dia ) \s* \z }ixms;
 
     # return if file can not be opened
     my $FH;
@@ -150,6 +152,9 @@ sub CleanupFile {
 
     # Remove VERSION from POD
     $Content =~ s{ ^=head1 [ ]* VERSION \n+ ^\$Revision: .*? \n+}{}xmsg;
+
+    # remove double POD =cut lines
+    $Content =~ s{ ^=cut\n+^=cut\n+}{=cut\n}xmsg;
 
     # delete the 'use vars qw($VERSION);' line
     $Content =~ s{ ( ^ $ \n )?  ^ use [ ] vars [ ] qw\(\$VERSION\); $ \n }{}ixms;
