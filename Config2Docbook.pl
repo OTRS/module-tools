@@ -72,7 +72,7 @@ if ($@) {
 
 # get options
 my %Opts = ();
-getopt( 'hmo', \%Opts );
+getopt( 'hmol', \%Opts );
 
 if ( $Opts{h} ) {
     _help();
@@ -83,7 +83,7 @@ if ( $Opts{h} ) {
 if ( !$Opts{m} ) {
     _help();
     print "\n missing path to module\n";
-    print "Example: Config2Docbook -m /Modules/MyModule";
+    print "Example: Config2Docbook -m /Modules/MyModule\n";
     exit 1;
 }
 
@@ -93,12 +93,58 @@ my %Options;
 $Opts{m} =~ s{(.+)/\z}{$1}smx;
 $Options{ConfigDirectory} = $Opts{m} . '/Kernel/Config/Files';
 
+# set output language
+my $Language;
+use vars qw(@ISA);
+my $Self = {};
+bless ($Self);
+if ( $Opts{l} && $Opts{l} eq 'en' ) {
+
+    # always allow plain english
+    $Language = 'en';
+}
+elsif ( $Opts{l} ) {
+
+    # check if a translation file exists
+    my @TranslationFiles = _DirectoryRead(
+        Directory => "$Opts{m}/Kernel/Language/",
+        Filter    => "$Opts{l}_*.pm",
+        Silent    => 1,
+    );
+    if ( @TranslationFiles ) {
+
+        # set desired language
+        $Language = $Opts{l};
+
+        # load translation values
+        for my $TranslationFile ( @TranslationFiles ) {
+            my ($Path, $Module) = ($1, $2) if $TranslationFile =~ m{ \A ( .+ ) / ( [^/]+ ) \.pm \z }xms;
+            {
+                @ISA = ("Kernel::Language::$Module");
+                push @INC, "$Path";
+                eval "require $Module";
+                $Self->Data();
+            }
+        }
+    }
+    else {
+
+        # default to english
+        $Language = 'en';
+    }
+}
+else {
+
+    # default to english
+    $Language = 'en';
+}
+
 # set output file
 my $OutputFile = 'ConfigChapter.xml';
 if ( $Opts{o} ) {
     $OutputFile = $Opts{o} . '.xml';
 }
-$Options{OutputLocation} = $Opts{m} . '/doc/en/' . $OutputFile;
+$Options{OutputLocation} = $Opts{m} . '/doc/' . $Language . '/' . $OutputFile;
 
 # create parser in / out object
 my $XMLObject = new OTRS::XML::Simple;
@@ -168,7 +214,8 @@ sub _help {
     print "Config2Docbook.pl - Convert sysc config settings to Docbook"
         . " format\n";
     print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n";
-    print "usage: Config2Docbook.pl -m <path to module> -o <Output filename> (optional)\n";
+    print "usage: Config2Docbook.pl -m <path to module> -l <language> (optional)"
+        . " -o <Output filename> (optional)\n";
 }
 
 sub _ParseConfigFile {
@@ -255,55 +302,42 @@ sub _CreateDocbookConfigChapter {
         # output
         print "Procesing $SettingFile.xml\n";
 
-        if ( ref $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} eq 'ARRAY' ) {
-
-            for my $Setting ( @{ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} } ) {
-
-                # TODO: Lang shoud be a parameter
-                my $DescriptionContent;
-
-                if ( ref $Setting->{Description} eq 'ARRAY' ) {
-                    DESCRIPTION:
-                    for my $Description ( @{ $Setting->{Description} } ) {
-                        next DESCRIPTION if $Description->{Lang} ne 'en';
-
-                        $DescriptionContent = $Description->{content};
-                        last DESCRIPTION;
-                    }
-                }
-                else {
-                    $DescriptionContent = $Setting->{Description}->{content};
-                }
-
-                push @ConvertedSettings, {
-                    title => $Setting->{Name} . ".",
-                    para  => [
-                        "Group: $Setting->{Group}, Subgroup: $Setting->{SubGroup}.",
-                        $DescriptionContent,
-                    ],
-                };
-
-                # output
-                print "\t Added setting: $Setting->{Name}...done\n";
-            }
+        if ( ref $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} ne 'ARRAY' ) {
+            $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} =
+                [ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} ];
         }
-        else {
-            my $Setting = $Param{ConfigSettings}->{$SettingFile}->{ConfigItem};
 
-            # TODO: Lang shoud be a parameter
+        for my $Setting ( @{ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} } ) {
+
             my $DescriptionContent;
 
-            if ( ref $Setting->{Description} eq 'ARRAY' ) {
-                DESCRIPTION:
-                for my $Description ( @{ $Setting->{Description} } ) {
-                    next DESCRIPTION if $Description->{Lang} ne 'en';
+            if ( ref $Setting->{Description} ne 'ARRAY' ) {
+                $Setting->{Description} = [ $Setting->{Description} ];
+            }
+
+            DESCRIPTION:
+            for my $Description ( @{ $Setting->{Description} } ) {
+
+                # for legacy documentation with individual languages
+                if ( $Description->{Lang} ) {
+                    next DESCRIPTION if $Description->{Lang} ne $Language;
 
                     $DescriptionContent = $Description->{content};
                     last DESCRIPTION;
                 }
-            }
-            else {
-                $DescriptionContent = $Setting->{Description}->{content};
+
+                # only items with 'Translatable' flag from here
+                next DESCRIPTION if !$Description->{Translatable};
+
+                # get original (english) description first
+                $DescriptionContent = $Description->{content};
+
+                # check for translation
+                if ( $Self->{Translation}->{$DescriptionContent} ) {
+                    $DescriptionContent = $Self->{Translation}->{$DescriptionContent};
+                }
+
+                last DESCRIPTION;
             }
 
             push @ConvertedSettings, {
