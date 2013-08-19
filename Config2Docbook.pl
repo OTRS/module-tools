@@ -41,11 +41,11 @@ sub sorted_keys
     if ( $Name eq 'chapter' ) {
 
         # set the right sort order
-        return ( 'title', 'para', 'section', );
+        return ( 'title', 'para', 'sect1', );
     }
 
     # only change sort order for section
-    if ( $Name eq 'section' ) {
+    if ( $Name eq 'sect1' ) {
 
         # set the right sort order
         return ( 'title', 'para', );
@@ -244,7 +244,7 @@ sub _CreateDocbookConfigChapter {
             title => 'Configuration',
             para =>
                 'The package can be configured via the SysConfig in the Admin Interface. The following configuration options are available:',
-            section => [],
+            sect1 => [],
         },
     );
 
@@ -319,7 +319,7 @@ sub _CreateDocbookConfigChapter {
         }
     }
 
-    $Docbook{chapter}->{section} = \@ConvertedSettings;
+    $Docbook{chapter}->{sect1} = \@ConvertedSettings;
 
     #output
     print "\nGenerating Docbook structure...";
