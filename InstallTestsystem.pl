@@ -89,7 +89,7 @@ $SystemName =~ s{/}{}xmsg;
 # Determine a string that is used for database user name, database name and database password
 my $DatabaseSystemName = $SystemName;
 $DatabaseSystemName =~ s{-}{_}xmsg;                         # replace - by _ (hyphens not allowed in database name)
-$DatabaseSystemName =~ s{\.}{_}xmsg;                        # replace - by _ (hyphens not allowed in database name)
+$DatabaseSystemName =~ s{\.}{_}xmsg;                        # replace . by _ (hyphens not allowed in database name)
 $DatabaseSystemName = substr( $DatabaseSystemName, 0, 16 ); # shorten the string (mysql requirement)
 
 # edit Config.pm
@@ -233,6 +233,12 @@ print STDERR "############################################\n";
 system(
     "$Config{ModuleToolsRoot}/module-linker.pl install $Config{EnvironmentRoot}Fred $InstallDir"
 );
+print STDERR "############################################\n";
+
+# Deleting Cache
+print STDERR "--- Deleting cache config...\n";
+print STDERR "############################################\n";
+system("sudo perl $InstallDir/bin/otrs.DeleteCache.pl");
 print STDERR "############################################\n";
 
 # Rebuild Config
