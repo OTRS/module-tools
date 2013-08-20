@@ -250,6 +250,14 @@ for my $Service ( @{ $Config->{Services} } ) {
         print STDERR "Service $ServiceID has been created.\n";
         $ServicesNameToID{ $Service->{Name} } = $ServiceID;
     }
+
+    # add service as defalut service for all customers
+    $CommonObject{ServiceObject}->CustomerUserServiceMemberAdd(
+        CustomerUserLogin => '<DEFAULT>',
+        ServiceID         => $ServiceID,
+        Active            => 1,
+        UserID            => 1,
+    );
 }
 
 # Add SLAs and connect them with the Services
