@@ -110,9 +110,13 @@ my $ModuleFinder = sub {
     return if $FileName =~ m{\.project}xms;
     return if $FileName =~ m{\.includepath}xms;
     return if $FileName =~ m{\.settings}xms;
-    return if $FileName =~ m{SVN}xms;
+    return if $FileName =~ m{/SVN}xms;
     return if $FileName =~ m{\.svn}xms;
-    return if $FileName =~ m{CVS}xms;
+    return if $FileName =~ m{/CVS}xms;
+    return if $FileName =~ m{/\.git}xms;
+    return if $FileName =~ m{/\.DS_Store}xms;
+    return if $FileName =~ m{/\.tidyall\.d/}xms;
+    return if $FileName =~ m{perltidy\.LOG}xms;
     return if $FileName =~ m{ $SOPMFileName \z}xms;
     return if $FileName =~ m{ \. dia \z }xms;
 
