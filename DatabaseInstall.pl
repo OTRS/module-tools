@@ -96,17 +96,32 @@ my $PackageContent = $CommonObject{MainObject}->FileRead(
 
 my %Structure = $CommonObject{PackageObject}->PackageParse( String => $PackageContent );
 
-# database install is usually 'post'
-if ( $Action eq 'install' && $Structure{DatabaseInstall} && $Structure{DatabaseInstall}->{post} ) {
-    $CommonObject{PackageObject}->_Database(
-        Database => $Structure{DatabaseInstall}->{post},
-    );
+if ( $Action eq 'install' && $Structure{DatabaseInstall} ) {
+
+    if ( $Structure{DatabaseInstall}->{pre} ) {
+        $CommonObject{PackageObject}->_Database(
+            Database => $Structure{DatabaseInstall}->{pre},
+        );
+    }
+
+    if ( $Structure{DatabaseInstall}->{post} ) {
+        $CommonObject{PackageObject}->_Database(
+            Database => $Structure{DatabaseInstall}->{post},
+        );
+    }
 }
-# database uninstall is usually 'pre'
-elsif ( $Action eq 'uninstall'  && $Structure{DatabaseUninstall} && $Structure{DatabaseUninstall}->{pre} ) {
-    $CommonObject{PackageObject}->_Database(
-        Database => $Structure{DatabaseUninstall}->{pre},
-    );
+
+if ( $Action eq 'uninstall' && $Structure{DatabaseUninstall} ) {
+    if ( $Structure{DatabaseUninstall}->{pre} ) {
+        $CommonObject{PackageObject}->_Database(
+            Database => $Structure{DatabaseUninstall}->{pre},
+        );
+    }
+    if ( $Structure{DatabaseUninstall}->{post} ) {
+        $CommonObject{PackageObject}->_Database(
+            Database => $Structure{DatabaseUninstall}->{post},
+        );
+    }
 }
 
 print "... done\n"
