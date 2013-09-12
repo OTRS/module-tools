@@ -1,0 +1,15 @@
+<snippet>
+	<content><![CDATA[
+for my \$Needed ( qw($1) ) {
+    # check needed stuff
+    if ( !\$Param{ \$Needed } ) {
+        \$Self->{LogObject}->Log(
+            Priority => 'error',
+            Message  => "Need \$Needed!",
+        );
+        return;
+    }
+}
+]]></content>
+	<tabTrigger>oneededloop</tabTrigger> -->
+</snippet>
