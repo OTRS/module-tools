@@ -1,7 +1,8 @@
 <snippet>
-	<content><![CDATA[
+    <content><![CDATA[
 \$Self->{LogObject}->Dumper('Debug - ${1:ModuleName}', '${2:VariableName}', ${3:\\}$4${2:VariableName});
 ]]></content>
-	<tabTrigger>odu</tabTrigger>
-	<!-- <scope>source.perl</scope> -->
+    <tabTrigger>odu</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.perl</scope> -->
 </snippet>
