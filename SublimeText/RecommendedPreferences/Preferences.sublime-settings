@@ -40,10 +40,10 @@
 
 		".metadata",
 		"css-cache",
-        "js-cache",
-        "var/tmp",
-        "var/fred",
-        "var/article"
+		"js-cache",
+		"var/tmp",
+		"var/fred",
+		"var/article"
 	],
 
 	"bold_folder_labels": true,
