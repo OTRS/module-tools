@@ -104,8 +104,9 @@ if ( $Action eq 'install' && $Structure{CodeInstall} ) {
         Structure => \%Structure,
     );
 }
+
 # code uninstall is usually 'pre'
-elsif ($Action eq 'uninstall' && $Structure{CodeUninstall} ) {
+elsif ( $Action eq 'uninstall' && $Structure{CodeUninstall} ) {
     $CommonObject{PackageObject}->_Code(
         Code      => $Structure{CodeUninstall},
         Type      => 'pre',

@@ -2,7 +2,7 @@
 # --
 # module-tools/link.pl
 #   - script for linking OTRS modules into framework root
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -84,7 +84,7 @@ R($Start);
 sub R {
     my $In   = shift;
     my @List = glob("$In/*");
-    foreach my $File (@List) {
+    for my $File (@List) {
         $File =~ s/\/\//\//g;
 
         # recurse into subdirectories
@@ -105,7 +105,7 @@ sub R {
                 my $Directory        = $1;
                 my @Directories      = split( /\//, $Directory );
                 my $DirectoryCurrent = '';
-                foreach my $Directory (@Directories) {
+                for my $Directory (@Directories) {
                     $DirectoryCurrent .= "/$Directory";
                     if ( $DirectoryCurrent && !-d $DirectoryCurrent ) {
                         if ( mkdir $DirectoryCurrent ) {
