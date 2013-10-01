@@ -33,10 +33,20 @@ if ( !$Opts{'a'} || !$Opts{'v'} || !$Opts{'m'} || !$Opts{'o'} ) {
     $Opts{'h'} = 1;
 }
 if ( $Opts{'h'} ) {
-    print "ITSMLinker.pl -  to link / unlink all ITSM modules into a OTRS system\n";
-    print "Copyright (C) 2001-2013 OTRS AG, http://otrs.org/\n\n";
-    print "usage: ITSMLinker.pl -a <install|uninstall> -v <ITSM branch version number> -m <Module-Path> -o <OTRS-path>\n";
-    print "example: ITSMLinker.pl -a install -v 3.3 -m /devel -o /devel/otrs33-itsm\n\n";
+
+    print <<'EOF';
+
+ITSMLinker.pl -  to link / unlink all ITSM modules into a OTRS system
+Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
+
+Usage:
+    ITSMLinker.pl -a <install|uninstall> -v <ITSM branch version number> -m <Module-Path> -o <OTRS-path>
+
+Example:
+    ITSMLinker.pl -a install -v 3.3 -m /devel -o /devel/otrs33-itsm
+
+EOF
+
     exit 1;
 }
 
@@ -57,6 +67,9 @@ if ( $Opts{'a'} eq 'uninstall' ) {
 # replace . with _
 $Opts{'v'} =~ s{\.}{_}gxms;
 $Opts{'v'} = '_' . $Opts{'v'};
+
+# remove slashes at the end
+$Opts{'m'} =~ s{ / \z }{}gxms;
 
 for my $Module (@ITSMModules) {
 
