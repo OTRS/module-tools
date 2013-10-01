@@ -250,8 +250,8 @@ sub PrintFiles() {
     print "\n+ List of files in $Param{Source} +\n";
     print "---------\n";
     my $Counter = 0;
-    for my $file ( sort @{ $Param{ListOfFiles} } ) {
-        print "$file \n";
+    for my $File ( sort @{ $Param{ListOfFiles} } ) {
+        print "$File \n";
         $Counter++;
     }
     print "---------\n"
@@ -311,8 +311,8 @@ sub DiffList {
                 . "Please check for syntax errors\n"
                 . "----------------\n";
             my $Counter = 0;
-            for my $file (sort @SOPMvsDIR) {
-                print "  " . $file . "\n";
+            for my $File (sort @SOPMvsDIR) {
+                print "  " . $File . "\n";
                 $Counter++;
             }
             print "----------------\n"
@@ -328,8 +328,8 @@ sub DiffList {
                 . "----------------\n";
 
             my $Counter = 0;
-            for my $file (sort @DIRvsSOPM) {
-                print "  $file\n";
+            for my $File (sort @DIRvsSOPM) {
+                print "  $File\n";
                 $Counter++;
             }
             print "----------------\n"
