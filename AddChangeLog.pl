@@ -2,7 +2,7 @@
 # --
 # module-tools/AddChangeLog.pl
 #   - script for adding entries to change log
-# Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -61,32 +61,34 @@ Formats the line and inserts it to the correct location.
 sub UpdateChanges {
 
     my $ChangesFile;
-    for my $File ( qw ( CHANGES.md CHANGES ) ){
+    FILE:
+    for my $File (qw ( CHANGES.md CHANGES )) {
         if ( -e $File ) {
             $ChangesFile = $File;
-            last;
+            last FILE;
         }
     }
     if ( !$ChangesFile ) {
         die "No CHANGES.md or CHANGES file found in path.\n";
     }
 
-    # format Change line. If bug does not exist, this will stop the script.
-    my $ChangeLine = FormatChangesLine($Bug, $ChangesFile);
+    # If bug does not exist, this will stop the script.
+    my $Summary = GetBugSummary($Bug);
+    my $ChangeLine = FormatChangesLine( $Bug, $Summary, $ChangesFile );
 
     # read in existing changes file
-    open my $InFile, '<', $ChangesFile || die "Couldn't open $ChangesFile: $!";
+    open my $InFile, '<', $ChangesFile || die "Couldn't open $ChangesFile: $!";    ## no critic
     binmode $InFile;
     my @Changes = <$InFile>;
     close $InFile;
 
     # write out new file with added line
-    open my $OutFile, '>', $ChangesFile || die "Couldn't open $ChangesFile: $!";
+    open my $OutFile, '>', $ChangesFile || die "Couldn't open $ChangesFile: $!";    ## no critic
     binmode $OutFile;
 
     my $Printed = 0;
-    for my $Line ( @Changes ) {
-        if (!$Printed && $Line =~ /^ - / ) {
+    for my $Line (@Changes) {
+        if ( !$Printed && $Line =~ /^ - / ) {
             print $OutFile $ChangeLine;
             $Printed = 1;
         }
@@ -94,8 +96,27 @@ sub UpdateChanges {
     }
     close $OutFile;
 
-    # TODO maybe prepare git log message, add CHANGES to staged files.
+    ## no critic
+    open $OutFile, '>',
+        '.git/OTRSCommitTemplate.msg' || die "Couldn't open .git/OTRSCommitTemplate.msg: $!";
+    ## use critic
+    binmode $OutFile;
+    print $OutFile "Fixed: $Summary (bug#$Bug).\n";
+    close $OutFile;
+
     return 1;
+}
+
+sub GetBugSummary {
+    my $Bug = shift;
+
+    # get bug description from bug tracker
+    # if bug does not exist we automatically get an error message and the script dies
+    my $Bugzilla = new WWW::Bugzilla3( site => 'bugs.otrs.org' );
+    my @BugInfo  = $Bugzilla->get_bugs($Bug);
+    my $Summary  = $BugInfo[0]->{summary};
+
+    return $Summary;
 }
 
 =item FormatChangesLine()
@@ -109,29 +130,26 @@ file (Markdown or not) generates a properly formatted entry and returns this.
 
 sub FormatChangesLine {
 
-    my $Bug = shift;
+    my $Bug         = shift;
+    my $Summary     = shift;
     my $ChangesFile = shift;
 
-    # get bug description from bug tracker
-    # if bug does not exist we automatically get an error message and the script dies
-    my $Bugzilla = new WWW::Bugzilla3(site => 'bugs.otrs.org');
-    my @BugInfo = $Bugzilla->get_bugs( $Bug );
-    my $Description = $BugInfo[0]->{summary};
-
     # get todays date as iso format (yyyy-mm-dd)
-    my $Time = localtime;
+    my $Time = localtime;      ## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
     my $Date = $Time->ymd();
 
-    # formatting is different for markdown files; below first 'regular', second 'markdown'.
-    # - 2013-03-02 Fixed bug#9214 - IE10: impossible to open links from rich text articles.
-    # - 2013-03-02 Fixed bug#[9214](http://bugs.otrs.org/show_bug.cgi?id=9214) - IE10: impossible to open links from rich text articles.
+# formatting is different for markdown files; below first 'regular', second 'markdown'.
+# - 2013-03-02 Fixed bug#9214 - IE10: impossible to open links from rich text articles.
+# - 2013-03-02 Fixed bug#[9214](http://bugs.otrs.org/show_bug.cgi?id=9214) - IE10: impossible to open links from rich text articles.
 
     # format for CHANGES (OTRS 3.1.x and earlier) is different from CHANGES.md
     my $Line;
     if ( $ChangesFile eq 'CHANGES' ) {
-        $Line = " - $Date Fixed bug#$Bug - $Description.\n";    }
+        $Line = " - $Date Fixed bug#$Bug - $Summary.\n";
+    }
     else {
-        $Line = " - $Date Fixed bug#[$Bug](http://bugs.otrs.org/show_bug.cgi?id=$Bug) - $Description.\n";
+        $Line
+            = " - $Date Fixed bug#[$Bug](http://bugs.otrs.org/show_bug.cgi?id=$Bug) - $Summary.\n";
     }
     return $Line;
 }
