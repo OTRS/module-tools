@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 # --
-# module-tools/module-linker.pl
-#   - script for linking OTRS modules into framework root
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# module-linker.pl - script for linking OTRS modules into framework root
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -23,6 +22,8 @@
 use strict;
 use warnings;
 
+## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
+
 use File::Find;
 use Cwd;
 
@@ -33,6 +34,7 @@ if ( $Action !~ m{^(install|uninstall)$} ) {
 }
 
 if ( $^O =~ 'MSWin' ) {
+
     require Win32;
 
     # mklink is only supported on Vista, Win2008 or later.
@@ -139,7 +141,9 @@ sub InstallHandler {
             }
 
             # remove link to some different file
+            ## no critic
             unlink($Target) or die "ERROR: Can't unlink symlink: $Target";
+            ## use critic
         }
 
         # backup target if it already exists as a file
@@ -207,7 +211,9 @@ sub UninstallHandler {
 
         # remove link only if it points to our current source
         if ( readlink($Target) eq $File::Find::name ) {
+            ## no critic
             unlink($Target) or die "ERROR: Can't unlink symlink: $Target";
+            ## use critic
             print "NOTICE: link from $Target removed\n";
         }
 
@@ -224,29 +230,4 @@ sub UninstallHandler {
     return 1;
 }
 
-=head1 NAME
-
-module-linker.pl - simplified reimplementation of link.pl and remove-links.pl
-based on File::Find
-
-=head1 SYNOPSIS
-
-module-linker.pl install <source-module-folder> <otrs-folder>
-or
-module-linker.pl uninstall <source-module-folder> <otrs-folder>
-
-This script either installs a given OTRS module into the OTRS framework (by creating
-appropriate links) or uninstalls the module (by removing those links again).
-
-The intention of this reimplementation is to have simpler code and to make the
-script slightly more robust against unintended inclusion of unwanted files,
-e.g. files contained in repository meta folders ('CVS' or '.svn') and IDE-specific
-files (.project and the like).
-
-=head1 TERMS AND CONDITIONS
-
-This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (GPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut
+exit 0;

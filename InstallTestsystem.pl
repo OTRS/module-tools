@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 # --
-# module-tools/InstallTestsystem.pl
-#
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# InstallTestsystem.pl - script to setup test systems
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -16,9 +15,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # or see http://www.gnu.org/licenses/agpl.txt.
-# ---
+# --
 
 =head1 NAME
 
@@ -65,18 +64,18 @@ my %Config = (
     'ModuleToolsRoot' => '/ws/module-tools/',
 
     # user name for mysql (should be the same that you usually use to install a local OTRS instance)
-    'DatabaseUserName'     => 'root',
+    'DatabaseUserName' => 'root',
 
     # password for your mysql user
-    'DatabasePassword'     => '',
+    'DatabasePassword' => '',
 
-    'PermissionsOTRSUser'  => '_www',                 # OTRS user
-    'PermissionsOTRSGroup' => '_www',                 # OTRS group
-    'PermissionsWebUser'   => '_www',                 # otrs-web user
-    'PermissionsWebGroup'  => '_www',                 # otrs-web group
+    'PermissionsOTRSUser'  => '_www',    # OTRS user
+    'PermissionsOTRSGroup' => '_www',    # OTRS group
+    'PermissionsWebUser'   => '_www',    # otrs-web user
+    'PermissionsWebGroup'  => '_www',    # otrs-web group
 
     # the apache config of the system you're going to install will be copied to this location
-    'ApacheCFGDir'         => '/etc/apache2/other/',
+    'ApacheCFGDir' => '/etc/apache2/other/',
 
     # the command to restart apache (could be different on other systems)
     'ApacheRestartCommand' => 'apachectl graceful',
@@ -88,8 +87,8 @@ $SystemName =~ s{/}{}xmsg;
 
 # Determine a string that is used for database user name, database name and database password
 my $DatabaseSystemName = $SystemName;
-$DatabaseSystemName =~ s{-}{_}xmsg;                         # replace - by _ (hyphens not allowed in database name)
-$DatabaseSystemName =~ s{\.}{_}xmsg;                        # replace . by _ (hyphens not allowed in database name)
+$DatabaseSystemName =~ s{-}{_}xmsg;     # replace - by _ (hyphens not allowed in database name)
+$DatabaseSystemName =~ s{\.}{_}xmsg;    # replace . by _ (hyphens not allowed in database name)
 $DatabaseSystemName = substr( $DatabaseSystemName, 0, 16 ); # shorten the string (mysql requirement)
 
 # edit Config.pm
@@ -100,9 +99,11 @@ if ( !-e $InstallDir . '/Kernel/Config.pm.dist' ) {
     exit 2;
 }
 
-open FILE, $InstallDir . '/Kernel/Config.pm.dist' or die "Couldn't open $!";
-my $ConfigStr = join( "", <FILE> );
-close FILE;
+## no critic
+open my $File, $InstallDir . '/Kernel/Config.pm.dist' or die "Couldn't open $!";
+## use critic
+my $ConfigStr = join( "", <$File> );
+close $File;
 
 $ConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
 $ConfigStr =~ s{('otrs'|'some-pass')}{'$DatabaseSystemName'}xmsg;
@@ -143,9 +144,11 @@ EOD
 
 $ConfigStr =~ s{\# \s* \$Self->\{CheckMXRecord\} \s* = \s* 0;}{$ConfigInjectStr}xms;
 
-open( MYOUTFILE, '>' . $InstallDir . '/Kernel/Config.pm' );
-print MYOUTFILE $ConfigStr;
-close MYOUTFILE;
+## no critic
+open( my $MyOutFile, '>' . $InstallDir . '/Kernel/Config.pm' );
+## use critic
+print $MyOutFile $ConfigStr;
+close $MyOutFile;
 
 # check apache config
 if ( !-e $InstallDir . '/scripts/apache2-httpd.include.conf' ) {
@@ -167,25 +170,32 @@ system(
 );
 
 print STDERR "--- Editing Apache config...\n";
-open FILE, $ApacheConfigFile or die "Couldn't open $!";
-my $ApacheConfigStr = join( "", <FILE> );
-close FILE;
+## no critic
+open $File, $ApacheConfigFile or die "Couldn't open $!";
+## use critic
+my $ApacheConfigStr = join( "", <$File> );
+close $File;
 
-$ApacheConfigStr =~ s{Perlrequire \s+ /opt/otrs/scripts/apache2-perl-startup\.pl}{Perlrequire $ApacheModPerlFile}xms;
+$ApacheConfigStr
+    =~ s{Perlrequire \s+ /opt/otrs/scripts/apache2-perl-startup\.pl}{Perlrequire $ApacheModPerlFile}xms;
 $ApacheConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
 $ApacheConfigStr =~ s{/otrs/}{/$SystemName/}xmsg;
 $ApacheConfigStr =~ s{/otrs-web/}{/$SystemName-web/}xmsg;
 $ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perlOFF.c>}xmsg;
 $ApacheConfigStr =~ s{<Location \s+ /otrs>}{<Location /$SystemName>}xms;
 
-open( MYOUTFILE, '>' . $ApacheConfigFile ) or die "Couldn't open $!";
-print MYOUTFILE $ApacheConfigStr;
-close MYOUTFILE;
+## no critic
+open( $MyOutFile, '>' . $ApacheConfigFile ) or die "Couldn't open $!";
+## use critic
+print $MyOutFile $ApacheConfigStr;
+close $MyOutFile;
 
 print STDERR "--- Editing Apache mod perl config...\n";
-open FILE, $ApacheModPerlFile or die "Couldn't open $!";
-my $ApacheModPerlConfigStr = join( "", <FILE> );
-close FILE;
+## no critic
+open $File, $ApacheModPerlFile or die "Couldn't open $!";
+## use critic
+my $ApacheModPerlConfigStr = join( "", <$File> );
+close $File;
 
 # set correct path
 $ApacheModPerlConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
@@ -194,9 +204,11 @@ $ApacheModPerlConfigStr =~ s{/opt/otrs}{$InstallDir}xmsg;
 $ApacheModPerlConfigStr =~ s{^#(use DBD::mysql \(\);)$}{$1}msg;
 $ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::mysql;)$}{$1}msg;
 
-open( MYOUTFILE, '>' . $ApacheModPerlFile ) or die "Couldn't open $!";
-print MYOUTFILE $ApacheModPerlConfigStr;
-close MYOUTFILE;
+## no critic
+open( $MyOutFile, '>' . $ApacheModPerlFile ) or die "Couldn't open $!";
+## use critic
+print $MyOutFile $ApacheModPerlConfigStr;
+close $MyOutFile;
 
 # restart apache
 print STDERR "--- Restarting apache...\n";

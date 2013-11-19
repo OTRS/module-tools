@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# bin/ModuleCode.pl - to install the packagesetup CodeInstall()
+# ModuleCode.pl - to install the packagesetup CodeInstall()
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify

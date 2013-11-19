@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 # --
-# module-tools/AddChangeLog.pl
-#   - script for adding entries to change log
+# AddChangeLog.pl - script for adding entries to change log
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify

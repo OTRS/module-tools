@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 # --
-# module-tools/CheckChangedFiles.pl
-#   - script for get changed file between different releases of OTRS
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# CheckChangedFiles.pl - script for get changed file between different releases of OTRS
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -45,6 +44,8 @@ Please send any questions, suggestions & complaints to <dev-support@otrs.com>
 
 use strict;
 use warnings;
+
+## nofilter(TidyAll::Plugin::OTRS::Perl::PerlCritic)
 
 use Getopt::Long;
 use Pod::Usage;
@@ -175,10 +176,10 @@ sub FindFilesOfVersion {
         return if @ReducedChecks && !grep { $PackageName =~ m{\A $_ }xms } @ReducedChecks;
 
         # create file handle for digest function
-        open( FH, '<', $FileName ) or return;
-        binmode(FH);
-        $VersionFile2MD5{$PackageName} = Digest::MD5->new->addfile(*FH)->hexdigest;
-        close(FH);
+        open my $FH, '<', $FileName or return;
+        binmode $FH;
+        $VersionFile2MD5{$PackageName} = Digest::MD5->new()->addfile($FH)->hexdigest();
+        close $FH;
     };
 
     # start gathering filelist

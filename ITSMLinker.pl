@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# bin/ITSMLinker.pl - to link / unlink all ITSM modules into a OTRS system
+# ITSMLinker.pl - to link / unlink all ITSM modules into a OTRS system
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify

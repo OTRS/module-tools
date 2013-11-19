@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # --
-# module-tools/FileCheck.pl - searchs for mistakes in the list of files registered in SOPM
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# FileCheck.pl - searchs for mistakes in the list of files registered in SOPM
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -164,7 +164,9 @@ sub GetDirectoryFileList {
 
         # check if file can not open
         my $FH;
+        ## no critic
         if ( !open $FH, '<', $CustomIgnoreFilesLocation ) {
+            ## use critic
             print "Can't open or read '$CustomIgnoreFilesLocation': $!"
         }
         else {
@@ -181,7 +183,9 @@ sub GetDirectoryFileList {
 
         # check if file can not open
         my $FH;
+        ## no critic
         if ( !open $FH, '<', $CustomIgnoreDirsLocation ) {
+            ## use critic
             print "Can't open or read '$CustomIgnoreDirsLocation': $!"
         }
         else {
@@ -211,15 +215,22 @@ sub GetDirectoryFileList {
         my $MatchFile       = 0;
         my $MatchCustomFile = 0;
 
+        IGNOREDIRECTORY:
         for my $IgnoreDirectory (@IgnoreDirs) {
+
             $MatchDir = $FullName =~ m{$IgnoreDirectory/}xms;
-            last if ($MatchDir);
+
+            last IGNOREDIRECTORY if $MatchDir;
         }
 
+        IGNOREFILE:
         for my $IgnoreFile (@IgnoreFiles) {
-            $MatchFile       = $Name      =~ m{\A$IgnoreFile\z}xms;
+
+            $MatchFile       = $Name =~ m{\A$IgnoreFile\z}xms;
             $MatchCustomFile = $CleanName =~ m{\A$IgnoreFile\z}xms;
-            last if ( $MatchFile || $MatchCustomFile );
+
+            last IGNOREFILE if $MatchFile;
+            last IGNOREFILE if $MatchCustomFile;
         }
 
         if ( !$MatchDir && !$MatchFile && !$MatchCustomFile ) {
@@ -237,14 +248,16 @@ sub GetDirectoryFileList {
                 ListOfFiles => \@FileList,
             );
         }
-        return sort @FileList;
+
+        my @SortedFileList = sort @FileList;
+
+        return @SortedFileList;
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
-sub PrintFiles() {
+sub PrintFiles {
     my %Param = @_;
 
     print "\n+ List of files in $Param{Source} +\n";
@@ -277,18 +290,18 @@ sub DiffList {
     # get files in SOPM and not in File System
     # diff Hashes
     my @SOPMvsDIR;
-    for my $key ( keys %SOPM ) {
-        if ( !$Directory{$key} ) {
-            push @SOPMvsDIR, $key;
+    for my $Key ( sort keys %SOPM ) {
+        if ( !$Directory{$Key} ) {
+            push @SOPMvsDIR, $Key;
         }
     }
 
     # get files in File System and not in SOPM
     # diff Hashes
     my @DIRvsSOPM;
-    for my $key ( keys %Directory ) {
-        if ( !$SOPM{$key} ) {
-            push @DIRvsSOPM, $key;
+    for my $Key ( sort keys %Directory ) {
+        if ( !$SOPM{$Key} ) {
+            push @DIRvsSOPM, $Key;
         }
     }
 
@@ -311,7 +324,7 @@ sub DiffList {
                 . "Please check for syntax errors\n"
                 . "----------------\n";
             my $Counter = 0;
-            for my $File (sort @SOPMvsDIR) {
+            for my $File ( sort @SOPMvsDIR ) {
                 print "  " . $File . "\n";
                 $Counter++;
             }
@@ -328,7 +341,7 @@ sub DiffList {
                 . "----------------\n";
 
             my $Counter = 0;
-            for my $File (sort @DIRvsSOPM) {
+            for my $File ( sort @DIRvsSOPM ) {
                 print "  $File\n";
                 $Counter++;
             }

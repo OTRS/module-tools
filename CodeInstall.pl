@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# bin/CodeInstall.pl - to install the packagesetup CodeInstall()
+# CodeInstall.pl - to install the packagesetup CodeInstall()
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
@@ -114,4 +114,6 @@ elsif ( $Action eq 'uninstall' && $Structure{CodeUninstall} ) {
     );
 }
 
-print "... done\n"
+print "... done\n";
+
+exit 0;

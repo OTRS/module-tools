@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# bin/DatabaseInstall.pl - to install the packages DatabaseInstall()
+# DatabaseInstall.pl - to install the packages DatabaseInstall()
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify

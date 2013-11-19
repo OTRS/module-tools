@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # --
-# module-tools/module_check.pl - script to check OTRS modules
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# module_check.pl - script to check OTRS modules
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
@@ -55,7 +55,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
 }
 if ( $Opts{'h'} ) {
     print "\nmodule_check.pl - Check OTRS modules\n";
-    print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n\n";
+    print "Copyright (C) 2001-2013 OTRS AG, http://otrs.com/\n\n";
     print "usage:\n   module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]\n\n";
     print "example:\n   /workspace/module-tools/module_check.pl -o /workspace/otrs-git/ -m /workspace/ITSMCore_3_3/\n\n";
     exit 1;
@@ -121,8 +121,8 @@ sub CheckFile {
     my $OriginalFH = File::Temp->new( DIR => '/tmp');
 
     # get temp file names
-    my $ModuleTempfile   = $ModuleFH->filename;
-    my $OriginalTempfile = $OriginalFH->filename;
+    my $ModuleTempfile   = $ModuleFH->filename();
+    my $OriginalTempfile = $OriginalFH->filename();
 
     # save content to temp files
     print $ModuleFH $ModuleContent;
@@ -172,7 +172,9 @@ sub OriginalContentPrepare {
     my (%Param) = @_;
 
     # open file and get content
+    ## no critic
     open my $FH, '<', $Param{File} or die "could not open file $Param{File}\n";
+    ## use critic
     my $Content = do { local $/; <$FH> };
     close $FH;
 
@@ -192,7 +194,9 @@ sub ModuleContentPrepare {
     my (%Param) = @_;
 
     # open file and get content
+    ## no critic
     open my $FH, '<', $Param{File} or die "could not open file $Param{File}\n";
+    ## use critic
     my $Content = do { local $/; <$FH> };
     close $FH;
 
@@ -266,7 +270,9 @@ No documentation yet.
 sub OriginalFilenameGet {
     my (%Param) = @_;
 
+    ## no critic
     open my $FH, '<', $Param{File} or die "could not open file $Param{File}\n";
+    ## use critic
 
     my $Counter = 0;
     my $Filename;
@@ -361,15 +367,3 @@ sub ContentClean {
 }
 
 exit 0;
-
-=back
-
-=head1 KNOWN LIMITATIONS
-
-False negatives might be reported when the first line of the new content starts with an '#'.
-
-=head1 SEE ALSO
-
-L<https://wiki.otrs.com/twiki/bin/view/Development/KennzeichnungVonCodestellenAngepassterOTRS-Framework-Dateien>
-
-=cut

@@ -1,11 +1,7 @@
 #!/usr/bin/perl
 # --
-# module-tools/FillTestsystem.pl
-#   - script for adding test data to a OTRS instance, including
-#     agents, customers, services and slas. The service feature
-#     will be enabled and services and slas can be connected.
-#
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# FillTestsystem.pl - script for adding test data to a OTRS instance
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -21,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # or see http://www.gnu.org/licenses/agpl.txt.
-# ---
+# --
 
 =head1 NAME
 
@@ -279,7 +275,7 @@ for my $SLA ( @{ $Config->{SLAs} } ) {
 
     # Get Services that this SLA should be connected with
     my @ServiceIDs;
-    for my $Service ( keys %ServicesNameToID ) {
+    for my $Service ( sort keys %ServicesNameToID ) {
         if ( grep { $_ eq $Service } @{ $SLA->{ServiceNames} } ) {
             push @ServiceIDs, $ServicesNameToID{$Service};
         }

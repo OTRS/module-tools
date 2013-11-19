@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # --
 # Config2Docbook.pl - rebuild config
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -33,8 +33,7 @@ if ($@) {
 use base 'XML::Simple';
 
 # Override the sort method form XML::Simple
-sub sorted_keys
-{
+sub SortedKeys {
     my ( $Self, $Name, $Hashref ) = @_;
 
     # only change sort order for chapter
@@ -51,7 +50,7 @@ sub sorted_keys
         return ( 'title', 'para', );
     }
 
-    return $Self->SUPER::sorted_keys( $Name, $Hashref );    # for the rest, I don't care!
+    return $Self->SUPER::SortedKeys( $Name, $Hashref );    # for the rest, I don't care!
 }
 
 # main Config2Docbook program
@@ -75,13 +74,13 @@ my %Opts = ();
 getopt( 'hmol', \%Opts );
 
 if ( $Opts{h} ) {
-    _help();
+    _Help();
     exit 1;
 }
 
 # check for module parameter
 if ( !$Opts{m} ) {
-    _help();
+    _Help();
     print "\n missing path to module\n";
     print "Example: Config2Docbook -m /Modules/MyModule\n";
     exit 1;
@@ -97,7 +96,7 @@ $Options{ConfigDirectory} = $Opts{m} . '/Kernel/Config/Files';
 my $Language;
 use vars qw(@ISA);
 my $Self = {};
-bless ($Self);
+
 if ( $Opts{l} && $Opts{l} eq 'en' ) {
 
     # always allow plain english
@@ -111,18 +110,22 @@ elsif ( $Opts{l} ) {
         Filter    => "$Opts{l}_*.pm",
         Silent    => 1,
     );
-    if ( @TranslationFiles ) {
+    if (@TranslationFiles) {
 
         # set desired language
         $Language = $Opts{l};
 
         # load translation values
-        for my $TranslationFile ( @TranslationFiles ) {
-            my ($Path, $Module) = ($1, $2) if $TranslationFile =~ m{ \A ( .+ ) / ( [^/]+ ) \.pm \z }xms;
+        for my $TranslationFile (@TranslationFiles) {
+
+            my ( $Path, $Module );
+            ( $Path, $Module ) = ( $1, $2 )
+                if $TranslationFile =~ m{ \A ( .+ ) / ( [^/]+ ) \.pm \z }xms;
+
             {
                 @ISA = ("Kernel::Language::$Module");
                 push @INC, "$Path";
-                eval "require $Module";
+                eval { require $Module };
                 $Self->Data();
             }
         }
@@ -208,12 +211,12 @@ if ( !$WriteFileSuccess ) {
 
 # internal functions
 
-sub _help {
+sub _Help {
     my %Param = @_;
 
     print "Config2Docbook.pl - Convert sysc config settings to Docbook"
         . " format\n";
-    print "Copyright (C) 2001-2012 OTRS AG, http://otrs.org/\n";
+    print "Copyright (C) 2001-2013 OTRS AG, http://otrs.com/\n";
     print "usage: Config2Docbook.pl -m <path to module> -l <language> (optional)"
         . " -o <Output filename> (optional)\n";
 }
@@ -504,8 +507,11 @@ sub _DirectoryRead {
         my @Glob = glob "$Param{Directory}/$Filter";
 
         # look for repeated values
+        GLOBNAME:
         for my $GlobName (@Glob) {
-            next if !-e $GlobName;
+
+            next GLOBNAME if !-e $GlobName;
+
             if ( !$Seen{$GlobName} ) {
                 push @GlobResults, $GlobName;
                 $Seen{$GlobName} = 1;
@@ -538,7 +544,9 @@ sub _DirectoryRead {
     }
 
     # always sort the result
-    return sort @Results;
+    my @SortedResult = sort @Results;
+
+    return @SortedResult;
 }
 
 =item FileWrite()
@@ -656,4 +664,4 @@ sub _FileWrite {
     return $Param{Location};
 }
 
-1;
+exit 0;

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # --
-# module-tools/git-find-file.pl - script to locate a file in the git history
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# git-find-file.pl - script to locate a file in the git history
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
@@ -44,10 +44,10 @@ use File::Spec;
 
 # get options
 my %Opts = ();
-getopt('fth', \%Opts);
+getopt( 'fth', \%Opts );
 
 # set default
-if (!$Opts{f} || !$Opts{t}) {
+if ( !$Opts{f} || !$Opts{t} ) {
     $Opts{'h'} = 1;
 }
 
@@ -62,22 +62,22 @@ EOF
 
 # Try to split $Opts{f} into the git repository path and the relative filename
 #   inside of this repository.
-my @Directories = split('/', $Opts{f});
-splice(@Directories, 0, 1) if $Directories[0] eq '';
+my @Directories = split( '/', $Opts{f} );
+splice( @Directories, 0, 1 ) if $Directories[0] eq '';
 
-my ($RepositoryDirectory, $RelativeFilename);
+my ( $RepositoryDirectory, $RelativeFilename );
 
 COUNTER:
-for my $Counter (1 .. scalar @Directories) {
-    my $Directory = "/" . File::Spec->catfile(@Directories[0 .. $Counter - 1]);
-    if (-d "$Directory/.git") {
+for my $Counter ( 1 .. scalar @Directories ) {
+    my $Directory = "/" . File::Spec->catfile( @Directories[ 0 .. $Counter - 1 ] );
+    if ( -d "$Directory/.git" ) {
         $RepositoryDirectory = $Directory;
-        $RelativeFilename = File::Spec->catfile(@Directories[$Counter .. $#Directories]);
+        $RelativeFilename    = File::Spec->catfile( @Directories[ $Counter .. $#Directories ] );
         last COUNTER;
     }
 }
 
-if (!$RepositoryDirectory) {
+if ( !$RepositoryDirectory ) {
     die "Could not find a git repository in path $Opts{f}.\n";
 }
 
@@ -85,8 +85,8 @@ if (!$RepositoryDirectory) {
 chdir($RepositoryDirectory) || die "Could not change working directory to RepositoryDirectory. $!";
 
 # Get all revisions for the requested file
-my @FileRevisions = split(/\n/, `git rev-list --all $RelativeFilename`);
-print "Found " . (scalar @FileRevisions) . " existing revisions in git history.\n";
+my @FileRevisions = split( /\n/, `git rev-list --all $RelativeFilename` );
+print "Found " . ( scalar @FileRevisions ) . " existing revisions in git history.\n";
 
 # Get the file contents for all revisions.
 my %FileContents;
@@ -95,10 +95,11 @@ for my $FileRevision (@FileRevisions) {
 }
 
 # Get the content of the target file that should be found in the history
+## no critic
 open( my $TargetFileHandle, '<', $Opts{t} ) || die "Can't open '$Opts{t}': $!\n";
+## use critic
 my $TargetFileContents = do { local $/; <$TargetFileHandle> };
 close $TargetFileHandle;
-
 
 print "Checking for direct matches in git history...\n";
 my $DirectMatch;
@@ -112,9 +113,11 @@ for my $FileRevision (@FileRevisions) {
     my $FileContentCVS = $FileContents{$FileRevision};
     $FileContentCVS =~ s{(\$ (?:Id:|Date:) .*? \d{4})-(\d{2})-(\d{2} .*? \$)}{$1/$2/$3}xmsg;
 
-    if ($TargetFileContents eq $FileContents{$FileRevision}
+    if (
+        $TargetFileContents eq $FileContents{$FileRevision}
         || $TargetFileContents eq $FileContentCVS
-    ) {
+        )
+    {
         print $FileRevision . "\n";
         $DirectMatch++;
     }
@@ -125,13 +128,13 @@ print "No direct matches found, checking similiarity index...\n";
 
 my %SimilarityIndex;
 for my $FileRevision (@FileRevisions) {
-    my $Similarity =  similarity($TargetFileContents, $FileContents{$FileRevision});
-    $SimilarityIndex{ $FileRevision } = $Similarity;
+    my $Similarity = similarity( $TargetFileContents, $FileContents{$FileRevision} );
+    $SimilarityIndex{$FileRevision} = $Similarity;
 }
 
 my @SimilarVersions = sort { $SimilarityIndex{$b} <=> $SimilarityIndex{$a} } keys %SimilarityIndex;
-for my $FileRevision (splice @SimilarVersions, 0, 10) {
-    print "$FileRevision " . sprintf("%.3f", $SimilarityIndex{$FileRevision} * 100) . "\n";
+for my $FileRevision ( splice @SimilarVersions, 0, 10 ) {
+    print "$FileRevision " . sprintf( "%.3f", $SimilarityIndex{$FileRevision} * 100 ) . "\n";
 }
 
 exit 0;
