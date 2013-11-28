@@ -33,7 +33,7 @@ if ($@) {
 use base 'XML::Simple';
 
 # Override the sort method form XML::Simple
-sub SortedKeys {
+sub sorted_keys {    ## no critic
     my ( $Self, $Name, $Hashref ) = @_;
 
     # only change sort order for chapter
@@ -50,7 +50,7 @@ sub SortedKeys {
         return ( 'title', 'para', );
     }
 
-    return $Self->SUPER::SortedKeys( $Name, $Hashref );    # for the rest, I don't care!
+    return $Self->SUPER::sorted_keys( $Name, $Hashref );    ## no critic
 }
 
 # main Config2Docbook program
