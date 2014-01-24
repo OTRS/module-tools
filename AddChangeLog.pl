@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # --
 # AddChangeLog.pl - script for adding entries to change log
-# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2014 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -85,9 +85,14 @@ sub UpdateChanges {
     open my $OutFile, '>', $ChangesFile || die "Couldn't open $ChangesFile: $!";    ## no critic
     binmode $OutFile;
 
-    my $Printed = 0;
+    my $Printed            = 0;
+    my $ReleaseHeaderFound = 0;
     for my $Line (@Changes) {
-        if ( !$Printed && $Line =~ /^ - / ) {
+        if ( !$ReleaseHeaderFound && $Line =~ m{^[#]?\d+[.]\d+[.]\d+[ ]} ) {
+            $ReleaseHeaderFound = 1;
+        }
+
+        if ( $ReleaseHeaderFound && !$Printed && $Line =~ /^ - / ) {
             print $OutFile $ChangeLine;
             $Printed = 1;
         }
