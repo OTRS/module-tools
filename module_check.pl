@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # --
 # module_check.pl - script to check OTRS modules
-# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2014 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -55,7 +55,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
 }
 if ( $Opts{'h'} ) {
     print "\nmodule_check.pl - Check OTRS modules\n";
-    print "Copyright (C) 2001-2013 OTRS AG, http://otrs.com/\n\n";
+    print "Copyright (C) 2001-2014 OTRS AG, http://otrs.com/\n\n";
     print "usage:\n   module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]\n\n";
     print "example:\n   /workspace/module-tools/module_check.pl -o /workspace/otrs-git/ -m /workspace/ITSMCore_3_3/\n\n";
     exit 1;
