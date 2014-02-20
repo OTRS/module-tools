@@ -65,7 +65,7 @@ if ( $Content =~ m{\A\#\d} ) {
 
     # format bug links
     $Section
-        =~ s{ Fixed [ ] bug\# \[( \d{4,6} )\]\(.*?\) }{Bug#[[http://bugs.otrs.org/show_bug.cgi?id=$1][$1]]}ismxg;
+        =~ s{ (?:Fixed [ ])? bug\# \[( \d{4,6} )\]\(.*?\) }{Bug#[[http://bugs.otrs.org/show_bug.cgi?id=$1][$1]]}ismxg;
 }
 
 # OLD STYLE
