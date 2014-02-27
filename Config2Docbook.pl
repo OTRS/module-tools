@@ -96,6 +96,7 @@ $Options{ConfigDirectory} = $Opts{m} . '/Kernel/Config/Files';
 my $Language;
 use vars qw(@ISA);
 my $Self = {};
+bless ($Self);
 
 if ( $Opts{l} && $Opts{l} eq 'en' ) {
 
@@ -125,7 +126,7 @@ elsif ( $Opts{l} ) {
             {
                 @ISA = ("Kernel::Language::$Module");
                 push @INC, "$Path";
-                eval { require $Module };
+                eval "require $Module";
                 $Self->Data();
             }
         }
