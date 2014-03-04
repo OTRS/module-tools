@@ -116,6 +116,9 @@ elsif ( $Opts{l} ) {
         # set desired language
         $Language = $Opts{l};
 
+        # translation hash
+        $Self->{Translation} ||= {};
+
         # load translation values
         for my $TranslationFile (@TranslationFiles) {
 
