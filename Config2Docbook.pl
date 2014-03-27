@@ -19,10 +19,12 @@
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-# create a XML::Simple subclas
-package OTRS::XML::Simple;
 use strict;
 use warnings;
+
+## nofilter(TidyAll::Plugin::OTRS::Perl::PerlCritic)
+
+package OTRS::XML::Simple;
 
 eval { require XML::Simple };
 if ($@) {
@@ -96,7 +98,7 @@ $Options{ConfigDirectory} = $Opts{m} . '/Kernel/Config/Files';
 my $Language;
 use vars qw(@ISA);
 my $Self = {};
-bless ($Self);
+bless($Self);
 
 if ( $Opts{l} && $Opts{l} eq 'en' ) {
 
@@ -319,7 +321,8 @@ sub _CreateDocbookConfigChapter {
 
         for my $Setting (
             sort _SortYesNo @{ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} }
-        ) {
+            )
+        {
 
             my $DescriptionContent;
 
