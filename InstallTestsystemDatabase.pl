@@ -36,16 +36,22 @@ use Kernel::System::Main;
 use Kernel::System::DB;
 use Kernel::System::XML;
 
+local $Kernel::OM;
+if ( eval 'require Kernel::System::ObjectManager' ) {    ## no critic
+
+    # create object manager
+    $Kernel::OM = Kernel::System::ObjectManager->new();
+}
+
 # create common objects
 my %CommonObject = ();
 $CommonObject{ConfigObject} = Kernel::Config->new(%CommonObject);
 $CommonObject{EncodeObject} = Kernel::System::Encode->new(%CommonObject);
-$CommonObject{LogObject}
-    = Kernel::System::Log->new( %CommonObject, LogPrefix => 'OTRS-InstallTestsystemDatabase.pl' );
-$CommonObject{TimeObject} = Kernel::System::Time->new(%CommonObject);
-$CommonObject{MainObject} = Kernel::System::Main->new(%CommonObject);
-$CommonObject{DBObject}   = Kernel::System::DB->new(%CommonObject);
-$CommonObject{XMLObject}  = Kernel::System::XML->new(%CommonObject);
+$CommonObject{LogObject}    = Kernel::System::Log->new( %CommonObject, LogPrefix => 'OTRS-InstallTestsystemDatabase.pl' );
+$CommonObject{TimeObject}   = Kernel::System::Time->new(%CommonObject);
+$CommonObject{MainObject}   = Kernel::System::Main->new(%CommonObject);
+$CommonObject{DBObject}     = Kernel::System::DB->new(%CommonObject);
+$CommonObject{XMLObject}    = Kernel::System::XML->new(%CommonObject);
 
 # install database
 print STDERR "--- Creating tables and inserting data...\n";

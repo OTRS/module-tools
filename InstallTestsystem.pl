@@ -43,11 +43,17 @@ use Getopt::Std;
 
 # get options
 my %Opts = ();
-getopt( 'p', \%Opts );
+getopt( 'pf', \%Opts );
 
 my $InstallDir = $Opts{p};
 if ( !$InstallDir || !-e $InstallDir ) {
     Usage("ERROR: -p must be a valid directory!");
+    exit 2;
+}
+
+my $FredDir = $Opts{f};
+if ( !$FredDir || !-e $FredDir ) {
+    Usage("ERROR: -f must be a valid Fred-Directory!");
     exit 2;
 }
 
@@ -243,7 +249,7 @@ system("sudo chown -R $Config{PermissionsOTRSUser}:$Config{PermissionsOTRSGroup}
 print STDERR "--- Linking Fred...\n";
 print STDERR "############################################\n";
 system(
-    "$Config{ModuleToolsRoot}/module-linker.pl install $Config{EnvironmentRoot}Fred $InstallDir"
+    "$Config{ModuleToolsRoot}/module-linker.pl install $FredDir $InstallDir"
 );
 print STDERR "############################################\n";
 
@@ -292,7 +298,7 @@ sub Usage {
 $Message
 
 USAGE:
-    $0 -p /ws/otrs32-devel
+    $0 -p /ws/otrs32-devel -f /devel/Fred_3_1
 HELPSTR
     return;
 }
