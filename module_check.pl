@@ -102,12 +102,12 @@ sub CheckFile {
     return if $ModuleFile !~ m{ [.](pl|pm|dtl|tt|t) \s* \z }ixms;
 
     # get original file name from $origin, continue only when an original name was found
-    my ($OriginalFilename, $GitCommmitID) = OriginalFilenameGet(File => $ModuleFile);
+    my ($OriginalFilename, $GitCommitID) = OriginalFilenameGet(File => $ModuleFile);
     return if !$OriginalFilename;
 
-    # check if the $GitCommmitID is up to date
+    # check if the $GitCommitID is up to date
     my $GitCommitIDUpdateNeeded = '';
-    if ( $GitCommmitID ne $LatestGitCommitID) {
+    if ( $GitCommitID && $GitCommitID ne $LatestGitCommitID) {
         $GitCommitIDUpdateNeeded = "GitCommitID needs to be updated to the latest CommitID '$LatestGitCommitID' in the the origin line!\n\n";
     }
 
@@ -282,7 +282,7 @@ sub OriginalFilenameGet {
 
     my $Counter = 0;
     my $Filename;
-    my $GitCommmitID;
+    my $GitCommitID;
     LINE:
     while (my $Line = <$FH>) {
 
@@ -298,7 +298,7 @@ sub OriginalFilenameGet {
         # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
         if ( $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / blob / ([^/]+) \S+ / ([^/]+) }ixms ) {
 
-            $GitCommmitID = $1;
+            $GitCommitID = $1;
             $Filename     = $2;
 
             last LINE;
@@ -311,7 +311,7 @@ sub OriginalFilenameGet {
     }
     close $FH;
 
-    return ( $Filename, $GitCommmitID );
+    return ( $Filename, $GitCommitID );
 }
 
 =item ContentClean
