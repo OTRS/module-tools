@@ -82,7 +82,7 @@ for my $Module (@ITSMModules) {
     # get name of SOPM file
     my $SOPMFile = $Module . '.sopm';
 
-    # create moule path and name with correct version
+    # create module path and name with correct version
     $Module = $Opts{'m'} . '/' . $Module . $Opts{'v'};
 
     # link the module
