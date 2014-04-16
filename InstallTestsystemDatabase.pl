@@ -47,11 +47,12 @@ if ( eval 'require Kernel::System::ObjectManager' ) {    ## no critic
 my %CommonObject = ();
 $CommonObject{ConfigObject} = Kernel::Config->new(%CommonObject);
 $CommonObject{EncodeObject} = Kernel::System::Encode->new(%CommonObject);
-$CommonObject{LogObject}    = Kernel::System::Log->new( %CommonObject, LogPrefix => 'OTRS-InstallTestsystemDatabase.pl' );
-$CommonObject{TimeObject}   = Kernel::System::Time->new(%CommonObject);
-$CommonObject{MainObject}   = Kernel::System::Main->new(%CommonObject);
-$CommonObject{DBObject}     = Kernel::System::DB->new(%CommonObject);
-$CommonObject{XMLObject}    = Kernel::System::XML->new(%CommonObject);
+$CommonObject{LogObject}
+    = Kernel::System::Log->new( %CommonObject, LogPrefix => 'OTRS-InstallTestsystemDatabase.pl' );
+$CommonObject{TimeObject} = Kernel::System::Time->new(%CommonObject);
+$CommonObject{MainObject} = Kernel::System::Main->new(%CommonObject);
+$CommonObject{DBObject}   = Kernel::System::DB->new(%CommonObject);
+$CommonObject{XMLObject}  = Kernel::System::XML->new(%CommonObject);
 
 # install database
 print STDERR "--- Creating tables and inserting data...\n";
