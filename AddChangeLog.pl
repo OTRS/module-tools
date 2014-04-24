@@ -25,7 +25,7 @@ AddChangeLog.pl - script for adding change log entries
 
 =head1 SYNOPSIS
 
-AddChangeLog.pl -b 1234
+AddChangeLog.pl -b 1234 -f CHANGES (optional)
 ChangeLog with bugzilla entry number
 
 =head1 DESCRIPTION
@@ -37,15 +37,17 @@ Please send any questions, suggestions & complaints to <dev-support@otrs.com>
 use strict;
 use warnings;
 
+use Cwd;
 use Getopt::Long;
 use Pod::Usage;
 use Time::Piece;
 use WWW::Bugzilla3;
 
-my ( $Help, $Bug );
+my ( $Help, $Bug, $UserFile );
 GetOptions(
     'h'   => \$Help,
     'b=s' => \$Bug,
+    'f=s' => \$UserFile,
 );
 pod2usage( -verbose => 0 ) if $Help || !$Bug;
 UpdateChanges();
@@ -59,16 +61,36 @@ Formats the line and inserts it to the correct location.
 
 sub UpdateChanges {
 
-    my $ChangesFile;
-    FILE:
-    for my $File (qw ( CHANGES.md CHANGES )) {
-        if ( -e $File ) {
-            $ChangesFile = $File;
-            last FILE;
-        }
-    }
+    my $ChangesFile = $UserFile || '';
+
     if ( !$ChangesFile ) {
-        die "No CHANGES.md or CHANGES file found in path.\n";
+
+        FILE:
+        for my $File (qw ( CHANGES.md CHANGES )) {
+            if ( -e $File ) {
+                $ChangesFile = $File;
+                last FILE;
+            }
+        }
+
+        # if no chages file was found maybe is a package path
+        if ( !$ChangesFile ) {
+            my $PackageName;
+
+            $PackageName = cwd();
+
+            $PackageName =~ s{.+/([^_]+)(:?_.+)?$}{$1};
+
+            # check for CHANGES-<PackageName>
+            my $File = "CHANGES-$PackageName";
+            if ( -e $File ) {
+                $ChangesFile = $File;
+            }
+
+            if ( !$ChangesFile ) {
+                die "No CHANGES.md, CHANGES or $File file found in path.\n";
+            }
+        }
     }
 
     # If bug does not exist, this will stop the script.
@@ -148,7 +170,7 @@ sub FormatChangesLine {
 
     # format for CHANGES (OTRS 3.1.x and earlier) is different from CHANGES.md
     my $Line;
-    if ( $ChangesFile eq 'CHANGES' ) {
+    if ( $ChangesFile ne 'CHANGES.md' ) {
         $Line = " - $Date Fixed bug#$Bug - $Summary.\n";
     }
     else {
