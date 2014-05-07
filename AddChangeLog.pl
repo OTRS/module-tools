@@ -26,7 +26,13 @@ AddChangeLog.pl - script for adding change log entries
 =head1 SYNOPSIS
 
 AddChangeLog.pl -b 1234
-ChangeLog with bugzilla entry number
+    Add bugzilla entry title to stable version CHANGES.md and commit message template.
+
+AddChangeLog.pl -b 1234 --beta
+    --beta causes the entry to be added to the latest version, even if it is not stable.
+
+AddChangeLog.pl -m "My commit message."
+    Add another message to CHANGES.md and commit message template.
 
 =head1 DESCRIPTION
 
@@ -42,12 +48,17 @@ use Pod::Usage;
 use Time::Piece;
 use WWW::Bugzilla3;
 
-my ( $Help, $Bug );
+my ( $Help, $Bug, $Message, $Beta );
 GetOptions(
     'h'   => \$Help,
     'b=s' => \$Bug,
+    'm=s' => \$Message,
+    'beta' => \$Beta,
 );
-pod2usage( -verbose => 0 ) if $Help || !$Bug;
+
+if ($Help || (!$Bug && !$Message)) {
+    pod2usage( -verbose => 0 );
+}
 UpdateChanges();
 
 =item UpdateChanges()
@@ -71,9 +82,18 @@ sub UpdateChanges {
         die "No CHANGES.md or CHANGES file found in path.\n";
     }
 
+    my $ChangeLine;
+    my $Summary;
+
     # If bug does not exist, this will stop the script.
-    my $Summary = GetBugSummary($Bug);
-    my $ChangeLine = FormatChangesLine( $Bug, $Summary, $ChangesFile );
+    if ($Bug) {
+        $Summary = GetBugSummary($Bug);
+        $ChangeLine = FormatChangesLine( $Bug, $Summary, $ChangesFile );
+    }
+    elsif ($Message) {
+        $Summary = $Message;
+        $ChangeLine = FormatChangesLine( '', $Message, $ChangesFile );
+    }
 
     # read in existing changes file
     open my $InFile, '<', $ChangesFile || die "Couldn't open $ChangesFile: $!";    ## no critic
@@ -87,8 +107,12 @@ sub UpdateChanges {
 
     my $Printed            = 0;
     my $ReleaseHeaderFound = 0;
+    my $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+[ ]}; # 1.2.3
+    if ($Beta) {
+        $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+}; # 1.2.3.beta3
+    }
     for my $Line (@Changes) {
-        if ( !$ReleaseHeaderFound && $Line =~ m{^[#]?\d+[.]\d+[.]\d+[ ]} ) {
+        if ( !$ReleaseHeaderFound && $Line =~ m{$ReleaseHeaderRegex} ) {
             $ReleaseHeaderFound = 1;
         }
 
@@ -105,7 +129,12 @@ sub UpdateChanges {
         '.git/OTRSCommitTemplate.msg' || die "Couldn't open .git/OTRSCommitTemplate.msg: $!";
     ## use critic
     binmode $OutFile;
-    print $OutFile "Fixed: $Summary (bug#$Bug).\n";
+    if ($Bug) {
+        print $OutFile "Fixed: $Summary (bug#$Bug).\n";
+    }
+    elsif ($Message) {
+        print $OutFile "$Message\n";
+    }
     close $OutFile;
 
     return 1;
@@ -148,12 +177,15 @@ sub FormatChangesLine {
 
     # format for CHANGES (OTRS 3.1.x and earlier) is different from CHANGES.md
     my $Line;
-    if ( $ChangesFile eq 'CHANGES' ) {
+    if ( $Bug && $ChangesFile eq 'CHANGES' ) {
         $Line = " - $Date Fixed bug#$Bug - $Summary.\n";
     }
-    else {
+    elsif ($Bug) {
         $Line
             = " - $Date Fixed bug#[$Bug](http://bugs.otrs.org/show_bug.cgi?id=$Bug) - $Summary.\n";
+    }
+    elsif ($Message) {
+        $Line = " - $Date $Summary.\n";
     }
     return $Line;
 }
