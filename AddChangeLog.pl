@@ -25,7 +25,7 @@ AddChangeLog.pl - script for adding change log entries
 
 =head1 SYNOPSIS
 
-AddChangeLog.pl -b 1234
+AddChangeLog.pl -b 1234 [-f CHANGES]
     Add bugzilla entry title to stable version CHANGES.md and commit message template.
 
 AddChangeLog.pl -b 1234 --beta
@@ -43,17 +43,19 @@ Please send any questions, suggestions & complaints to <dev-support@otrs.com>
 use strict;
 use warnings;
 
+use Cwd;
 use Getopt::Long;
 use Pod::Usage;
 use Time::Piece;
 use WWW::Bugzilla3;
 
-my ( $Help, $Bug, $Message, $Beta );
+my ( $Help, $Bug, $Message, $Beta, $UserFile );
 GetOptions(
     'h'   => \$Help,
     'b=s' => \$Bug,
     'm=s' => \$Message,
     'beta' => \$Beta,
+    'f=s' => \$UserFile,
 );
 
 if ($Help || (!$Bug && !$Message)) {
@@ -70,16 +72,36 @@ Formats the line and inserts it to the correct location.
 
 sub UpdateChanges {
 
-    my $ChangesFile;
-    FILE:
-    for my $File (qw ( CHANGES.md CHANGES )) {
-        if ( -e $File ) {
-            $ChangesFile = $File;
-            last FILE;
-        }
-    }
+    my $ChangesFile = $UserFile || '';
+
     if ( !$ChangesFile ) {
-        die "No CHANGES.md or CHANGES file found in path.\n";
+
+        FILE:
+        for my $File (qw ( CHANGES.md CHANGES )) {
+            if ( -e $File ) {
+                $ChangesFile = $File;
+                last FILE;
+            }
+        }
+
+        # if no chages file was found maybe is a package path
+        if ( !$ChangesFile ) {
+            my $PackageName;
+
+            $PackageName = cwd();
+
+            $PackageName =~ s{.+/([^_]+)(:?_.+)?$}{$1};
+
+            # check for CHANGES-<PackageName>
+            my $File = "CHANGES-$PackageName";
+            if ( -e $File ) {
+                $ChangesFile = $File;
+            }
+
+            if ( !$ChangesFile ) {
+                die "No CHANGES.md, CHANGES or $File file found in path.\n";
+            }
+        }
     }
 
     my $ChangeLine;
@@ -177,7 +199,7 @@ sub FormatChangesLine {
 
     # format for CHANGES (OTRS 3.1.x and earlier) is different from CHANGES.md
     my $Line;
-    if ( $Bug && $ChangesFile eq 'CHANGES' ) {
+    if ( $Bug && $ChangesFile ne 'CHANGES.md' ) {
         $Line = " - $Date Fixed bug#$Bug - $Summary.\n";
     }
     elsif ($Bug) {
@@ -185,7 +207,7 @@ sub FormatChangesLine {
             = " - $Date Fixed bug#[$Bug](http://bugs.otrs.org/show_bug.cgi?id=$Bug) - $Summary.\n";
     }
     elsif ($Message) {
-        $Line = " - $Date $Summary.\n";
+        $Line = " - $Date $Summary\n";
     }
     return $Line;
 }

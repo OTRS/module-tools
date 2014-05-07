@@ -55,6 +55,13 @@ use Kernel::System::CustomerUser;
 use Kernel::System::Service;
 use Kernel::System::SLA;
 
+local $Kernel::OM;
+if ( eval 'require Kernel::System::ObjectManager' ) {    ## no critic
+
+    # create object manager
+    $Kernel::OM = Kernel::System::ObjectManager->new();
+}
+
 my %CommonObject = ();
 $CommonObject{ConfigObject}       = Kernel::Config->new();
 $CommonObject{EncodeObject}       = Kernel::System::Encode->new(%CommonObject);

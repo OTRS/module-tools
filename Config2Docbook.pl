@@ -19,10 +19,12 @@
 # or see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-# create a XML::Simple subclas
-package OTRS::XML::Simple;
 use strict;
 use warnings;
+
+## nofilter(TidyAll::Plugin::OTRS::Perl::PerlCritic)
+
+package OTRS::XML::Simple;
 
 eval { require XML::Simple };
 if ($@) {
@@ -71,7 +73,7 @@ if ($@) {
 
 # get options
 my %Opts = ();
-getopt( 'hmol', \%Opts );
+getopt( 'hmols', \%Opts );
 
 if ( $Opts{h} ) {
     _Help();
@@ -96,6 +98,7 @@ $Options{ConfigDirectory} = $Opts{m} . '/Kernel/Config/Files';
 my $Language;
 use vars qw(@ISA);
 my $Self = {};
+bless($Self);
 
 if ( $Opts{l} && $Opts{l} eq 'en' ) {
 
@@ -115,6 +118,9 @@ elsif ( $Opts{l} ) {
         # set desired language
         $Language = $Opts{l};
 
+        # translation hash
+        $Self->{Translation} = {};
+
         # load translation values
         for my $TranslationFile (@TranslationFiles) {
 
@@ -125,7 +131,7 @@ elsif ( $Opts{l} ) {
             {
                 @ISA = ("Kernel::Language::$Module");
                 push @INC, "$Path";
-                eval { require $Module };
+                eval "require $Module";
                 $Self->Data();
             }
         }
@@ -192,6 +198,9 @@ for my $FileLocation (@FilesInDirectory) {
 #output
 print "\n";
 
+# set sorting parameter
+$Self->{SortByName} = $Opts{s};
+
 # generate XML docbook config chapter based in config file
 my $ConfigChapter = _CreateDocbookConfigChapter( ConfigSettings => \%ConfigSettings );
 
@@ -218,7 +227,7 @@ sub _Help {
         . " format\n";
     print "Copyright (C) 2001-2014 OTRS AG, http://otrs.com/\n";
     print "usage: Config2Docbook.pl -m <path to module> -l <language> (optional)"
-        . " -o <Output filename> (optional)\n";
+        . " -o <Output filename> (optional) -s <sort by name 1/0> (optional)\n";
 }
 
 sub _ParseConfigFile {
@@ -310,7 +319,10 @@ sub _CreateDocbookConfigChapter {
                 [ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} ];
         }
 
-        for my $Setting ( @{ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} } ) {
+        for my $Setting (
+            sort _SortYesNo @{ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} }
+            )
+        {
 
             my $DescriptionContent;
 
@@ -662,6 +674,17 @@ sub _FileWrite {
 
     return $Param{Filename} if $Param{Filename};
     return $Param{Location};
+}
+
+sub _SortYesNo {
+    my $Param = $_[0];
+
+    if ( $Self->{SortByName} ) {
+        return $a->{Name} cmp $b->{Name};
+    }
+    else {
+        return 0;
+    }
 }
 
 exit 0;

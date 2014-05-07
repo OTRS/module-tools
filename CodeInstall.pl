@@ -75,6 +75,13 @@ if ( !-e "$Module" ) {
     exit 0;
 }
 
+local $Kernel::OM;
+if ( eval 'require Kernel::System::ObjectManager' ) {    ## no critic
+
+    # create object manager
+    $Kernel::OM = Kernel::System::ObjectManager->new();
+}
+
 # create common objects
 my %CommonObject = ();
 $CommonObject{ConfigObject} = Kernel::Config->new();

@@ -36,6 +36,13 @@ use Kernel::System::Main;
 use Kernel::System::DB;
 use Kernel::System::XML;
 
+local $Kernel::OM;
+if ( eval 'require Kernel::System::ObjectManager' ) {    ## no critic
+
+    # create object manager
+    $Kernel::OM = Kernel::System::ObjectManager->new();
+}
+
 # create common objects
 my %CommonObject = ();
 $CommonObject{ConfigObject} = Kernel::Config->new(%CommonObject);

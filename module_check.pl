@@ -67,6 +67,10 @@ my $ModulePath   = $Opts{'m'} . '/';
 $OriginalPath =~ s{ /+ $ }{/}xms;
 $ModulePath =~ s{ /+ $ }{/}xms;
 
+# get the latestest git commit id from the original path and remove newline at the end
+my $LatestGitCommitID = `cd $OriginalPath; git log --format="%H" | head -n1`;
+chomp $LatestGitCommitID;
+
 print "\n";
 print "Original-Framework-Path: [$OriginalPath]\n";
 print "Module-Path            : [$ModulePath]\n\n";
@@ -94,12 +98,18 @@ sub CheckFile {
     # skip CVS directories
     return if $ModuleDir =~ m{ /CVS|\.git /? }xms;
 
-    # check only Perl- and Template-files
-    return if $ModuleFile !~ m{ [.](pl|pm|dtl|t) \s* \z }ixms;
+    # check only Perl-, Template (dtl and TemplateToolkit) and test files
+    return if $ModuleFile !~ m{ [.](pl|pm|dtl|tt|t) \s* \z }ixms;
 
-    # get original file name from OldId, continue only when an original name was found
-    my $OriginalFilename = OriginalFilenameGet(File => $ModuleFile);
+    # get original file name from $origin, continue only when an original name was found
+    my ($OriginalFilename, $GitCommitID) = OriginalFilenameGet(File => $ModuleFile);
     return if !$OriginalFilename;
+
+    # check if the $GitCommitID is up to date
+    my $GitCommitIDUpdateNeeded = '';
+    if ( $GitCommitID && $GitCommitID ne $LatestGitCommitID) {
+        $GitCommitIDUpdateNeeded = "GitCommitID needs to be updated to the latest CommitID '$LatestGitCommitID' in the the origin line!\n\n";
+    }
 
     # get and prepare module content
     my $ModuleContent = ModuleContentPrepare(File => $ModuleFile );
@@ -116,7 +126,7 @@ sub CheckFile {
     # get and prepare original content
     my $OriginalContent = OriginalContentPrepare(File => $OriginalFile );
 
-    # crate temp files for the diff
+    # create temp files for the diff
     my $ModuleFH   = File::Temp->new( DIR => '/tmp' );
     my $OriginalFH = File::Temp->new( DIR => '/tmp');
 
@@ -140,10 +150,11 @@ sub CheckFile {
     my $DiffResult = `diff $DiffOptions $OriginalTempfile $ModuleTempfile`;
 
     # print diff result
-    if ( $Opts{'v'} || $DiffResult ) {
+    if ( $Opts{'v'} || $DiffResult || $GitCommitIDUpdateNeeded ) {
         print "DIFF RESULT for:\n";
         print "$OriginalFile\n";
         print "$ModuleFile\n\n";
+        print $GitCommitIDUpdateNeeded if $GitCommitIDUpdateNeeded;
         print $DiffResult . "\n\n" if $DiffResult;
     }
 
@@ -155,7 +166,7 @@ sub CheckFile {
         print $DiffResult . "\n\n";
     }
 
-    if ( $Opts{'v'} || $DiffResult ) {
+    if ( $Opts{'v'} || $DiffResult || $GitCommitIDUpdateNeeded ) {
         print "-----------------------------------------------------------------------------------------------------\n";
     }
 
@@ -250,11 +261,6 @@ sub ModuleContentPrepare {
     # put formerly commented code in place
     $Content =~ s{ ^ ---PLACEHOLDER--- $ \s }{ shift @NewCodeBlocks }xmseg;
 
-    # delete $origin line
-    # Example:
-    # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
-    $Content =~ s{ ^ \# [ ] ( \$origin: [^\n]+ ) \n ( ^ \# [ ] -- \n )? }{}xms;
-
     # clean the content
     $Content = ContentClean( Content => $Content );
 
@@ -276,18 +282,28 @@ sub OriginalFilenameGet {
 
     my $Counter = 0;
     my $Filename;
+    my $GitCommitID;
     LINE:
     while (my $Line = <$FH>) {
 
-        # Example:
+        # Example for $OldId (used in CVS)
         # $OldId: AgentTicketNote.pm,v 1.34.2.4 2008/03/25 13:27:05 ub Exp $
-        # or:
-        # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
-        if ( $Line =~ m{ \A \# [ ] \$OldId: [ ] (.+?) ,v [ ] }ixms || $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / ([^/]+) }ixms ) {
+        if ( $Line =~ m{ \A \# [ ] \$OldId: [ ] (.+?) ,v [ ] }ixms ) {
 
             $Filename = $1;
             last LINE;
         }
+
+        # Example for $origin (used in GIT)
+        # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
+        if ( $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / blob / ([^/]+) \S+ / ([^/]+) }ixms ) {
+
+            $GitCommitID = $1;
+            $Filename     = $2;
+
+            last LINE;
+        }
+
     }
     continue {
         $Counter++;
@@ -295,7 +311,7 @@ sub OriginalFilenameGet {
     }
     close $FH;
 
-    return $Filename;
+    return ( $Filename, $GitCommitID );
 }
 
 =item ContentClean
@@ -309,14 +325,17 @@ sub ContentClean {
 
     my $Content = $Param{Content};
 
-    # delete the different version lines
+    # delete $origin line
+    # Example:
+    # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
+    $Content =~ s{ ^ \# [ ] ( \$origin: [^\n]+ ) \n ( ^ \# [ ] -- \n )? }{}xms;
 
+    # delete the different version lines
     # example1: $VERSION = qw($Revision: 1.30 $) [1];
     $Content =~ s{ ^ \$VERSION [ ] = [ ] qw \( \$[R]evision: [ ] .+? $ \n }{}ixms;
 
     # example2: $VERSION = '$Revision: 1.30 $';
     $Content =~ s{ ^ \$VERSION [ ] = [ ] '     \$[R]evision: [ ] .+? $ \n }{}ixms;
-
 
     # example3:
     #=head1 VERSION
