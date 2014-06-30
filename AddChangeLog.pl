@@ -51,14 +51,14 @@ use WWW::Bugzilla3;
 
 my ( $Help, $Bug, $Message, $Beta, $UserFile );
 GetOptions(
-    'h'   => \$Help,
-    'b=s' => \$Bug,
-    'm=s' => \$Message,
+    'h'    => \$Help,
+    'b=s'  => \$Bug,
+    'm=s'  => \$Message,
     'beta' => \$Beta,
-    'f=s' => \$UserFile,
+    'f=s'  => \$UserFile,
 );
 
-if ($Help || (!$Bug && !$Message)) {
+if ( $Help || ( !$Bug && !$Message ) ) {
     pod2usage( -verbose => 0 );
 }
 UpdateChanges();
@@ -129,9 +129,9 @@ sub UpdateChanges {
 
     my $Printed            = 0;
     my $ReleaseHeaderFound = 0;
-    my $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+[ ]}; # 1.2.3
+    my $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+[ ]};                           # 1.2.3
     if ($Beta) {
-        $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+}; # 1.2.3.beta3
+        $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+};                             # 1.2.3.beta3
     }
     for my $Line (@Changes) {
         if ( !$ReleaseHeaderFound && $Line =~ m{$ReleaseHeaderRegex} ) {
