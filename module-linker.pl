@@ -120,6 +120,13 @@ sub InstallHandler {
         return;
     }
 
+    # skip files that could confict
+    # [this e.g. bypases github README.md or README.markdown]
+    if ( m{^README.markdown$} || m{^README.md$} || m{^LICENSE$} ) {
+        $File::Find::prune = 1;
+        return;
+    }
+
     #   print "handling '$File::Find::name'\n";
 
     # compute full target name (by replacing source- with destination-path)
