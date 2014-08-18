@@ -29,15 +29,18 @@ use Getopt::Long;
 # ----------------------------------------------------------------------
 
 my @DevelDirectories = (
-#    '/path/to/your/devel/directory/',
+
+    #    '/path/to/your/devel/directory/',
 );
 
 my @AditionalDevelDirectories = (
-#    '/path/to/your/directory/with/all/git/repositories/',
+
+    #    '/path/to/your/directory/with/all/git/repositories/',
 );
 
 my @GitIgnore = (
-#    '/path/to/ignore/',
+
+    #    '/path/to/ignore/',
 );
 
 my $CodePolicyRegisterCommand
@@ -90,10 +93,14 @@ for my $Directory ( sort @GitDirectoryList ) {
     if ( $GitStatusOutput =~ m{ \QYour branch is ahead of\E }xms ) {
         push @GitDirsAdeadOfRemote, $Directory;
     }
+
     # different output between git version 1.x and 2.x
     # git 2.x: nothing to commit, working directory clean
     # git 1.x: nothing to commit (working directory clean)
-    elsif ( $GitStatusOutput =~ m{ nothing \s* to \s* commit ,? \s* \(? \s* working \s* directory \s* clean \s* \)? }xms ) {
+    elsif ( $GitStatusOutput
+        =~ m{ nothing \s* to \s* commit ,? \s* \(? \s* working \s* directory \s* clean \s* \)? }xms
+        )
+    {
         push @GitDirsClean, $Directory;
     }
     else {
