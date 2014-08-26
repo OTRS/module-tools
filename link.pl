@@ -64,10 +64,10 @@ if ($OptHelp) {
 
 # Now get the work done
 
-my $Source = shift || die "Need Application CVS location as ARG0";
+my $Source = shift || die "Need module location as ARG0";
 $Source = File::Spec->rel2abs($Source);
 if ( !-d $Source ) {
-    die "ERROR: invalid Application CVS directory '$Source'";
+    die "ERROR: invalid module directory '$Source'";
 }
 
 my $Dest = shift || die "Need Framework-Root location as ARG1";
@@ -88,11 +88,7 @@ sub R {
 
         # recurse into subdirectories
         if ( -d $File ) {
-
-            # skip CVS directories
-            if ( $File !~ /\/CVS$/ ) {
-                R($File);
-            }
+            R($File);
         }
         else {
             my $OrigFile = $File;
