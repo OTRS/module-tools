@@ -52,6 +52,7 @@ use Kernel::System::Main;
 use Kernel::System::DB;
 use Kernel::System::Time;
 use Kernel::System::Package;
+use Kernel::System::XML;
 
 my ( $OptHelp, $Module, $Action );
 
