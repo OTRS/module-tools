@@ -42,6 +42,9 @@ use FindBin qw($RealBin);
 use lib dirname($RealBin);
 use lib dirname($RealBin) . "/Kernel/cpan-lib";
 
+# also use relative path to find this if invoked inside of the OTRS directory
+use lib "Kernel/cpan-lib";
+
 use Getopt::Long;
 use Pod::Usage;
 
