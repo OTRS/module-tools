@@ -56,7 +56,10 @@ use File::Spec ();
 
 # get options
 my ($OptHelp);
-GetOptions( 'h' => \$OptHelp ) || pod2usage( -verbose => 1, message => 'invalid params' );
+GetOptions( 'h' => \$OptHelp ) || pod2usage(
+    -verbose => 1,
+    message  => 'invalid params'
+);
 
 if ($OptHelp) {
     pod2usage( -verbose => 0 );    # this will exit the script

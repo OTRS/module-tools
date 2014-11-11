@@ -375,7 +375,11 @@ sub _CreateDocbookConfigChapter {
 
     # convert perl structure into XML structure
     my $ConfigChapter = eval {
-        $XMLObject->XMLout( \%Docbook, NoAttr => 1, KeepRoot => 1 );
+        $XMLObject->XMLout(
+            \%Docbook,
+            NoAttr   => 1,
+            KeepRoot => 1
+        );
     };
 
     if ($@) {
@@ -596,7 +600,7 @@ sub _FileWrite {
         # filename clean up
         $Param{Filename} = $Self->FilenameCleanUp(
             Filename => $Param{Filename},
-            Type => $Param{Type} || 'Local',    # Local|Attachment|MD5
+            Type     => $Param{Type} || 'Local',    # Local|Attachment|MD5
         );
         $Param{Location} = "$Param{Directory}/$Param{Filename}";
     }

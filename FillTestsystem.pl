@@ -29,8 +29,6 @@ FileListCheck.pl
 
 =head1 DESCRIPTION
 
-Please send any questions, suggestions & complaints to <dev-support@otrs.com>
-
 =cut
 
 use strict;
@@ -129,7 +127,7 @@ my $Config = {
             ServiceNames => ['Service 2'],
         },
         {
-            Name => 'SLA 2',
+            Name         => 'SLA 2',
             ServiceNames => [ 'Service 2', 'Service 1' ],
         },
     ],

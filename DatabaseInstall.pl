@@ -29,8 +29,6 @@ DatabaseInstall.pl -m MyModule.sopm -a [install|uninstall]
 
 =head1 DESCRIPTION
 
-Please send any questions, suggestions & complaints to <dev-support@otrs.com>
-
 =cut
 
 use strict;

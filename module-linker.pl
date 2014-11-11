@@ -38,8 +38,7 @@ if ( $^O =~ 'MSWin' ) {
     require Win32;
 
     # mklink is only supported on Vista, Win2008 or later.
-    my ( $VersionString, $VersionMajor, $VersionMinor, $VersionBuild, $VersionID )
-        = Win32::GetOSVersion();
+    my ( $VersionString, $VersionMajor, $VersionMinor, $VersionBuild, $VersionID ) = Win32::GetOSVersion();
     if ( $VersionID < 2 || ( $VersionID = 2 && $VersionMajor < 6 ) ) {
         print
             "If you want to use the module-linker script on Windows, you should use Vista, Win2008 or later";

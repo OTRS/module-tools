@@ -38,8 +38,6 @@ CheckChangedFiles.pl [ -h | -r | -m /path/to/module ] /path/to/base/version /pat
 
 =head1 DESCRIPTION
 
-Please send any questions, suggestions & complaints to <dev-support@otrs.com>
-
 =cut
 
 use strict;

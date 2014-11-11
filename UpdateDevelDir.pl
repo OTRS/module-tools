@@ -43,8 +43,7 @@ my @GitIgnore = (
     #    '/path/to/ignore/',
 );
 
-my $CodePolicyRegisterCommand
-    = '/path/to/your/OTRSCodePolicy/scripts/install-git-hooks.pl';
+my $CodePolicyRegisterCommand = '/path/to/your/OTRSCodePolicy/scripts/install-git-hooks.pl';
 
 # ----------------------------------------------------------------------
 

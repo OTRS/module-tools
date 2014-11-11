@@ -36,8 +36,6 @@ AddChangeLog.pl -m "My commit message."
 
 =head1 DESCRIPTION
 
-Please send any questions, suggestions & complaints to <dev-support@otrs.com>
-
 =cut
 
 use strict;
@@ -203,8 +201,7 @@ sub FormatChangesLine {
         $Line = " - $Date Fixed bug#$Bug - $Summary.\n";
     }
     elsif ($Bug) {
-        $Line
-            = " - $Date Fixed bug#[$Bug](http://bugs.otrs.org/show_bug.cgi?id=$Bug) - $Summary.\n";
+        $Line = " - $Date Fixed bug#[$Bug](http://bugs.otrs.org/show_bug.cgi?id=$Bug) - $Summary.\n";
     }
     elsif ($Message) {
         $Line = " - $Date $Summary\n";

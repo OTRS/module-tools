@@ -29,8 +29,6 @@ InstallTestsystem.pl
 
 =head1 DESCRIPTION
 
-Please send any questions, suggestions & complaints to <dev-support@otrs.com>
-
 =cut
 
 use strict;
@@ -95,7 +93,7 @@ $SystemName =~ s{/}{}xmsg;
 my $DatabaseSystemName = $SystemName;
 $DatabaseSystemName =~ s{-}{_}xmsg;     # replace - by _ (hyphens not allowed in database name)
 $DatabaseSystemName =~ s{\.}{_}xmsg;    # replace . by _ (hyphens not allowed in database name)
-$DatabaseSystemName = substr( $DatabaseSystemName, 0, 16 ); # shorten the string (mysql requirement)
+$DatabaseSystemName = substr( $DatabaseSystemName, 0, 16 );    # shorten the string (mysql requirement)
 
 # edit Config.pm
 print STDERR "--- Editing and copying Config.pm...\n";
