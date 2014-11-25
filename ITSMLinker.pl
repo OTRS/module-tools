@@ -29,7 +29,7 @@ my %Opts = ();
 getopt( 'avmoh', \%Opts );
 
 # set default
-if ( !$Opts{'a'} || !$Opts{'v'} || !$Opts{'m'} || !$Opts{'o'} ) {
+if ( !$Opts{'a'} || !$Opts{'m'} || !$Opts{'o'} ) {
     $Opts{'h'} = 1;
 }
 if ( $Opts{'h'} ) {
@@ -37,14 +37,15 @@ if ( $Opts{'h'} ) {
     print <<'EOF';
 
 ITSMLinker.pl -  to link / unlink all ITSM modules into a OTRS system
-Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
+Copyright (C) 2001-2014 OTRS AG, http://otrs.org/
 
 Usage:
-    ITSMLinker.pl -a <install|uninstall> -v <ITSM branch version number> -m <Module-Path> -o <OTRS-path> [ -d (also executes DatabaseInstall and CodeInstall) ]
+    ITSMLinker.pl -a <install|uninstall> [ -v <ITSM branch version number> ] -m <Module-Path> -o <OTRS-path> [ -d (also executes DatabaseInstall and CodeInstall) ]
 
 Examples:
     ITSMLinker.pl -a install -v 3.3 -m /devel -o /devel/otrs33-itsm
-    ITSMLinker.pl -a install -v 3.3 -m /devel -o /devel/otrs33-itsm -d
+    ITSMLinker.pl -a install -v 4.0 -m /devel -o /devel/otrs40-itsm -d
+    ITSMLinker.pl -a install -m /devel -o /devel/otrs40-itsm -d
 
 EOF
 
@@ -67,8 +68,11 @@ if ( $Opts{'a'} eq 'uninstall' ) {
 }
 
 # replace . with _
-$Opts{'v'} =~ s{\.}{_}gxms;
-$Opts{'v'} = '_' . $Opts{'v'};
+$Opts{'v'} ||= '';
+if ( $Opts{'v'} ) {
+    $Opts{'v'} =~ s{\.}{_}gxms;
+    $Opts{'v'} = '_' . $Opts{'v'};
+}
 
 # remove slashes at the end
 $Opts{'m'} =~ s{ / \z }{}gxms;
