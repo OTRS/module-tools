@@ -25,7 +25,7 @@ DatabaseInstall.pl - script to setup database tables of linked modules for devel
 
 =head1 SYNOPSIS
 
-DatabaseInstall.pl -m MyModule.sopm -a [install|uninstall]
+DatabaseInstall.pl -m MyModule.sopm -a [install|uninstall|upgrade]
 
 =head1 DESCRIPTION
 
@@ -55,19 +55,25 @@ use Kernel::System::Time;
 use Kernel::System::Package;
 use Kernel::System::XML;
 
-my ( $OptHelp, $Module, $Action );
-
 GetOptions(
-    'h'   => \$OptHelp,
-    'm=s' => \$Module,
-    'a=s' => \$Action
+    'h'   => \my $OptHelp,
+    'm=s' => \my $Module,
+    'a=s' => \my $Action,
 );
 
 if ( $OptHelp || !$Module ) {
     pod2usage( -verbose => 0 );
 }
 
-if ( !defined $Action || $Action ne 'uninstall' ) {
+my %Actions = (
+    install   => 1,
+    uninstall => 1,
+    upgrade   => 1,
+);
+
+$Action = lc $Action if defined $Action;
+
+if ( !defined $Action || !$Actions{$Action} ) {
     $Action = 'install';
 }
 
@@ -105,32 +111,21 @@ my $PackageContent = $CommonObject{MainObject}->FileRead(
 
 my %Structure = $CommonObject{PackageObject}->PackageParse( String => $PackageContent );
 
-if ( $Action eq 'install' && $Structure{DatabaseInstall} ) {
+my $StructureKey = 'Database' . ucfirst $Action;
 
-    if ( $Structure{DatabaseInstall}->{pre} ) {
+if ( $Structure{$StructureKey} ) {
+
+    if ( $Structure{$StructureKey}->{pre} ) {
         $CommonObject{PackageObject}->_Database(
-            Database => $Structure{DatabaseInstall}->{pre},
+            Database => $Structure{$StructureKey}->{pre},
         );
     }
 
-    if ( $Structure{DatabaseInstall}->{post} ) {
+    if ( $Structure{$StructureKey}->{post} ) {
         $CommonObject{PackageObject}->_Database(
-            Database => $Structure{DatabaseInstall}->{post},
-        );
-    }
-}
-
-if ( $Action eq 'uninstall' && $Structure{DatabaseUninstall} ) {
-    if ( $Structure{DatabaseUninstall}->{pre} ) {
-        $CommonObject{PackageObject}->_Database(
-            Database => $Structure{DatabaseUninstall}->{pre},
-        );
-    }
-    if ( $Structure{DatabaseUninstall}->{post} ) {
-        $CommonObject{PackageObject}->_Database(
-            Database => $Structure{DatabaseUninstall}->{post},
+            Database => $Structure{$StructureKey}->{post},
         );
     }
 }
 
-print "... done\n"
+print "... done\n";
