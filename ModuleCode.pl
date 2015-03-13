@@ -37,6 +37,7 @@ use Kernel::System::Main;
 use Kernel::System::DB;
 use Kernel::System::Time;
 use Kernel::System::Package;
+use Kernel::System::XML;
 
 # get options
 my %Opt;
@@ -105,6 +106,13 @@ else {
     if ( $Action =~ m{\A CodeUninstall }msx ) {
         $Type = 'pre';
     }
+}
+
+local $Kernel::OM;
+if ( eval 'require Kernel::System::ObjectManager' ) {    ## no critic
+
+    # create object manager
+    $Kernel::OM = Kernel::System::ObjectManager->new();
 }
 
 # create common objects
