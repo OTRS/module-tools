@@ -82,13 +82,13 @@ sub UpdateChanges {
             }
         }
 
-        # if no chages file was found maybe is a package path
+        # if no changes file was found maybe is a package path
         if ( !$ChangesFile ) {
             my $PackageName;
 
             $PackageName = cwd();
 
-            $PackageName =~ s{.+/([^_]+)(:?_.+)?$}{$1};
+            $PackageName =~ s{.+/([^_|-]+)(:?[_|-].+)?$}{$1};
 
             # check for CHANGES-<PackageName>
             my $File = "CHANGES-$PackageName";
