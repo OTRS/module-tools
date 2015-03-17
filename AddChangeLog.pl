@@ -45,7 +45,7 @@ use Cwd;
 use Getopt::Long;
 use Pod::Usage;
 use Time::Piece;
-use WWW::Bugzilla3;
+use XMLRPC::Lite;
 
 my ( $Help, $Bug, $Message, $Beta, $UserFile );
 GetOptions(
@@ -165,10 +165,18 @@ sub GetBugSummary {
 
     # get bug description from bug tracker
     # if bug does not exist we automatically get an error message and the script dies
-    my $Bugzilla = new WWW::Bugzilla3( site => 'bugs.otrs.org' );
-    my @BugInfo  = $Bugzilla->get_bugs($Bug);
-    my $Summary  = $BugInfo[0]->{summary};
+    my $proxy = XMLRPC::Lite->proxy('http://bugs.otrs.org/xmlrpc.cgi');
+    my $Result = $proxy->call(
+        'Bug.get',
+        {
+            'ids'=> [$Bug],
+        },
+    )->result();
+    if (!$Result || !$Result->{bugs} || !@{ $Result->{bugs} }) {
+        die "Could not find Bug $Bug.\n";
+    }
 
+    my $Summary  = $Result->{bugs}->[0]->{summary};
     return $Summary;
 }
 
