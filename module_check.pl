@@ -295,7 +295,7 @@ sub OriginalFilenameGet {
 
         # Example for $origin (used in GIT)
         # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
-        if ( $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / blob / ([^/]+) \S+ / ([^/]+) }ixms ) {
+        if ( $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / blobs? / ([^/]+) \S+ / ([^/]+) }ixms ) {
 
             $GitCommitID = $1;
             $Filename     = $2;
