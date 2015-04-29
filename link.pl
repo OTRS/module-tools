@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 # --
-# link.pl - script for linking OTRS modules into framework root
 # Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify

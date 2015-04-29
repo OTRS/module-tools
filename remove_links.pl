@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 # --
-# remove_links.pl - script to remove links from an OTRS framework
 # Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify

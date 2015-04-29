@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 # --
-# git-find-file.pl - script to locate a file in the git history
 # Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify

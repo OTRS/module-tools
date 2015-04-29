@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 # --
-# otrs.Changes2Wiki.pl - small helper script to convert changes entries
 # Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
