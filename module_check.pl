@@ -298,7 +298,7 @@ sub OriginalFilenameGet {
         if ( $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / blobs? / ([^/]+) \S+ / ([^/]+) }ixms ) {
 
             $GitCommitID = $1;
-            $Filename     = $2;
+            $Filename    = $2;
 
             last LINE;
         }
