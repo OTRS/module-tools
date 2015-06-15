@@ -267,7 +267,7 @@ for my $SLA ( @{ $Config->{SLAs} } ) {
     next SLA if !$SLA;
     next SLA if !%{$SLA};
 
-    # check if this service already exists
+    # check if this sla already exists
     my $ExistingSLAID = $CommonObject{SLAObject}->SLALookup(
         Name => $SLA->{Name},
     );
