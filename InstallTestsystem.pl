@@ -267,6 +267,13 @@ system(
 );
 print STDERR "############################################\n";
 
+# link DatabaseInstall and CodeInstall
+print STDERR "--- Linking DatabaseInstall and CodeInstall...\n";
+print STDERR "############################################\n";
+system("ln -s -t $InstallDir/bin $Config{ModuleToolsRoot}DatabaseInstall.pl");
+system("ln -s -t $InstallDir/bin $Config{ModuleToolsRoot}CodeInstall.pl");
+print STDERR "############################################\n";
+
 # setting permissions
 print STDERR "--- Setting permissions...\n";
 print STDERR "############################################\n";
