@@ -57,6 +57,13 @@ if ( !$FredDir || !-e $FredDir ) {
 # remove possible slash at the end
 $InstallDir =~ s{ / \z }{}xms;
 
+# get OTRS major version number
+my $OTRSReleaseString = `cat RELEASE`;
+my $OTRSMajorVersion = '';
+if ($OTRSReleaseString =~ m{ VERSION \s+ = \s+ (\d+) .* \z }xms ) {
+    $OTRSMajorVersion = $1;
+}
+
 # Configuration
 my %Config = (
 
@@ -83,6 +90,16 @@ my %Config = (
     # the command to restart apache (could be different on other systems)
     'ApacheRestartCommand' => 'apachectl graceful',
 );
+
+# define some maintenance commands
+if ($OTRSMajorVersion >= 5) {
+    $Config{RebuildConfigCommand} = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Config::Rebuild' -s /bin/bash otrs";
+    $Config{DeleteCacheCommand}   = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Cache::Delete' -s /bin/bash otrs";
+}
+else {
+    $Config{RebuildConfigCommand} = "sudo perl $InstallDir/bin/otrs.RebuildConfig.pl";
+    $Config{DeleteCacheCommand}   = "sudo perl $InstallDir/bin/otrs.DeleteCache.pl";
+}
 
 my $SystemName = $InstallDir;
 $SystemName =~ s{$Config{EnvironmentRoot}}{}xmsg;
@@ -250,24 +267,24 @@ system(
 );
 print STDERR "############################################\n";
 
-# Deleting Cache
-print STDERR "--- Deleting cache config...\n";
+# setting permissions
+print STDERR "--- Setting permissions...\n";
 print STDERR "############################################\n";
-system("sudo perl $InstallDir/bin/otrs.DeleteCache.pl");
+system(
+   "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
+);
+print STDERR "############################################\n";
+
+# Deleting Cache
+print STDERR "--- Deleting cache...\n";
+print STDERR "############################################\n";
+system($Config{DeleteCacheCommand});
 print STDERR "############################################\n";
 
 # Rebuild Config
 print STDERR "--- Rebuilding config...\n";
 print STDERR "############################################\n";
-system("sudo perl $InstallDir/bin/otrs.RebuildConfig.pl");
-print STDERR "############################################\n";
-
-# setting permissions
-print STDERR "--- Setting permissions...\n";
-print STDERR "############################################\n";
-system(
-    "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
-);
+system($Config{RebuildConfigCommand});
 print STDERR "############################################\n";
 
 # inject test data
