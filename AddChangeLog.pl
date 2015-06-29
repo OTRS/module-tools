@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 # --
-# AddChangeLog.pl - script for adding entries to change log
 # Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # --
 # This program is free software; you can redistribute it and/or modify
@@ -165,18 +164,18 @@ sub GetBugSummary {
 
     # get bug description from bug tracker
     # if bug does not exist we automatically get an error message and the script dies
-    my $proxy = XMLRPC::Lite->proxy('http://bugs.otrs.org/xmlrpc.cgi');
-    my $Result = $proxy->call(
+    my $Proxy  = XMLRPC::Lite->proxy('http://bugs.otrs.org/xmlrpc.cgi');
+    my $Result = $Proxy->call(
         'Bug.get',
         {
-            'ids'=> [$Bug],
+            ids => [$Bug],
         },
     )->result();
-    if (!$Result || !$Result->{bugs} || !@{ $Result->{bugs} }) {
+    if ( !$Result || !$Result->{bugs} || !@{ $Result->{bugs} } ) {
         die "Could not find Bug $Bug.\n";
     }
 
-    my $Summary  = $Result->{bugs}->[0]->{summary};
+    my $Summary = $Result->{bugs}->[0]->{summary};
     return $Summary;
 }
 
