@@ -59,8 +59,8 @@ $InstallDir =~ s{ / \z }{}xms;
 
 # get OTRS major version number
 my $OTRSReleaseString = `cat RELEASE`;
-my $OTRSMajorVersion = '';
-if ($OTRSReleaseString =~ m{ VERSION \s+ = \s+ (\d+) .* \z }xms ) {
+my $OTRSMajorVersion  = '';
+if ( $OTRSReleaseString =~ m{ VERSION \s+ = \s+ (\d+) .* \z }xms ) {
     $OTRSMajorVersion = $1;
 }
 
@@ -92,7 +92,7 @@ my %Config = (
 );
 
 # define some maintenance commands
-if ($OTRSMajorVersion >= 5) {
+if ( $OTRSMajorVersion >= 5 ) {
     $Config{RebuildConfigCommand} = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Config::Rebuild' -s /bin/bash otrs";
     $Config{DeleteCacheCommand}   = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Cache::Delete' -s /bin/bash otrs";
 }
@@ -278,20 +278,20 @@ print STDERR "############################################\n";
 print STDERR "--- Setting permissions...\n";
 print STDERR "############################################\n";
 system(
-   "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
+    "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
 );
 print STDERR "############################################\n";
 
 # Deleting Cache
 print STDERR "--- Deleting cache...\n";
 print STDERR "############################################\n";
-system($Config{DeleteCacheCommand});
+system( $Config{DeleteCacheCommand} );
 print STDERR "############################################\n";
 
 # Rebuild Config
 print STDERR "--- Rebuilding config...\n";
 print STDERR "############################################\n";
-system($Config{RebuildConfigCommand});
+system( $Config{RebuildConfigCommand} );
 print STDERR "############################################\n";
 
 # inject test data
