@@ -51,14 +51,14 @@ EOF
     exit 1;
 }
 
-my @ITSMModules = qw(
-    GeneralCatalog
-    ITSMCore
-    ITSMIncidentProblemManagement
-    ITSMConfigurationManagement
-    ITSMChangeManagement
-    ITSMServiceLevelManagement
-    ImportExport
+my @ITSMModules = (
+    'GeneralCatalog',
+    'ITSMCore',
+    'ITSMIncidentProblemManagement',
+    'ITSMConfigurationManagement',
+    'ITSMChangeManagement',
+    'ITSMServiceLevelManagement',
+    'ImportExport',
 );
 
 # reverse the list of packages for uninstall
