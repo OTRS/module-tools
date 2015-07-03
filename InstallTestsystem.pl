@@ -93,8 +93,8 @@ my %Config = (
 
 # define some maintenance commands
 if ( $OTRSMajorVersion >= 5 ) {
-    $Config{RebuildConfigCommand} = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Config::Rebuild' -s /bin/bash otrs";
-    $Config{DeleteCacheCommand}   = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Cache::Delete' -s /bin/bash otrs";
+    $Config{RebuildConfigCommand} = "$InstallDir/bin/otrs.Console.pl Maint::Config::Rebuild";
+    $Config{DeleteCacheCommand}   = "$InstallDir/bin/otrs.Console.pl Maint::Cache::Delete";
 }
 else {
     $Config{RebuildConfigCommand} = "sudo perl $InstallDir/bin/otrs.RebuildConfig.pl";
