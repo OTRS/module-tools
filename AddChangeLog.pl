@@ -95,6 +95,12 @@ sub UpdateChanges {
                 $ChangesFile = $File;
             }
 
+            # check for CHANGES-<PackageName>.md
+            $File .= ".md";
+            if ( -e $File ) {
+                $ChangesFile = $File;
+            }
+
             if ( !$ChangesFile ) {
                 die "No CHANGES.md, CHANGES or $File file found in path.\n";
             }
