@@ -78,14 +78,12 @@ if ( $Opts{'v'} ) {
 $Opts{'m'} =~ s{ / \z }{}gxms;
 
 my $ModuleToolsPath = $Opts{'t'};
-if (!$ModuleToolsPath) {
+if ( !$ModuleToolsPath ) {
     $ModuleToolsPath = "$Opts{'m'}/module-tools/";
 }
 
 # remove slashes at the end
 $ModuleToolsPath =~ s{ / \z }{}gxms;
-
-
 
 # copy helper scripts to bin folder
 system("cp $ModuleToolsPath/DatabaseInstall.pl $Opts{'o'}/bin");
