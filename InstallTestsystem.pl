@@ -58,7 +58,7 @@ if ( !$FredDir || !-e $FredDir ) {
 $InstallDir =~ s{ / \z }{}xms;
 
 # get OTRS major version number
-my $OTRSReleaseString = `cat RELEASE`;
+my $OTRSReleaseString = `cat $InstallDir/RELEASE`;
 my $OTRSMajorVersion  = '';
 if ( $OTRSReleaseString =~ m{ VERSION \s+ = \s+ (\d+) .* \z }xms ) {
     $OTRSMajorVersion = $1;
@@ -93,8 +93,8 @@ my %Config = (
 
 # define some maintenance commands
 if ( $OTRSMajorVersion >= 5 ) {
-    $Config{RebuildConfigCommand} = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Config::Rebuild' -s /bin/bash otrs";
-    $Config{DeleteCacheCommand}   = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Cache::Delete' -s /bin/bash otrs";
+    $Config{RebuildConfigCommand} = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Config::Rebuild' -s /bin/bash " . $Config{PermissionsOTRSUser};
+    $Config{DeleteCacheCommand}   = "su -c '$InstallDir/bin/otrs.Console.pl Maint::Cache::Delete' -s /bin/bash " . $Config{PermissionsOTRSUser};
 }
 else {
     $Config{RebuildConfigCommand} = "sudo perl $InstallDir/bin/otrs.RebuildConfig.pl";
