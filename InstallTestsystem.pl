@@ -62,6 +62,7 @@ my $OTRSReleaseString = `cat $InstallDir/RELEASE`;
 my $OTRSMajorVersion  = '';
 if ( $OTRSReleaseString =~ m{ VERSION \s+ = \s+ (\d+) .* \z }xms ) {
     $OTRSMajorVersion = $1;
+    print "Installing testsystem for OTRS version $OTRSMajorVersion.\n";
 }
 
 # Configuration
