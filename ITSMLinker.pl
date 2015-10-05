@@ -71,7 +71,7 @@ if ( $Opts{'a'} eq 'uninstall' ) {
 $Opts{'v'} ||= '';
 if ( $Opts{'v'} ) {
     $Opts{'v'} =~ s{\.}{_}gxms;
-    $Opts{'v'} = '-' . $Opts{'v'};
+    $Opts{'v'} = '_' . $Opts{'v'};
 }
 
 # remove slashes at the end
