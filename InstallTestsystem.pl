@@ -150,9 +150,7 @@ my $ConfigInjectStr = <<"EOD";
     \$Self->{'DefaultCharset'}      = 'utf-8';
     \$Self->{'AdminEmail'}          = 'root\@localhost';
     \$Self->{'Package::Timeout'}    = '120';
-
-    \$Self->{'CheckEmailAddresses'} = 0;
-    \$Self->{'CheckMXRecord'}       = 0;
+    \$Self->{'SendmailModule'}      =  'Kernel::System::Email::DoNotSendEmail';
 
     # Fred
     \$Self->{'Fred::BackgroundColor'} = '#006ea5';
