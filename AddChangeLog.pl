@@ -141,7 +141,7 @@ sub UpdateChanges {
             $ReleaseHeaderFound = 1;
         }
 
-        if ( $ReleaseHeaderFound && !$Printed && $Line =~ /^ - / ) {
+        if ( $ReleaseHeaderFound && !$Printed && $Line =~ m/^(\s+-\s+|$)/smx ) {
             print $OutFile $ChangeLine;
             $Printed = 1;
         }
