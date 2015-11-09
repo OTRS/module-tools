@@ -182,6 +182,11 @@ sub GetBugSummary {
     }
 
     my $Summary = $Result->{bugs}->[0]->{summary};
+    # Remove trailing dot if present.
+    if ($Summary) {
+        $Summary =~ s{[.]+$}{}smx;
+
+    }
     return $Summary;
 }
 
