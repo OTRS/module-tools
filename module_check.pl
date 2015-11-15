@@ -97,8 +97,8 @@ sub CheckFile {
     # skip CVS directories
     return if $ModuleDir =~ m{ /CVS|\.git /? }xms;
 
-    # check only Perl-, Template (dtl and TemplateToolkit) and test files
-    return if $ModuleFile !~ m{ [.](pl|pm|dtl|tt|t) \s* \z }ixms;
+    # check only Perl-, Template (dtl and TemplateToolkit), test and javascript files
+    return if $ModuleFile !~ m{ [.](pl|pm|dtl|tt|t|js) \s* \z }ixms;
 
     # get original file name from $origin, continue only when an original name was found
     my ($OriginalFilename, $GitCommitID) = OriginalFilenameGet(File => $ModuleFile);
@@ -114,12 +114,11 @@ sub CheckFile {
     my $ModuleContent = ModuleContentPrepare(File => $ModuleFile );
 
     # build original filename
-    my $OriginalFile = $ModuleDir . '/';
+    my $OriginalFile = $ModulePath . '/' . $OriginalFilename;
 
     $OriginalFile =~ s{ $ModulePath }{$OriginalPath}xms;
     $OriginalFile =~ s{ /Kernel/Custom/ }{/}xms;
     $OriginalFile =~ s{ /Custom/ }{/}xms;
-    $OriginalFile .= $OriginalFilename;
     $OriginalFile  =~ s{\s}{}xms;
 
     # get and prepare original content
@@ -210,16 +209,19 @@ sub ModuleContentPrepare {
     my $Content = do { local $/; <$FH> };
     close $FH;
 
+    # compile regexes for multiple use (to prevent typos)
+    my $CustomLineStart   = qr{ ^ [ ]* (?: \# | \/\/ | \/\/ [ ] \# ) [ ] }xms;
+    my $CustomDividerLine = qr{ $CustomLineStart --- [ ]* \n }xms;
+    my $CustomPackageLine = qr{ $CustomLineStart [^\n ]+ \n }xms;
+    my $CustomMarkerStart = qr{ $CustomDividerLine $CustomPackageLine $CustomDividerLine }xms;
+    my $CustomMarkerStop  = qr{ $CustomDividerLine }xms;
+
     # prevent checking of files with nested markers (markers within markers)
     if ( $Content =~ m{
         (
-            ^ \# [ ] --- [ \t]* \n
-            ^ \# [ ] [^\n ][^\n]+ \n
-            ^ \# [ ] --- [ \t]* \n
-            (?: (?! ^ \# [ ] --- [ \t]* \n ). )+
-            ^ \# [ ] --- [ \t]* \n
-            ^ \# [ ] [^\n ][^\n]+ \n
-            ^ \# [ ] --- [ \t]* \n
+            $CustomMarkerStart
+            (?: (?! $CustomMarkerStop ). )+
+            $CustomMarkerStart
         )
     }xms ) {
         die "Nested custom markers found in '$Param{File}': $1!";
@@ -227,11 +229,9 @@ sub ModuleContentPrepare {
 
     my @NewCodeBlocks;
     while ( $Content =~ s{
-        ^ [ \t]* \# [ ] --- [ \t]* \n
-        ^ [ \t]* \# [ ] [^\n]+ \n
-        ^ [ \t]* \# [ ] --- [ \t]* \n
+        $CustomMarkerStart
         ( .+? )
-        ^ [ \t]* \# [ ] --- [ \t]* \n
+        $CustomMarkerStop
     }{---PLACEHOLDER---\n}xms
     ) {
         my $Block = $1;
@@ -293,10 +293,12 @@ sub OriginalFilenameGet {
             last LINE;
         }
 
-        # Example for $origin (used in GIT)
-        # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
-        if ( $Line =~ m{ \A \# [ ] \$origin: [ ] \S+ / blobs? / ([^/]+) \S+ / ([^/]+) }ixms ) {
-
+        # Examples for $origin (used in GIT)
+        # ^ # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm $
+        # ^ // $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm $
+        # ^ // # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm $
+        my $CustomLineStart   = qr{ ^ [ ]* (?: \# | \/\/ | \/\/ [ ] \# ) [ ] }xms;
+        if ( $Line =~ m{ \A $CustomLineStart \$origin: [ ] [^ ]+ / blob s? / ( [^/]+ ) / ( [^ ]+ ) [ ]* \z }xms ) {
             $GitCommitID = $1;
             $Filename    = $2;
 
@@ -324,10 +326,17 @@ sub ContentClean {
 
     my $Content = $Param{Content};
 
-    # delete $origin line
-    # Example:
-    # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm
-    $Content =~ s{ ^ \# [ ] ( \$origin: [^\n]+ ) \n ( ^ \# [ ] -- \n )? }{}xms;
+    # delete $origin line and following divider line (including possible $former-origin line)
+    # Examples:
+    # ^ # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm $
+    # ^ // $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm $
+    # ^ // # $origin: https://github.com/OTRS/otrs/blob/c9a71af026e3407b6866e49b0c68346e28b19da8/Kernel/Modules/AgentTicketPhone.pm $
+    my $CustomLineStart   = qr{ ^ [ ]* (?: \# | \/\/ | \/\/ [ ] \# ) [ ] }xms;
+    $Content =~ s{
+        $CustomLineStart \$origin: [^\n]+ \n
+        ( $CustomLineStart \$former-origin: [^\n]+ \n )?
+        ( $CustomLineStart -- \n )?
+    }{}xms;
 
     # delete the different version lines
     # example1: $VERSION = qw($Revision: 1.30 $) [1];
