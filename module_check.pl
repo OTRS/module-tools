@@ -246,7 +246,7 @@ sub ModuleContentPrepare {
             if ( $Line =~ s{ \A \# [ ] ( \# .* ) \z }{}xms ) {
                 $NewCode .= $1 . "\n";
             }
-            elsif ( $Line =~ s{ \A \# ( .* ) \z }{}xms ) {
+            elsif ( $Line =~ s{ \A (?: \# | \/\/ ) ( .* ) \z }{}xms ) {
                 $NewCode .= $1 . "\n";
             }
             else {
