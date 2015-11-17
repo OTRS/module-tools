@@ -28,7 +28,7 @@ module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] 
 
 =head1 DESCRIPTION
 
-Check the change markers for the files that contain an OldID.
+Check the change markers for files that contain an OldID or origin.
 
 =head1 SUBROUTINES
 
@@ -46,7 +46,7 @@ use File::Temp qw( tempfile );
 
 # get options
 my %Opts = ();
-getopt('omd', \%Opts);
+getopt('om', \%Opts);
 
 # set default
 if (!$Opts{'o'} || !$Opts{'m'} ) {
@@ -55,7 +55,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
 if ( $Opts{'h'} ) {
     print "\nmodule_check.pl - Check OTRS modules\n";
     print "Copyright (C) 2001-2015 OTRS AG, http://otrs.com/\n\n";
-    print "usage:\n   module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]\n\n";
+    print "usage:\n   module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode] -i [ignore missing framwork files] [diff options: -u|-b|-B|-w]\n\n";
     print "example:\n   /workspace/module-tools/module_check.pl -o /workspace/otrs-git/ -m /workspace/ITSMCore_3_3/\n\n";
     exit 1;
 }
@@ -122,7 +122,10 @@ sub CheckFile {
     $OriginalFile  =~ s{\s}{}xms;
 
     # get and prepare original content
-    my $OriginalContent = OriginalContentPrepare(File => $OriginalFile );
+    my $OriginalContent = OriginalContentPrepare(
+        File => $OriginalFile,
+        Opts => \%Opts,
+    );
 
     # create temp files for the diff
     my $ModuleFH   = File::Temp->new( DIR => '/tmp' );
@@ -139,7 +142,7 @@ sub CheckFile {
     # process diff options
     my $DiffOptions = '';
     for my $Opt ( qw(u b B w) ) {
-        if ( defined( $Opts{$Opt} ) ) {
+        if ( $Opts{$Opt} ) {
             $DiffOptions .= " -$Opt";
         }
     }
@@ -182,7 +185,16 @@ sub OriginalContentPrepare {
 
     # open file and get content
     ## no critic
-    open my $FH, '<', $Param{File} or die "could not open file $Param{File}\n";
+    open my $FH, '<', $Param{File};
+    if ( $! ) {
+        if ( $Param{Opts}->{i} ) {
+            print "could not open file $Param{File}\n";
+            return '';
+        }
+        else {
+            die "could not open file $Param{File}\n";
+        }
+    }
     ## use critic
     my $Content = do { local $/; <$FH> };
     close $FH;
