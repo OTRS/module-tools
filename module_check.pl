@@ -104,6 +104,10 @@ sub CheckFile {
     my ($OriginalFilename, $GitCommitID) = OriginalFilenameGet(File => $ModuleFile);
     return if !$OriginalFilename;
 
+    # get latest commit ID for current original file
+    $LatestGitCommitID = `cd $OriginalPath; git log -1 --format="%H" --follow $OriginalFilename`;
+    chomp $LatestGitCommitID;
+
     # check if the $GitCommitID is up to date
     my $GitCommitIDUpdateNeeded = '';
     if ( $GitCommitID && $GitCommitID ne $LatestGitCommitID) {
