@@ -216,7 +216,7 @@ sub FormatChangesLine {
 
     # format for CHANGES (OTRS 3.1.x and earlier) is different from CHANGES.md
     my $Line;
-    if ( $Bug && $ChangesFile ne 'CHANGES.md' ) {
+    if ( $Bug && $ChangesFile !~ m{CHANGES .* \.md}msx ) {
         $Line = " - $Date Fixed bug#$Bug - $Summary.\n";
     }
     elsif ($Bug) {
