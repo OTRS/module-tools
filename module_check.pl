@@ -185,8 +185,8 @@ sub OriginalContentPrepare {
 
     # open file and get content
     ## no critic
-    open my $FH, '<', $Param{File};
-    if ( $! ) {
+    my $Success = open my $FH, '<', $Param{File};
+    if ( !$Success ) {
         if ( $Param{Opts}->{i} ) {
             print "could not open file $Param{File}\n";
             return '';
