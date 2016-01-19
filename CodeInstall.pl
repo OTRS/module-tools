@@ -24,7 +24,7 @@ CodeInstall.pl - script to run package install and uninstall code for developmen
 
 =head1 SYNOPSIS
 
-CodeInstall.pl -m MyModule.sopm -a [install|uninstall]
+CodeInstall.pl -m MyModule.sopm -a [install|uninstall|upgrade] -v [version (for -a = 'upgrade' )]
 
 =head1 DESCRIPTION
 
@@ -54,19 +54,26 @@ use Kernel::System::Time;
 use Kernel::System::Package;
 use Kernel::System::XML;
 
-my ( $OptHelp, $Module, $Action );
+my ( $OptHelp, $Module, $Action, $Version );
 
 GetOptions(
     'h'   => \$OptHelp,
     'm=s' => \$Module,
-    'a=s' => \$Action
+    'a=s' => \$Action,
+    'v=s' => \$Version,
 );
 
 if ( $OptHelp || !$Module ) {
     pod2usage( -verbose => 0 );
 }
 
-if ( !defined $Action || $Action ne 'uninstall' ) {
+my %Actions = (
+    install   => 1,
+    uninstall => 1,
+    upgrade   => 1,
+);
+
+if ( !defined $Action || !$Actions{$Action} ) {
     $Action = 'install';
 }
 
@@ -111,6 +118,27 @@ if ( $Action eq 'install' && $Structure{CodeInstall} ) {
         Type      => 'post',
         Structure => \%Structure,
     );
+}
+
+# code upgrade
+elsif ( $Action eq 'upgrade' && $Structure{CodeUpgrade} ) {
+    my @Codes;
+    for my $Part ( @{ $Structure{CodeUpgrade} } ) {
+        if ( !$Part->{Version} ) {
+            push @Codes, $Part;
+        }
+        elsif ( $Part->{Version} eq $Version ) {
+            push @Codes, $Part;
+        }
+    }
+
+    for my $Code ( @Codes ) {
+        $CommonObject{PackageObject}->_Code(
+            Code      => [ $Code ],
+            Type      => $Code->{Type},
+            Structure => \%Structure,
+        );
+    }
 }
 
 # code uninstall is usually 'pre'
