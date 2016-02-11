@@ -55,7 +55,7 @@ if (!$Opts{'o'} || !$Opts{'m'} ) {
 if ( $Opts{'h'} ) {
     print "\nmodule_check.pl - Check OTRS modules\n";
     print "Copyright (C) 2001-2016 OTRS AG, http://otrs.com/\n\n";
-    print "usage:\n   module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode] -i [ignore missing framwork files] [diff options: -u|-b|-B|-w]\n\n";
+    print "usage:\n   module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode] -i [ignore missing framwork files] -s [last commit id from single files] [diff options: -u|-b|-B|-w]\n\n";
     print "example:\n   /workspace/module-tools/module_check.pl -o /workspace/otrs-git/ -m /workspace/ITSMCore_3_3/\n\n";
     exit 1;
 }
@@ -103,6 +103,12 @@ sub CheckFile {
     # get original file name from $origin, continue only when an original name was found
     my ($OriginalFilename, $GitCommitID) = OriginalFilenameGet(File => $ModuleFile);
     return if !$OriginalFilename;
+
+    if ( $Opts{'s'} ) {
+        # get latest commit ID for current original file
+        $LatestGitCommitID = `cd $OriginalPath; git log -1 --format="%H" --follow $OriginalFilename`;
+        chomp $LatestGitCommitID;
+    }
 
     # check if the $GitCommitID is up to date
     my $GitCommitIDUpdateNeeded = '';
