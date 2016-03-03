@@ -24,10 +24,10 @@ AddChangeLog.pl - script for adding change log entries
 
 =head1 SYNOPSIS
 
-AddChangeLog.pl -b 1234 [-f CHANGES]
+AddChangeLog.pl -b 1234 [-pr 1001] [-f CHANGES]
     Add bugzilla entry title to stable version CHANGES.md and commit message template.
 
-AddChangeLog.pl -b 1234 --beta
+AddChangeLog.pl -b 1234 [-pr 1001] --beta
     --beta causes the entry to be added to the latest version, even if it is not stable.
 
 AddChangeLog.pl -m "My commit message."
@@ -46,10 +46,11 @@ use Pod::Usage;
 use Time::Piece;
 use XMLRPC::Lite;
 
-my ( $Help, $Bug, $Message, $Beta, $UserFile );
+my ( $Help, $Bug, $PullRequest, $Message, $Beta, $UserFile );
 GetOptions(
     'h'    => \$Help,
     'b=s'  => \$Bug,
+    'pr=s' => \$PullRequest,
     'm=s'  => \$Message,
     'beta' => \$Beta,
     'f=s'  => \$UserFile,
@@ -154,11 +155,14 @@ sub UpdateChanges {
         '.git/OTRSCommitTemplate.msg' || die "Couldn't open .git/OTRSCommitTemplate.msg: $!";
     ## use critic
     binmode $OutFile;
+    my $PRText = '';
     if ($Bug) {
-        print $OutFile "Fixed: $Summary (bug#$Bug).\n";
+        $PRText = ", PR#$PullRequest" if $PullRequest;
+        print $OutFile "Fixed: $Summary (bug#$Bug$PRText).\n";
     }
     elsif ($Message) {
-        print $OutFile "$Message\n";
+        $PRText = "(PR#$PullRequest) " if $PullRequest;
+        print $OutFile "$PRText$Message\n";
     }
     close $OutFile;
 
@@ -214,16 +218,19 @@ sub FormatChangesLine {
 # - 2013-03-02 Fixed bug#9214 - IE10: impossible to open links from rich text articles.
 # - 2013-03-02 Fixed bug#[9214](http://bugs.otrs.org/show_bug.cgi?id=9214) - IE10: impossible to open links from rich text articles.
 
+    my $PRText = '';
+    $PRText = "(PR#$PullRequest) " if $PullRequest;
+
     # format for CHANGES (OTRS 3.1.x and earlier) is different from CHANGES.md
     my $Line;
     if ( $Bug && $ChangesFile !~ m{CHANGES .* \.md}msx ) {
-        $Line = " - $Date Fixed bug#$Bug - $Summary.\n";
+        $Line = " - $Date Fixed bug#$Bug$PRText - $Summary.\n";
     }
     elsif ($Bug) {
-        $Line = " - $Date Fixed bug#[$Bug](http://bugs.otrs.org/show_bug.cgi?id=$Bug) - $Summary.\n";
+        $Line = " - $Date Fixed bug#[$Bug](http://bugs.otrs.org/show_bug.cgi?id=$Bug)$PRText - $Summary.\n";
     }
     elsif ($Message) {
-        $Line = " - $Date $Summary\n";
+        $Line = " - $Date $PRText$Summary\n";
     }
     return $Line;
 }
