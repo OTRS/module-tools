@@ -103,7 +103,7 @@ sub UpdateChanges {
             }
 
             if ( !$ChangesFile ) {
-                die "No CHANGES.md, CHANGES or $File file found in path.\n";
+                print STDERR "No CHANGES.md, CHANGES or $File file found in path.\n";
             }
         }
     }
@@ -121,37 +121,39 @@ sub UpdateChanges {
         $ChangeLine = FormatChangesLine( '', $Message, $ChangesFile );
     }
 
-    # read in existing changes file
-    open my $InFile, '<', $ChangesFile || die "Couldn't open $ChangesFile: $!";    ## no critic
-    binmode $InFile;
-    my @Changes = <$InFile>;
-    close $InFile;
+    if ($ChangesFile) {
+        # read in existing changes file
+        open my $InFile, '<', $ChangesFile || die "Couldn't open $ChangesFile: $!";    ## no critic
+        binmode $InFile;
+        my @Changes = <$InFile>;
+        close $InFile;
 
-    # write out new file with added line
-    open my $OutFile, '>', $ChangesFile || die "Couldn't open $ChangesFile: $!";    ## no critic
-    binmode $OutFile;
+        # write out new file with added line
+        open my $OutFile, '>', $ChangesFile || die "Couldn't open $ChangesFile: $!";    ## no critic
+        binmode $OutFile;
 
-    my $Printed            = 0;
-    my $ReleaseHeaderFound = 0;
-    my $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+[ ]};                           # 1.2.3
-    if ($Beta) {
-        $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+};                             # 1.2.3.beta3
-    }
-    for my $Line (@Changes) {
-        if ( !$ReleaseHeaderFound && $Line =~ m{$ReleaseHeaderRegex} ) {
-            $ReleaseHeaderFound = 1;
+        my $Printed            = 0;
+        my $ReleaseHeaderFound = 0;
+        my $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+[ ]};                           # 1.2.3
+        if ($Beta) {
+            $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+};                             # 1.2.3.beta3
         }
+        for my $Line (@Changes) {
+            if ( !$ReleaseHeaderFound && $Line =~ m{$ReleaseHeaderRegex} ) {
+                $ReleaseHeaderFound = 1;
+            }
 
-        if ( $ReleaseHeaderFound && !$Printed && $Line =~ m/^(\s+-\s+|$)/smx ) {
-            print $OutFile $ChangeLine;
-            $Printed = 1;
+            if ( $ReleaseHeaderFound && !$Printed && $Line =~ m/^(\s+-\s+|$)/smx ) {
+                print $OutFile $ChangeLine;
+                $Printed = 1;
+            }
+            print $OutFile $Line;
         }
-        print $OutFile $Line;
+        close $OutFile;
     }
-    close $OutFile;
 
     ## no critic
-    open $OutFile, '>',
+    open my $OutFile, '>',
         '.git/OTRSCommitTemplate.msg' || die "Couldn't open .git/OTRSCommitTemplate.msg: $!";
     ## use critic
     binmode $OutFile;
