@@ -1,0 +1,527 @@
+# Sample LDIF data for the ApacheDS
+#
+# Some star wars force users
+# userpassword for all persons is "pass"
+#
+version: 1
+
+dn: ou=users,o=force
+objectclass: organizationalUnit
+objectclass: top
+description: Contains entries which describe persons (force users light / dark)
+ou: users
+
+dn: ou=groups,o=force
+objectclass: organizationalUnit
+objectclass: top
+description: Contains entries which describe groups (orders, for instance)
+ou: groups
+
+dn: ou=orders,ou=groups,o=force
+objectclass: organizationalUnit
+objectclass: top
+description: Contains entries which describe force user orders (sithlords, for instance)
+ou: orders
+
+# sith lords
+# --------------
+dn: cn=Darth Bane,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Bane
+description: Bane is notable for being the originator of the "Rule of Two" for the Sith Lords.
+givenname: Darth
+sn: Bane
+uid: dbane
+mail: dbane@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Malak,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Malak
+description: Malak and Revan disobeyed the Jedi Council and helped the Republic defend against the Mandalorians.
+givenname: Darth
+sn: Malak
+uid: dmalak
+mail: dmalak@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Maul,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Maul
+description: Trained as Darth Sidious's first apprentice, he serves as a Sith Lord and a master of wielding a double-bladed lightsaber.
+givenname: Darth
+sn: Maul
+uid: dmaul
+mail: dmaul@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Nihilus,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Nihilus
+description: Darth Traya found and trained Nihilus on Malachor V. With Darth Sion, Nihilus later betrayed her and drove her into exile.
+givenname: Darth
+sn: Nihilus
+uid: dnihilus
+mail: dnihilus@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Plagueis,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Plagueis
+description: Plagueis made a grand plan to ensure the Sith would defeat the Jedi by undermining the Galactic Republic and ensure the dominance of the Dark Side of the Force.
+givenname: Darth
+sn: Plagueis
+uid: dplagueis
+mail: dplagueis@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Revan,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Revan
+description: Revan is depicted as a former Jedi who, along with Malak, left the Order to lead the fight in the Mandalorian Wars due to the Jedi's inaction.
+givenname: Darth
+sn: Revan
+uid: drevan
+mail: drevan@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Sidious,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Sidious
+description: Sidious instigates the Clone Wars, nearly destroys the Jedi, and transforms the Republic into the Empire.
+givenname: Darth
+sn: Sidious
+uid: dsidious
+mail: dsidious@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Talon,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Talon
+description: Talon's only objective was to become one of Darth Krayt's two Hands.
+givenname: Darth
+sn: Talon
+uid: dtalon
+mail: dtalon@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Tyranus,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Tyranus
+description: As the founder of the Confederacy of Independent Systems, he is the instigator of the Clone Wars.
+givenname: Darth
+sn: Tyranus
+uid: dtyranus
+mail: dtyranus@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Vader,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Vader
+description: Originally a Jedi prophesied to bring balance to the Force, he falls to the dark side of the Force and serves the evil Galactic Empire at the right hand of his Sith master, Emperor Palpatine.
+givenname: Darth
+sn: Vader
+uid: dvader
+mail: dvader@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Darth Vitiate,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Darth Vitiate
+description: He declared himself as the new Sith Emperor and ruled over the Sith after the Great Hyperspace War.
+givenname: Darth
+sn: Vitiate
+uid: dvitiate
+mail: dvitiate@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Exar Kun,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Exar Kun
+description: Fallen Jedi who led the Brotherhood of the Sith against the Jedi and the Galactic Republic during the Great Sith War.
+givenname: Exar
+sn: Kun
+uid: ekun
+mail: ekun@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Freedon Nadd,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Freedon Nadd
+description: Fallen Jedi who led the Brotherhood of the Sith against the Jedi and the Galactic Republic during the Great Sith War.
+givenname: Freedon
+sn: Nadd
+uid: fnadd
+mail: fnadd@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Marka Ragnos,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Marka Ragnos
+description: Following his death, he lived on as a force ghost and decreed that only the most worthy could succeed him as Dark Lord of the Sith.
+givenname: Marka
+sn: Ragnos
+uid: mragnos
+mail: mragnos@sithlords.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Sith Lords,ou=orders,ou=groups,o=force
+objectclass: groupOfUniqueNames
+objectclass: top
+cn: Sith Lords
+uniquemember: cn=Darth Bane,ou=users,o=force
+uniquemember: cn=Darth Malak,ou=users,o=force
+uniquemember: cn=Darth Maul,ou=users,o=force
+uniquemember: cn=Darth Nihilus,ou=users,o=force
+uniquemember: cn=Darth Plagueis,ou=users,o=force
+uniquemember: cn=Darth Revan,ou=users,o=force
+uniquemember: cn=Darth Sidious,ou=users,o=force
+uniquemember: cn=Darth Tyranus,ou=users,o=force
+uniquemember: cn=Darth Vader,ou=users,o=force
+uniquemember: cn=Darth Vitiate,ou=users,o=force
+uniquemember: cn=Exar Kun,ou=users,o=force
+uniquemember: cn=Freedon Nadd,ou=users,o=force
+uniquemember: cn=Marka Ragnos,ou=users,o=force
+
+# night sisters
+# --------------
+dn: cn=Asajj Ventress,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Asajj Ventress
+description: An assassin trained in the ways of the dark side by Count Dooku, Asajj Ventress yearned to be considered a true Sith, but such status wasn't allowed under the Sith's Rule of Two.
+givenname: Asajj
+sn: Ventress
+uid: aventress
+mail: aventress@mightsisters.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Savage Opress,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Savage Opress
+description: Savage Opress was once a common Nightbrother whose fighting prowess impressed Asajj Ventress. Transformed into a monstrous warrior by Mother Talzin, Opress became Count Dooku's new assassin and secret Sith apprentice.
+givenname: Savage
+sn: Opress
+uid: sopress
+mail: sopress@mightsisters.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Night Sisters,ou=orders,ou=groups,o=force
+objectclass: groupOfUniqueNames
+objectclass: top
+cn: Night Sisters
+uniquemember: cn=Asajj Ventress,ou=users,o=force
+uniquemember: cn=Savage Opress,ou=users,o=force
+
+# knights of ren
+# --------------
+dn: cn=Kylo Ren,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Kylo Ren
+description: A dark warrior strong with the Force, Kylo Ren commands First Order missions with a temper as fiery as his unconventional lightsaber.
+givenname: Kylo
+sn: Ren
+uid: kren
+mail: kren@knightsofren.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Knights of Ren,ou=orders,ou=groups,o=force
+objectclass: groupOfUniqueNames
+objectclass: top
+cn: Knights of Ren
+uniquemember: cn=Kylo Ren,ou=users,o=force
+
+# jedi order
+# --------------
+dn: cn=Aayla Secura,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Aayla Secura
+description: Aayla Secura was a female Twi'lek Jedi Master who served as a Jedi General during the Clone Wars. She had received the rank of Jedi Knight at some point before the war, making her a Jedi general at its onset.
+givenname: Aayla
+sn: Secura
+uid: asecura
+mail: asecura@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Ahsoka Tano,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Ahsoka Tano
+description: Ahsoka Tano, a Togruta female, was the Padawan learner to Anakin Skywalker and a hero of the Clone Wars. Alongside Anakin, she grew from headstrong student into a mature leader. But her destiny laid along a different path than the Jedi.
+givenname: Ahsoka
+sn: Tano
+uid: atano
+mail: atano@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Barriss Offee,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Barriss Offee
+description: Barriss Offee was a female Mirialan who trained as a Jedi Padawan during the Clone Wars. She carried a blue lightsaber and trained under Jedi Master Luminara Unduli.
+givenname: Barriss
+sn: Offee
+uid: boffee
+mail: boffee@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Eeth Koth,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Eeth Koth
+description: Eeth Koth was a male Iridonian Zabrak Jedi Master who fought during the Clone Wars in battles such as the Battle of Geonosis. At some point in the war, Koth was kidnapped by General Grievous but was rescued by Adi Gallia, Obi-Wan Kenobi and Anakin Skywalker.
+givenname: Eeth
+sn: Koth
+uid: ekoth
+mail: ekoth@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Ki-adi Mundi,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Ki-adi Mundi
+description: Ki-Adi-Mundi was a Cerean alien who sat on the Jedi Council. A humanoid being, Ki's most distinguishing physical feature was an enlarged conical cranium that contained a binary brain.
+givenname: Ki-adi
+sn: Mundi
+uid: kmundi
+mail: kmundi@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Kit Fisto,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Kit Fisto
+description: Kit Fisto was a Nautolan Jedi Master during the last years of the Galactic Republic. He was among the Jedi who participated in the Battle of Geonosis and was one of the few survivors out of the 200 who traveled there.
+givenname: Kit
+sn: Fisto
+uid: kfisto
+mail: kfisto@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Kyle Katarn,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Kyle Katarn
+description: Katarn was originally a member of the Galactic Empire, before becoming a mercenary for hire. He regularly worked for the Rebel Alliance and later became a member of the New Republic as well as a skilled Jedi and an instructor at the Jedi Academy, second only to Luke Skywalker.
+givenname: Kyle
+sn: Katarn
+uid: kkatarn
+mail: kkatarn@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Luke Skywalker,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Luke Skywalker
+description: Luke Skywalker was a Tatooine farmboy who rose from humble beginnings to become one of the greatest Jedi the galaxy has ever known.
+givenname: Luke
+sn: Skywalker
+uid: lskywalker
+mail: lskywalker@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Luminara Unduli,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Luminara Unduli
+description: A green-skinned Mirialan, Luminara Unduli served the Jedi Order during the final years of the Galactic Republic, and trained the capable Padawan Barriss Offee.
+givenname: Luminara
+sn: Unduli
+uid: lunduli
+mail: lunduli@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Mace Windu,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Mace Windu
+description: A grim Jedi Master with an amethyst-bladed lightsaber, Mace Windu was the champion of the Jedi Order, with little tolerance for the failings of the Senate, the arguments of politicians, or the opinions of rebellious Jedi.
+givenname: Mace
+sn: Windu
+uid: mwindu
+mail: mwindu@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Mara Jade Skywalker,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Mara Jade Skywalker
+description: Mara Jade Skywalker was, during different times in her life, an Emperor's Hand, a smuggler, and later a Jedi Master who sat upon the Jedi High Council.
+givenname: Mara Jade
+sn: Skywalker
+uid: mskywalker
+mail: mskywalker@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Nomi Sunrider,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Nomi Sunrider
+description: Nomi Sunrider was a legendary Jedi Master who lived approximately 4,000 years before the Battle of Yavin. She was a key figure in the defeat of Exar Kun during the Great Sith War..
+givenname: Nomi
+sn: Nomi Sunrider
+uid: nsunrider
+mail: nsunrider@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Obi-wan Kenobi,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Obi-wan Kenobi
+description: A legendary Jedi Master, Obi-Wan Kenobi was a noble man and gifted in the ways of the Force. He trained Anakin Skywalker, served as a general in the Republic Army during the Clone Wars, and guided Luke Skywalker as a mentor.
+givenname: Obi-wan
+sn: Kenobi
+uid: okenobi
+mail: okenobi@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Plo Koon,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Plo Koon
+description: A Kel Dor from Dorin, Plo Koon was among the wisest members of the Jedi Order, respected for his level-headed analysis of events and unflappable calm..
+givenname: Plo
+sn: Koon
+uid: pkoon
+mail: pkoon@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Qui-gon Jinn,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Qui-gon Jinn
+description: A venerable if maverick Jedi Master, Qui-Gon Jinn was a student of the living Force. Qui-Gon lived for the moment, espousing a philosophy of "feel, don't think -- use your instincts.".
+givenname: Qui-gon
+sn: Jinn
+uid: qjinn
+mail: qjinn@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Quinlan Vos,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Quinlan Vos
+description: A Jedi with a sarcastic sense of humor and a reputation for not playing by the rules, Quinlan Vos was an expert tracker renowned for his ability to read memories from objects people handled.
+givenname: Quinlan
+sn: Vos
+uid: qvos
+mail: qvos@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Shaak Ti,ou=users,o=force
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: top
+cn: Shaak Ti
+description: A wise and patient Jedi Master, the Togruta Shaak Ti fought at the Battle of Geonosis, and supervised the training of clone cadets on Kamino.
+givenname: Shaak
+sn: Shaak Ti
+uid: sti
+mail: sti@jediorder.net
+userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+
+dn: cn=Jedi Order,ou=orders,ou=groups,o=force
+objectclass: groupOfUniqueNames
+objectclass: top
+cn: Jedi Order
+uniquemember: cn=Aayla Secura,ou=users,o=force
+uniquemember: cn=Ahsoka Tano,ou=users,o=force
+uniquemember: cn=Barriss Offee,ou=users,o=force
+uniquemember: cn=Eeth Koth,ou=users,o=force
+uniquemember: cn=Ki-adi Mundi,ou=users,o=force
+uniquemember: cn=Kit Fisto,ou=users,o=force
+uniquemember: cn=Kyle Katarn,ou=users,o=force
+uniquemember: cn=Luke Skywalker,ou=users,o=force
+uniquemember: cn=Luminara Unduli,ou=users,o=force
+uniquemember: cn=Mace Windu,ou=users,o=force
+uniquemember: cn=Mara Jade Skywalker,ou=users,o=force
+uniquemember: cn=Nomi Sunrider,ou=users,o=force
+uniquemember: cn=Obi-wan Kenobi,ou=users,o=force
+uniquemember: cn=Plo Koon,ou=users,o=force
+uniquemember: cn=Qui-gon Jinn,ou=users,o=force
+uniquemember: cn=Quinlan Vos,ou=users,o=force
+uniquemember: cn=Shaak Ti,ou=users,o=force
