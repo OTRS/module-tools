@@ -64,6 +64,8 @@ use File::Basename;
 use vars (qw($Self));
 use Getopt::Std;
 
+print "\nDEPRECATED! better use GenerateConfigChapter.pl!\n\n";
+
 eval { require XML::Simple };
 if ($@) {
     print "Can't load XML::Simple: $@";
