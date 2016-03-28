@@ -237,7 +237,7 @@ description: An assassin trained in the ways of the dark side by Count Dooku, As
 givenname: Asajj
 sn: Ventress
 uid: aventress
-mail: aventress@mightsisters.net
+mail: aventress@nightsisters.net
 userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
 
 dn: cn=Savage Opress,ou=users,o=force
@@ -250,7 +250,7 @@ description: Savage Opress was once a common Nightbrother whose fighting prowess
 givenname: Savage
 sn: Opress
 uid: sopress
-mail: sopress@mightsisters.net
+mail: sopress@nightsisters.net
 userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
 
 dn: cn=Night Sisters,ou=orders,ou=groups,o=force
