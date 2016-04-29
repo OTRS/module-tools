@@ -123,42 +123,68 @@ use vars (qw($Self));
 
     # Attributes needed for group syncs
     # (attribute name for group value key)
-    #    $Self->{'AuthSyncModule::LDAP::AccessAttr'} = 'memberUid';
+    $Self->{'AuthSyncModule::LDAP::AccessAttr1'} = 'uniquemember';
+
     # (attribute for type of group content UID/DN for full ldap name)
     #    $Self->{'AuthSyncModule::LDAP::UserAttr'} = 'UID';
-    #    $Self->{'AuthSyncModule::LDAP::UserAttr'} = 'DN';
+    $Self->{'AuthSyncModule::LDAP::UserAttr1'} = 'DN';
 
     # AuthSyncModule::LDAP::UserSyncInitialGroups
     # (sync following group with rw permission after initial create of first agent
     # login)
-    #    $Self->{'AuthSyncModule::LDAP::UserSyncInitialGroups'} = [
-    #        'users',
-    #    ];
+    $Self->{'AuthSyncModule::LDAP::UserSyncInitialGroups1'} = [
+        'users',
+    ];
 
     # AuthSyncModule::LDAP::UserSyncGroupsDefinition
     # (If "LDAP" was selected for AuthModule and you want to sync LDAP
     # groups to otrs groups, define the following.)
-    #    $Self->{'AuthSyncModule::LDAP::UserSyncGroupsDefinition'} = {
-    #        # ldap group
-    #        'cn=agent,o=otrs' => {
-    #            # otrs group
-    #            'admin' => {
-    #                # permission
-    #                rw => 1,
-    #                ro => 1,
-    #            },
-    #            'faq' => {
-    #                rw => 0,
-    #                ro => 1,
-    #            },
-    #        },
-    #        'cn=agent2,o=otrs' => {
-    #            'users' => {
-    #                rw => 1,
-    #                ro => 1,
-    #            },
-    #        }
-    #    };
+    $Self->{'AuthSyncModule::LDAP::UserSyncGroupsDefinition1'} = {
+        'cn=Sith Lords,ou=orders,ou=groups,o=force' => {    # LDAP  group.
+            'admin' => {                                    # OTRS group.
+                rw => 1,                                    # Effective permission.
+                ro => 1,                                    # Effective permission.
+            },
+
+            # 'sithlords' => {      # This group does not exist in OTRS you need to create it in order to use it.
+            #     rw => 1,
+            #     ro => 1,
+            # },
+        },
+        'cn=Night Sisters,ou=orders,ou=groups,o=force' => {
+            'admin' => {
+                rw => 1,
+                ro => 1,
+            },
+
+            # 'nightsisters' => {
+            #     rw => 1,
+            #     ro => 1,
+            # },
+        },
+        'cn=Knights of Ren,ou=orders,ou=groups,o=force' => {
+            'admin' => {
+                rw => 1,
+                ro => 1,
+            },
+
+            # 'knightsofren' => {
+            #     rw => 1,
+            #     ro => 1,
+            # },
+        },
+        'cn=Jedi Order,ou=orders,ou=groups,o=force' => {
+            'admin' => {
+                rw => 1,
+                ro => 1,
+            },
+
+            # 'jediorder' => {
+            #     rw => 1,
+            #     ro => 1,
+            # },
+        },
+    };
 
     # AuthSyncModule::LDAP::UserSyncRolesDefinition
     # (If "LDAP" was selected for AuthModule and you want to sync LDAP
