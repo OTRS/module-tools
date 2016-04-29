@@ -189,17 +189,24 @@ use vars (qw($Self));
     # AuthSyncModule::LDAP::UserSyncRolesDefinition
     # (If "LDAP" was selected for AuthModule and you want to sync LDAP
     # groups to otrs roles, define the following.)
-    #    $Self->{'AuthSyncModule::LDAP::UserSyncRolesDefinition'} = {
-    #        # ldap group
-    #        'cn=agent,o=otrs' => {
-    #            # otrs role
-    #            'role1' => 1,
-    #            'role2' => 0,
-    #        },
-    #        'cn=agent2,o=otrs' => {
-    #            'role3' => 1,
-    #        }
-    #    };
+    $Self->{'AuthSyncModule::LDAP::UserSyncRolesDefinition1'} = {
+        'cn=Sith Lords,ou=orders,ou=groups,o=force' => {    # LDAP  group.
+            'sithlordsrole' => 1,    # OTRS role. (This role does not exists in OTRS, add it to get the results)
+            'ldaprole'      => 0,    # OTRS role. (This role does not exists in OTRS, add it to get the results)
+        },
+        'cn=Night Sisters,ou=orders,ou=groups,o=force' => {
+
+            # 'nightsistersrole' => 1,
+        },
+        'cn=Knights of Ren,ou=orders,ou=groups,o=force' => {
+
+            # 'knightsofrenrole' => 1,
+        },
+        'cn=Jedi Order,ou=orders,ou=groups,o=force' => {
+
+            # 'jediorderrole' => 1,
+        },
+    };
 
     # AuthSyncModule::LDAP::UserSyncAttributeGroupsDefinition
     # (If "LDAP" was selected for AuthModule and you want to sync LDAP
