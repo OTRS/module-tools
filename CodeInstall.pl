@@ -132,9 +132,9 @@ elsif ( $Action eq 'upgrade' && $Structure{CodeUpgrade} ) {
         }
     }
 
-    for my $Code ( @Codes ) {
+    for my $Code (@Codes) {
         $CommonObject{PackageObject}->_Code(
-            Code      => [ $Code ],
+            Code      => [$Code],
             Type      => $Code->{Type},
             Structure => \%Structure,
         );
