@@ -46,7 +46,7 @@ use File::Temp qw( tempfile );
 
 # get options
 my %Opts;
-getopt 'om', \%Opts;
+getopt('om', \%Opts);
 
 # set default
 if (!$Opts{o} || !$Opts{m} ) {
