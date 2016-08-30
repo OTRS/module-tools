@@ -24,7 +24,7 @@ module_check.pl - script to check OTRS modules
 
 =head1 SYNOPSIS
 
-module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode 1] [diff options: -u|-b|-B|-w]
+module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode] -i [ignore missing framwork files] -n [use newest commit id for all files] [diff options: -u|-b|-B|-w]
 
 =head1 DESCRIPTION
 
@@ -45,23 +45,23 @@ use File::Find;
 use File::Temp qw( tempfile );
 
 # get options
-my %Opts = ();
-getopt('om', \%Opts);
+my %Opts;
+getopt 'om', \%Opts;
 
 # set default
-if (!$Opts{'o'} || !$Opts{'m'} ) {
-    $Opts{'h'} = 1;
+if (!$Opts{o} || !$Opts{m} ) {
+    $Opts{h} = 1;
 }
-if ( $Opts{'h'} ) {
+if ( $Opts{h} ) {
     print "\nmodule_check.pl - Check OTRS modules\n";
     print "Copyright (C) 2001-2016 OTRS AG, http://otrs.com/\n\n";
-    print "usage:\n   module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode] -i [ignore missing framwork files] -s [last commit id from single files] [diff options: -u|-b|-B|-w]\n\n";
+    print "usage:\n   module_check.pl -o <Original-Framework-Path> -m <Module-Path> -v [verbose mode] -d [debug mode] -i [ignore missing framwork files] -n [use newest commit id for all files] [diff options: -u|-b|-B|-w]\n\n";
     print "example:\n   /workspace/module-tools/module_check.pl -o /workspace/otrs-git/ -m /workspace/ITSMCore_3_3/\n\n";
     exit 1;
 }
 
-my $OriginalPath = $Opts{'o'} . '/';
-my $ModulePath   = $Opts{'m'} . '/';
+my $OriginalPath = $Opts{o} . '/';
+my $ModulePath   = $Opts{m} . '/';
 
 $OriginalPath =~ s{ /+ $ }{/}xms;
 $ModulePath =~ s{ /+ $ }{/}xms;
@@ -94,7 +94,7 @@ sub CheckFile {
     # skip directories
     return if -d $ModuleFile;
 
-    # skip CVS directories
+    # skip cvs and git irectories
     return if $ModuleDir =~ m{ /CVS|\.git /? }xms;
 
     # check only Perl-, Template (dtl and TemplateToolkit), test and javascript files
@@ -104,7 +104,7 @@ sub CheckFile {
     my ($OriginalFilename, $GitCommitID) = OriginalFilenameGet(File => $ModuleFile);
     return if !$OriginalFilename;
 
-    if ( $Opts{'s'} ) {
+    if ( !$Opts{n} ) {
         # get latest commit ID for current original file
         $LatestGitCommitID = `cd $OriginalPath; git log -1 --format="%H" --follow $OriginalFilename`;
         chomp $LatestGitCommitID;
@@ -113,7 +113,7 @@ sub CheckFile {
     # check if the $GitCommitID is up to date
     my $GitCommitIDUpdateNeeded = '';
     if ( $GitCommitID && $GitCommitID ne $LatestGitCommitID) {
-        $GitCommitIDUpdateNeeded = "GitCommitID needs to be updated to the latest CommitID '$LatestGitCommitID' in the the origin line!\n\n";
+        $GitCommitIDUpdateNeeded = "GitCommitID needs to be updated to the newest CommitID '$LatestGitCommitID' in the origin line!\n\n";
     }
 
     # get and prepare module content
@@ -157,7 +157,7 @@ sub CheckFile {
     my $DiffResult = `diff $DiffOptions $OriginalTempfile $ModuleTempfile`;
 
     # print diff result
-    if ( $Opts{'v'} || $DiffResult || $GitCommitIDUpdateNeeded ) {
+    if ( $Opts{v} || $DiffResult || $GitCommitIDUpdateNeeded ) {
         print "DIFF RESULT for:\n";
         print "$OriginalFile\n";
         print "$ModuleFile\n\n";
@@ -166,14 +166,14 @@ sub CheckFile {
     }
 
     # verify the real files in debug mode
-    if ( $Opts{'d'} ) {
+    if ( $Opts{d} ) {
         $DiffResult = `diff $DiffOptions $OriginalFile $ModuleFile`;
         print "-----------------------------------------------------------------------------------------------------\n";
         print "VERIFY DIFF\n";
         print $DiffResult . "\n\n";
     }
 
-    if ( $Opts{'v'} || $DiffResult || $GitCommitIDUpdateNeeded ) {
+    if ( $Opts{v} || $DiffResult || $GitCommitIDUpdateNeeded ) {
         print "-----------------------------------------------------------------------------------------------------\n";
     }
 
