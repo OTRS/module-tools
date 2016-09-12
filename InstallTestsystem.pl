@@ -278,9 +278,15 @@ print STDERR "############################################\n";
 # setting permissions
 print STDERR "--- Setting permissions...\n";
 print STDERR "############################################\n";
-system(
-    "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
-);
+if ( $OTRSMajorVersion >= 5 ) {
+    system(
+        "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-group=$Config{PermissionsWebGroup} $InstallDir"
+    );
+} else {
+    system(
+        "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
+    );
+}
 print STDERR "############################################\n";
 
 # Deleting Cache
@@ -306,9 +312,15 @@ system("rm $InstallDir/bin/FillTestsystem.pl");
 # setting permissions
 print STDERR "--- Setting permissions again (just to be sure)...\n";
 print STDERR "############################################\n";
-system(
-    "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
-);
+if ( $OTRSMajorVersion >= 5 ) {
+    system(
+        "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-group=$Config{PermissionsWebGroup} $InstallDir"
+    );
+} else {
+    system(
+        "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
+    );
+}
 print STDERR "############################################\n";
 
 print STDERR "Finished.\n";
