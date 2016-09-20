@@ -64,7 +64,7 @@ sub Remove {
                 print "Unlink Symlink: $File\n";
                 unlink $OrigFile || die $!;
 
-                if ( -f "$OrigFile.old" ) {
+                if ( -f "$OrigFile.old" && !-l "$OrigFile.old" ) {
                     print "Restore orginal copy: $File\n";
                     rename( "$OrigFile.old", $OrigFile ) || die $!;
                 }
