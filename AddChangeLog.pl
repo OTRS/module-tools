@@ -43,7 +43,7 @@ use warnings;
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
-use Time::Piece;
+use DateTime;
 use XMLRPC::Lite;
 
 my ( $Help, $Bug, $PullRequest, $Message, $Beta, $UserFile );
@@ -122,6 +122,7 @@ sub UpdateChanges {
     }
 
     if ($ChangesFile) {
+
         # read in existing changes file
         open my $InFile, '<', $ChangesFile || die "Couldn't open $ChangesFile: $!";    ## no critic
         binmode $InFile;
@@ -212,9 +213,8 @@ sub FormatChangesLine {
     my $Summary     = shift;
     my $ChangesFile = shift;
 
-    # get todays date as iso format (yyyy-mm-dd)
-    my $Time = localtime;      ## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
-    my $Date = $Time->ymd();
+    # Get current date in iso format (yyyy-mm-dd).
+    my $Date = DateTime->now()->ymd();
 
 # formatting is different for markdown files; below first 'regular', second 'markdown'.
 # - 2013-03-02 Fixed bug#9214 - IE10: impossible to open links from rich text articles.
