@@ -282,7 +282,8 @@ if ( $OTRSMajorVersion >= 5 ) {
     system(
         "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-group=$Config{PermissionsWebGroup} $InstallDir"
     );
-} else {
+}
+else {
     system(
         "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
     );
@@ -316,7 +317,8 @@ if ( $OTRSMajorVersion >= 5 ) {
     system(
         "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-group=$Config{PermissionsWebGroup} $InstallDir"
     );
-} else {
+}
+else {
     system(
         "sudo perl $InstallDir/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $InstallDir"
     );
