@@ -53,7 +53,7 @@ if ( !$Opts{f} || !$Opts{t} ) {
 # show the help screen
 if ( $Opts{'h'} ) {
     print <<EOF;
-Copyright (C) 2001-2013 OTRS AG, http://otrs.org/
+Copyright (C) 2001-2016 OTRS AG, http://otrs.com/
 usage: git-find-file.pl -f <filename in repository> -t <target file to locate>
 EOF
     exit 1;

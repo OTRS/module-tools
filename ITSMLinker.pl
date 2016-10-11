@@ -36,7 +36,7 @@ if ( $Opts{'h'} ) {
     print <<'EOF';
 
 ITSMLinker.pl -  to link / unlink all ITSM modules into a OTRS system
-Copyright (C) 2001-2014 OTRS AG, http://otrs.org/
+Copyright (C) 2001-2016 OTRS AG, http://otrs.com/
 
 Usage:
     ITSMLinker.pl -a <install|uninstall> [ -v <ITSM branch version number> ] [ -t <Module-Tools-Path> ] -m <Module-Path> -o <OTRS-path> [ -d (also executes DatabaseInstall and CodeInstall) ]
