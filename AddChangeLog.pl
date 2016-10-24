@@ -177,7 +177,7 @@ sub GetBugSummary {
 
     # get bug description from bug tracker
     # if bug does not exist we automatically get an error message and the script dies
-    my $Proxy  = XMLRPC::Lite->proxy('http://bugs.otrs.org/xmlrpc.cgi');
+    my $Proxy  = XMLRPC::Lite->proxy('https://bugs.otrs.org/xmlrpc.cgi');
     my $Result = $Proxy->call(
         'Bug.get',
         {
@@ -229,7 +229,7 @@ sub FormatChangesLine {
         $Line = " - $Date Fixed bug#$Bug$PRText - $Summary.\n";
     }
     elsif ($Bug) {
-        $Line = " - $Date Fixed bug#[$Bug](http://bugs.otrs.org/show_bug.cgi?id=$Bug)$PRText - $Summary.\n";
+        $Line = " - $Date Fixed bug#[$Bug](https://bugs.otrs.org/show_bug.cgi?id=$Bug)$PRText - $Summary.\n";
     }
     elsif ($Message) {
         $Line = " - $Date $PRText$Summary\n";
