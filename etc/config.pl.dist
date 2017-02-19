@@ -1,0 +1,201 @@
+#!/usr/bin/perl
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU AFFERO General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+# or see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+use strict;
+use warnings;
+
+my $Config = {
+
+    # settings used by TestSystem::Instance::Setup and TestSystem::Database::Fill.
+    TestSystem => {
+
+        # the path to your workspace directory, w/ leading and trailing slashes
+        EnvironmentRoot => '/ws/',
+
+        # User name for mysql (should be the same that you usually use to install a local OTRS).
+        DatabaseUserNameMysql => 'root',
+
+        # Password for your mysql user.
+        DatabasePasswordMysql => '',
+
+        # User name for PostgreSQL.
+        DatabaseUserNamePostgresql => 'postgres',
+
+        # Password for your PostgreSQL user.
+        DatabasePasswordPostgresql => '',
+
+        # User name for Oracle.
+        DatabaseUserNameOracle => 'sys',
+
+        # Password for your Oracle user.
+        DatabasePasswordOracle => '',
+
+        PermissionsOTRSUser   => '_www',    # OTRS user
+        PermissionsOTRSGroup  => '_www',    # OTRS group
+        PermissionsWebUser    => '_www',    # otrs-web user
+        PermissionsWebGroup   => '_www',    # otrs-web group
+        PermissionsAdminGroup => ( $^O =~ /darwin/i ? 'wheel' : 'root' ),
+
+        # the apache config of the system you're going to install will be copied to this location
+        ApacheCFGDir => '/etc/apache2/other/',
+
+        # the command to restart apache (could be different on other systems)
+        ApacheRestartCommand => 'apachectl graceful',
+
+        # Define your own configuration here if you would like to override default one. You may use
+        #  following variables: $SystemName, %Config.
+#         ConfigInject => <<'EOD'
+#
+#     \$Self->{'SecureMode'} = 1;
+#     \$Self->{'SystemID'}            = '54';
+#     \$Self->{'SessionName'}         = '$SystemName';
+#     \$Self->{'ProductName'}         = '$SystemName';
+#     \$Self->{'ScriptAlias'}         = '$SystemName/';
+#     \$Self->{'Frontend::WebPath'}   = '/$SystemName-web/';
+#     \$Self->{'CheckEmailAddresses'} = 0;
+#     \$Self->{'CheckMXRecord'}       = 0;
+#     \$Self->{'Organization'}        = '';
+#     \$Self->{'LogModule'}           = 'Kernel::System::Log::File';
+#     \$Self->{'LogModule::LogFile'}  = '$Config{EnvironmentRoot}$SystemName/var/log/otrs.log';
+#     \$Self->{'FQDN'}                = 'localhost';
+#     \$Self->{'DefaultLanguage'}     = 'de';
+#     \$Self->{'DefaultCharset'}      = 'utf-8';
+#     \$Self->{'AdminEmail'}          = 'root\@localhost';
+#     \$Self->{'Package::Timeout'}    = '120';
+#     \$Self->{'SendmailModule'}      =  'Kernel::System::Email::DoNotSendEmail';
+#
+#     # Fred
+#     \$Self->{'Fred::BackgroundColor'} = '#006ea5';
+#     \$Self->{'Fred::SystemName'}      = '$SystemName';
+#     \$Self->{'Fred::ConsoleOpacity'}  = '0.7';
+#     \$Self->{'Fred::ConsoleWidth'}    = '30%';
+#
+#     # Misc
+#     \$Self->{'Loader::Enabled::CSS'}  = 0;
+#     \$Self->{'Loader::Enabled::JS'}   = 0;
+#
+#     # Selenium
+#     \$Self->{'SeleniumTestsConfig'} = {
+#         remote_server_addr  => '192.168.56.1',
+#         port                => '8901',
+#         browser_name        => 'firefox',
+#         platform            => 'ANY',
+#         extra_capabilities  => {
+#             marionette => \0,
+#         },
+#         # window_height => 1200,    # optional, default 1000
+#         # window_width  => 1600,    # optional, default 1200
+#     };
+#
+# EOD
+# ,
+
+        # Agent data
+        Agents => [
+            {
+                UserFirstname => 'agent-1',
+                UserLastname  => 'agent-1',
+                UserLogin     => 'agent-1',
+                UserPw        => 'agent-1',
+                UserEmail     => 'agent-1@localhost',
+            },
+            {
+                UserFirstname => 'agent-2',
+                UserLastname  => 'agent-2',
+                UserLogin     => 'agent-2',
+                UserPw        => 'agent-2',
+                UserEmail     => 'agent-2@localhost',
+            },
+        ],
+
+        # Customer data
+        Customers => [
+            {
+                UserFirstname  => 'customer-1',
+                UserLastname   => 'customer-1',
+                UserCustomerID => 'customer-1',
+                UserLogin      => 'customer-1',
+                UserPassword   => 'customer-1',
+                UserEmail      => 'customer-1@localhost',
+            },
+            {
+                UserFirstname  => 'customer-2',
+                UserLastname   => 'customer-2',
+                UserCustomerID => 'customer-2',
+                UserLogin      => 'customer-2',
+                UserPassword   => 'customer-2',
+                UserEmail      => 'customer-2@localhost',
+            },
+        ],
+
+        # Service data
+        Services => [
+            { Name => 'Service 1' },
+            { Name => 'Service 2' },
+        ],
+
+        # SLA data
+        SLAs => [
+            {
+                Name         => 'SLA 1',
+                ServiceNames => ['Service 2'],
+            },
+            {
+                Name         => 'SLA 2',
+                ServiceNames => [ 'Service 2', 'Service 1' ],
+            },
+        ],
+    },
+
+    # Settings used by Git::Directories::Update.
+    DevelDir => {
+        DevelDirectories => [
+            #    '/path/to/your/devel/directory/',
+        ],
+        AdditionalDevelDirectories => [
+            #    '/path/to/your/directory/with/all/git/repositories/',
+        ],
+        GitIgnore => [
+            #    '/path/to/ignore/',
+        ],
+        CodePolicyRegisterCommand => '/path/to/your/OTRSCodePolicy/scripts/install-git-hooks.pl',
+    },
+
+    # Collections of modules to be used by Files::Link, Files::Unlink, Module::Install, Module::UnInstall.
+    ModuleCollection => {
+        itsm5 => [
+            'path/to/GeneralCatalog-5_0',
+            'path/to/ITSMCore-5_0',
+            'path/to/ITSMIncidentProblemManagement-5_0',
+            'path/to/ITSMConfigurationManagement-5_0',
+            'path/to/ITSMChangeManagement-5_0',
+            'path/to/ITSMServiceLevelManagement-5_0',
+            'path/to/ImportExport-5_0',
+        ],
+        public5 => [
+            'path/to/FAQ-5_0',
+            'path/to/OTRSAppointmentCalendar-5_0',
+            'path/to/OTRSMasterSlave-5_0',
+            'path/to/Survey-5_0',
+            'path/to/SystemMonitoring-5_0',
+            'path/to/TimeAccounting-5_0',
+        ],
+    },
+};
