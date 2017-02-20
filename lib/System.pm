@@ -61,7 +61,7 @@ sub ObjectInstanceCreate {
 
     if ( !$RequireSuccess ) {
         if ( !$Param{Silent} ) {
-            die "Could not require $Package.";
+            die "Could not require $Package:\n$@";
         }
         return;
     }
