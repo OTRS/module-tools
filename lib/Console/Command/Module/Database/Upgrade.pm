@@ -66,7 +66,7 @@ sub Run {
     my $Module = File::Spec->rel2abs( $Self->GetArgument('module-file-path') );
 
     # To capture the standard error.
-    my $ErrorMessage;
+    my $ErrorMessage = '';
 
     my $Success;
 
