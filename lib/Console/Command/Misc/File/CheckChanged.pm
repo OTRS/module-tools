@@ -154,9 +154,10 @@ It strips out the root directory from the file name.
 my $FileName2MD5 = FindFilesOfVersion( '/ws/otrs-head' );
 
 results will look like:
-$FileName2MD5 = {
-    'Kernel/System/Main.pm' => '7731615a697d7ed0da2579a9c71d7d9c',
-};
+
+    $FileName2MD5 = {
+        'Kernel/System/Main.pm' => '7731615a697d7ed0da2579a9c71d7d9c',
+    };
 
 =cut
 

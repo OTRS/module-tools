@@ -28,7 +28,7 @@ Console::Command::TestSystem::Instance::Setup - Console command to setup and con
 
 =head1 DESCRIPTION
 
-Configure settings, database and apache of a testing otrs instance
+Configure settings, Database and Apache of a testing otrs instance
 
 =cut
 
@@ -70,7 +70,7 @@ sub PreRun {
 
     my $FredDirectory = $Self->GetOption('fred-directory');
     if ($FredDirectory) {
-        $FredDirectory = File::Spec->rel2abs( $FredDirectory);
+        $FredDirectory = File::Spec->rel2abs($FredDirectory);
     }
 
     if ($FredDirectory) {
@@ -103,11 +103,11 @@ sub Run {
     my ($Self) = @_;
 
     my $FrameworkDirectory = File::Spec->rel2abs( $Self->GetOption('framework-directory') );
-    my $DatabaseType = ucfirst ($Self->GetOption('database-type') || 'Mysql');
+    my $DatabaseType = ucfirst( $Self->GetOption('database-type') || 'Mysql' );
 
     my $FredDirectory = $Self->GetOption('fred-directory');
     if ($FredDirectory) {
-        $FredDirectory = File::Spec->rel2abs( $FredDirectory);
+        $FredDirectory = File::Spec->rel2abs($FredDirectory);
     }
 
     # Remove possible slash at the end.
@@ -320,7 +320,7 @@ EOD
         ## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
         require DBD::Oracle;    ## no critic
         push @DBIParam, {
-            ora_session_mode => $DBD::Oracle::ORA_SYSDBA,
+            ora_session_mode => $DBD::Oracle::ORA_SYSDBA,    ## no critic
         };
         $ENV{ORACLE_HOME} = "/u01/app/oracle/product/11.2.0/xe";
     }
