@@ -68,7 +68,10 @@ sub PreRun {
 
     my @Directories = ($FrameworkDirectory);
 
-    my $FredDirectory = File::Spec->rel2abs( $Self->GetOption('fred-directory') );
+    my $FredDirectory = $Self->GetOption('fred-directory');
+    if ($FredDirectory) {
+        $FredDirectory = File::Spec->rel2abs( $FredDirectory);
+    }
 
     if ($FredDirectory) {
         push @Directories, $FredDirectory;
@@ -84,12 +87,12 @@ sub PreRun {
     }
 
     if ( !-e $FrameworkDirectory . '/RELEASE' ) {
-        die "$FrameworkDirectory does not seams to be an OTRS framework directory";
+        die "$FrameworkDirectory does not seam to be an OTRS framework directory";
     }
 
     if ($FredDirectory) {
         if ( !-e $FredDirectory . '/Fred.sopm' ) {
-            die "$FrameworkDirectory does not seams to be a Fred module directory";
+            die "$FrameworkDirectory does not seam to be a Fred module directory";
         }
     }
 
@@ -102,7 +105,10 @@ sub Run {
     my $FrameworkDirectory = File::Spec->rel2abs( $Self->GetOption('framework-directory') );
     my $DatabaseType = ucfirst ($Self->GetOption('database-type') || 'Mysql');
 
-    my $FredDirectory = File::Spec->rel2abs( $Self->GetOption('fred-directory') );
+    my $FredDirectory = $Self->GetOption('fred-directory');
+    if ($FredDirectory) {
+        $FredDirectory = File::Spec->rel2abs( $FredDirectory);
+    }
 
     # Remove possible slash at the end.
     $FrameworkDirectory =~ s{ / \z }{}xms;
