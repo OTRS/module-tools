@@ -71,13 +71,13 @@ sub Configure {
     my $Name = $Self->Name();
 
     $Self->AdditionalHelp(<<"EOF");
-<green>otrs.Console.pl $Name --bug 1234 [--pull-request 1001] [--target-path CHANGES.md]</green>
+<green>otrs.ModuleTools.pl $Name --bug 1234 [--pull-request 1001] [--target-path CHANGES.md]</green>
     Add bugzilla entry title to stable version CHANGES.md and commit message template.
 
-<green>otrs.Console.pl $Name --bug 1234 [--pull-request 1001] --beta</green>
+<green>otrs.ModuleTools.pl $Name --bug 1234 [--pull-request 1001] --beta</green>
     --beta causes the entry to be added to the latest version, even if it is not stable.
 
-<green>otrs.Console.pl $Name --message "My commit message."</green>
+<green>otrs.ModuleTools.pl $Name --message "My commit message."</green>
     Add another message to CHANGES.md and commit message template.
 EOF
 

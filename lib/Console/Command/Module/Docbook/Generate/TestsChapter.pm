@@ -222,7 +222,7 @@ XML
 XML
 
     if ( !@{ $Param{FileList} } ) {
-        $Chapter .= 'shell> perl bin/otrs.Console.pl Dev::UnitTest::Run - - test'
+        $Chapter .= 'shell> perl bin/otrs.Console.pl Dev::UnitTest::Run -- test'
     }
 
     for my $File ( sort { "\L$a" cmp "\L$b" } @{ $Param{FileList} } ) {

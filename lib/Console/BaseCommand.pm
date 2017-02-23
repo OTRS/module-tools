@@ -372,9 +372,9 @@ sub Execute {
     # Don't allow to run these scripts as root.
     if ( !$ParsedGlobalOptions->{'allow-root'} && $> == 0 ) {    # $EFFECTIVE_USER_ID
         $Self->PrintError(
-            "You cannot run otrs.Console.pl as root. Please run it as the 'otrs' user or with the help of su:"
+            "You cannot run otrs.ModuleTools.pl as root. Please run it as the 'otrs' user or with the help of su:"
         );
-        $Self->Print("  <yellow>su -c \"bin/otrs.Console.pl MyCommand\" -s /bin/bash otrs</yellow>\n");
+        $Self->Print("  <yellow>su -c \"bin/otrs.ModuleTools.pl MyCommand\" -s /bin/bash otrs</yellow>\n");
         return $Self->ExitCodeError();
     }
 
@@ -484,7 +484,7 @@ sub GetUsageHelp {
 
     my $UsageText = "<green>$Self->{Description}</green>\n";
     $UsageText .= "\n<yellow>Usage:</yellow>\n";
-    $UsageText .= " otrs.Console.pl $Self->{Name}";
+    $UsageText .= " otrs.ModuleTools.pl $Self->{Name}";
 
     my $OptionsText   = "<yellow>Options:</yellow>\n";
     my $ArgumentsText = "<yellow>Arguments:</yellow>\n";

@@ -59,17 +59,17 @@ sub Configure {
 
 <yellow>Uninstalling from relative module directory</yellow>
 
-    <green>otrs.Console.pl $Name ../MyModule ./</green>
-    <green>otrs.Console.pl $Name MyModule OTRS-5_0</green>
+    <green>otrs.ModuleTools.pl $Name ../MyModule ./</green>
+    <green>otrs.ModuleTools.pl $Name MyModule OTRS-5_0</green>
 
 <yellow>Uninstalling from absolute module directory</yellow>
 
-    <green>otrs.Console.pl $Name /Users/MyUser/ws/MyModule</green>
-    <green>otrs.Console.pl $Name /Users/MyUser/ws/MyModule /Users/MyUser/ws/OTRS-5_0</green>
+    <green>otrs.ModuleTools.pl $Name /Users/MyUser/ws/MyModule</green>
+    <green>otrs.ModuleTools.pl $Name /Users/MyUser/ws/MyModule /Users/MyUser/ws/OTRS-5_0</green>
 
 <yellow>Uninstalling from module collaction</yellow>
 
-    <green>otrs.Console.pl $Name ModuleCollection</green>
+    <green>otrs.ModuleTools.pl $Name ModuleCollection</green>
 EOF
 
     return;
