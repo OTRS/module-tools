@@ -41,7 +41,7 @@ BaseModule - base class for module commands
 =head2 CodeActionHandler()
 Performs a package Code action from its sopm file such as CodeInstall, CodeUpdate, etc
 
-    my $Success = ModuleObject->CodeActionHandler(
+    my $Success = $ModuleObject->CodeActionHandler(
         Module => /Packages/MyPackage/MyPackage.sopm,
         Action => 'Install',                                # Install, Uninstall, Upgrade, Reinstall
         Type   => 'Pre',                                    # Pre, Post
@@ -127,7 +127,7 @@ sub CodeActionHandler {
 =head2 DatabaseActionHandler()
 Performs a package Database action from its sopm file such as DatabaseInstall or DatabaseIninstall.
 
-    my $Success = ModuleObject->DatabaseActionHandler(
+    my $Success = $ModuleObject->DatabaseActionHandler(
         Module => /Packages/MyPackage/MyPackage.sopm,
         Action => 'Install',                                # Install, Uninstall
     );
