@@ -304,7 +304,7 @@ sub FormatChangesLine {
 
     my $PRText = '';
     if ($PullRequest) {
-        $PRText = "(PR#$PullRequest) ";
+        $PRText = "(PR#$PullRequest)";
     }
 
     # Format for CHANGES (OTRS 3.1.x and earlier) is different from CHANGES.md.
