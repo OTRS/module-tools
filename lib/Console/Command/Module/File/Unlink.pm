@@ -42,7 +42,7 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'remove-all',
+        Name        => 'all',
         Description => "Remove all links from framework.",
         Required    => 0,
         HasValue    => 0,
@@ -55,7 +55,7 @@ sub Configure {
 sub PreRun {
     my ($Self) = @_;
 
-    my $RemoveAll = $Self->GetOption('remove-all');
+    my $RemoveAll = $Self->GetOption('all');
     my $Module    = $Self->GetArgument('module');
 
     if ( !$RemoveAll && !$Module ) {
@@ -96,7 +96,7 @@ sub PreRun {
 sub Run {
     my ($Self) = @_;
 
-    if ( $Self->GetOption('remove-all') ) {
+    if ( $Self->GetOption('all') ) {
         return $Self->RemoveLinks();
     }
     else {
