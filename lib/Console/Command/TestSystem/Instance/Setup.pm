@@ -211,7 +211,7 @@ sub Run {
             browser_name        => 'firefox',
             platform            => 'ANY',
             extra_capabilities  => {
-                marionette => \0,
+                marionette => '',
             },
             # window_height => 1200,    # optional, default 1000
             # window_width  => 1600,    # optional, default 1200
