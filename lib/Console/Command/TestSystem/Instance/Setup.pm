@@ -204,6 +204,8 @@ sub Run {
         \$Self->{'Loader::Enabled::CSS'}  = 0;
         \$Self->{'Loader::Enabled::JS'}   = 0;
 
+        \$Self->{'Frontend::TemplateCache'} = 0;
+
         # Selenium
         \$Self->{'SeleniumTestsConfig'} = {
             remote_server_addr  => 'localhost',
