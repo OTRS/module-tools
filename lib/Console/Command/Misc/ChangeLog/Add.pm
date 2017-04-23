@@ -15,7 +15,7 @@ use Cwd;
 use DateTime;
 use XMLRPC::Lite;
 
-use base qw(Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 =head1 NAME
 

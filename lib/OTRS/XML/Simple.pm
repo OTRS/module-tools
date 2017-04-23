@@ -17,7 +17,7 @@ if ($@) {
     exit 1;
 }
 
-use base 'XML::Simple';
+use parent 'XML::Simple';
 
 # Override the sort method form XML::Simple
 sub sorted_keys {    ## no critic

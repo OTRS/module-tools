@@ -13,7 +13,7 @@ use warnings;
 
 use File::Spec();
 
-use base qw(Console::BaseCommand Console::BaseModule);
+use parent qw(Console::BaseCommand Console::BaseModule);
 
 =head1 NAME
 

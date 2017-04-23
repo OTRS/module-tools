@@ -14,7 +14,7 @@ use warnings;
 use String::Similarity;
 use File::Spec();
 
-use base qw(Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 =head1 NAME
 

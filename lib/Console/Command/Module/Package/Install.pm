@@ -17,7 +17,7 @@ use Console::Command::Module::File::Link;
 use Console::Command::Module::Database::Install;
 use Console::Command::Module::Code::Install;
 
-use base qw(Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 =head1 NAME
 

@@ -20,7 +20,7 @@ use Console::Command::Module::File::Link;
 use Console::Command::TestSystem::Database::Install;
 use Console::Command::TestSystem::Database::Fill;
 
-use base qw(Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 =head1 NAME
 

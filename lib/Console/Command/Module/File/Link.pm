@@ -13,7 +13,7 @@ use warnings;
 
 use File::Spec();
 
-use base qw(Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 =head1 NAME
 
@@ -45,7 +45,7 @@ sub Configure {
     my $Name = $Self->Name();
 
     $Self->AdditionalHelp(<<"EOF");
-The <green>otrs.ModuleTools.pl $Name</green> comand installs a given OTRS module into the OTRS framework by creating appropriate links.
+The <green>otrs.ModuleTools.pl $Name</green> command installs a given OTRS module into the OTRS framework by creating appropriate links.
 
 Beware that code from the .sopm file is not executed.
 

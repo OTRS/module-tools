@@ -17,7 +17,7 @@ use Console::Command::Module::File::Unlink;
 use Console::Command::Module::Database::Uninstall;
 use Console::Command::Module::Code::Uninstall;
 
-use base qw(Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 =head1 NAME
 

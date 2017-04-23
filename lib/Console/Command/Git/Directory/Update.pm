@@ -11,7 +11,7 @@ package Console::Command::Git::Directory::Update;
 use strict;
 use warnings;
 
-use base qw(Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 =head1 NAME
 

@@ -13,7 +13,7 @@ use warnings;
 
 use System;
 
-use base qw(Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 sub Configure {
     my ( $Self, %Param ) = @_;

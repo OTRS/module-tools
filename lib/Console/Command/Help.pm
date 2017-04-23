@@ -13,7 +13,7 @@ use warnings;
 
 use System;
 
-use base qw(
+use parent qw(
     Console::BaseCommand
 );
 

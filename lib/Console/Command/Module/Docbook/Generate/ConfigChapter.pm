@@ -23,7 +23,7 @@ use Getopt::Std;
 
 use vars (qw(@ISA));
 
-use base qw(Console::BaseCommand Console::BaseDocbook);
+use parent qw(Console::BaseCommand Console::BaseDocbook);
 
 =head1 NAME
 

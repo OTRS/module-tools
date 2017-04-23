@@ -21,7 +21,7 @@ if ($@) {
 use OTRS::XML::Simple;
 use Getopt::Std;
 
-use base qw(Console::BaseCommand Console::BaseDocbook);
+use parent qw(Console::BaseCommand Console::BaseDocbook);
 
 =head1 NAME
 

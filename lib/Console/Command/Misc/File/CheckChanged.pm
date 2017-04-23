@@ -14,7 +14,7 @@ use warnings;
 use File::Find;
 use Digest::MD5 qw(md5_hex);
 
-use base qw(Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 =head1 NAME
 
