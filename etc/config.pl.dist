@@ -104,6 +104,12 @@ my $Config = {
 #         # window_width  => 1600,    # optional, default 1200
 #     };
 #
+#    \$Self->{TestDatabase} = {
+#        DatabaseDSN  => 'DBI:mysql:database=otrs_test;host=127.0.0.1;',
+#        DatabaseUser => 'otrs_test',
+#        DatabasePw   => 'otrs_test',
+#    };
+#
 # EOD
 # ,
 
