@@ -85,7 +85,7 @@ sub Run {
 
     $Self->Print("$ErrorMessage\n");
 
-    if ( !$Success || $ErrorMessage =~ m{error}i ) {
+    if ( !$Success || $ErrorMessage =~ m{ERROR\:} ) {
         $Self->PrintError("Couldn't run database update correctly from $Module");
         return $Self->ExitCodeError();
     }
