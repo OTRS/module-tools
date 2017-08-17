@@ -126,7 +126,7 @@ sub Run {
     # Set output file.
     my $OutputFile = $Self->GetOption('target-filename') // 'TestsChapter';
     $OutputFile .= '.xml';
-    my $Language = $Self->GetOption('target-filename') // 'en';
+    my $Language = $Self->GetOption('language') // 'en';
     my $TargetLocation = $ModuleDirectory . '/doc/' . $Language . '/' . $OutputFile;
 
     # wWite the XML file in the file system.
