@@ -62,10 +62,11 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'beta',
-        Description => "Specify if change log entry is added into the first beta section.",
+        Name        => 'version',
+        Description => "Specify if change log entry is added for the specific version.",
         Required    => 0,
-        HasValue    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
     );
 
     my $Name = $Self->Name();
@@ -74,8 +75,8 @@ sub Configure {
 <green>otrs.ModuleTools.pl $Name --bug 1234 [--pull-request 1001] [--target-path CHANGES.md]</green>
     Add bugzilla entry title to stable version CHANGES.md and commit message template.
 
-<green>otrs.ModuleTools.pl $Name --bug 1234 [--pull-request 1001] --beta</green>
-    --beta causes the entry to be added to the latest version, even if it is not stable.
+<green>otrs.ModuleTools.pl $Name --bug 1234 [--pull-request 1001] [--version 6]</green>
+    --version causes the entry to be added for the specific OTRS version, e.g. OTRS6, even if it is not stable.
 
 <green>otrs.ModuleTools.pl $Name --message "My commit message."</green>
     Add another message to CHANGES.md and commit message template.
@@ -203,8 +204,9 @@ sub Run {
         my $Printed            = 0;
         my $ReleaseHeaderFound = 0;
         my $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+[ ]};    # 1.2.3
-        if ( $Self->GetOption('beta') ) {
-            $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+};      # 1.2.3.beta3
+        my $Version            = $Self->GetOption('version');
+        if ($Version) {
+            $ReleaseHeaderRegex = qr{^[#]?$Version[.]\d+[.]\d+};
         }
         for my $Line (@Changes) {
             if ( !$ReleaseHeaderFound && $Line =~ m{$ReleaseHeaderRegex} ) {
