@@ -100,9 +100,18 @@ sub Run {
 
     $Self->{SortByName} = $Self->GetOption('sort-by-name') // 1;
 
+    my $ConfigVersion      = 1;
+    my $ConfigVersion1Path = '/Kernel/Config/Files/';
+    my $ConfigVersion2Path = '/Kernel/Config/Files/XML';
+
     # Get configuration directory inside the module.
-    my $ConfigDirectory = $ModuleDirectory . '/Kernel/Config/Files';
-    if ( !-e $ConfigDirectory ) {
+    my $ConfigDirectory = $ModuleDirectory . $ConfigVersion1Path;
+
+    if ( -e $ModuleDirectory . $ConfigVersion2Path && -d $ModuleDirectory . $ConfigVersion2Path ) {
+        $ConfigDirectory = $ModuleDirectory . $ConfigVersion2Path;
+        $ConfigVersion   = 2;
+    }
+    elsif ( !-e $ConfigDirectory ) {
         $Self->PrintError("Directory does not exists: $ConfigDirectory!\n");
         return $Self->ExitCodeError();
     }
@@ -112,6 +121,7 @@ sub Run {
 
     my %ConfigSettings = $Self->_GetConfigSettings(
         ConfigDirectory => $ConfigDirectory,
+        ConfigVersion   => $ConfigVersion,
     );
 
     if ( !%ConfigSettings ) {
@@ -128,6 +138,7 @@ sub Run {
 
     my @FormatedSettings = $Self->_FormatSettings(
         ConfigSettings => \%ConfigSettings,
+        ConfigVersion  => $ConfigVersion,
     );
 
     $Self->Print(" <green>done</green>\n");
@@ -239,7 +250,8 @@ sub _GetConfigSettings {
     for my $FileLocation (@FilesInDirectory) {
 
         my $Result = $Self->_ParseConfigFile(
-            FileLocation => $FileLocation,
+            FileLocation  => $FileLocation,
+            ConfigVersion => $Param{ConfigVersion},
         );
 
         return if !$Result;
@@ -282,14 +294,24 @@ sub _ParseConfigFile {
         $ParsedSettings = $XMLObject->XMLin($FileLocation);
     };
 
+    # Settings for OTRS 5 and before have ConfigVersion = 1
+    #   while for OTRS 6 and beyond have ConfigFersion = 2
+    #   each version has some structure differences.
+    my $SettingRoot    = 'ConfigItem';
+    my $ValueAttribute = 'Setting';
+    if ( $Param{ConfigVersion} == 2 ) {
+        $SettingRoot    = 'Setting';
+        $ValueAttribute = 'Value';
+    }
+
     # Remove not needed (for documentation).
-    if ( ref $ParsedSettings->{ConfigItem} eq 'ARRAY' ) {
-        for my $Setting ( @{ $ParsedSettings->{ConfigItem} } ) {
-            delete $Setting->{'Setting'};
+    if ( ref $ParsedSettings->{$SettingRoot} eq 'ARRAY' ) {
+        for my $Setting ( @{ $ParsedSettings->{$SettingRoot} } ) {
+            delete $Setting->{$ValueAttribute};
         }
     }
     else {
-        delete $ParsedSettings->{ConfigItem}->{'Setting'}
+        delete $ParsedSettings->{$SettingRoot}->{$ValueAttribute}
     }
 
     # Check for conversion errors.
@@ -312,24 +334,32 @@ sub _FormatSettings {
     my ( $Self, %Param ) = @_;
 
     # Check needed parameters.
-    for my $Needed (qw(ConfigSettings)) {
+    for my $Needed (qw(ConfigSettings ConfigVersion)) {
         if ( !$Param{$Needed} ) {
             print "Need $Needed:!";
             return;
         }
     }
 
+    # Settings for OTRS 5 and before have ConfigVersion = 1
+    #   while for OTRS 6 and beyond have ConfigFersion = 2
+    #   each version has some structure differences.
+    my $SettingRoot = 'ConfigItem';
+    if ( $Param{ConfigVersion} == 2 ) {
+        $SettingRoot = 'Setting';
+    }
+
     my @ConvertedSettings;
 
     for my $SettingFile ( sort keys %{ $Param{ConfigSettings} } ) {
 
-        if ( ref $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} ne 'ARRAY' ) {
-            $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} =
-                [ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} ];
+        if ( ref $Param{ConfigSettings}->{$SettingFile}->{$SettingRoot} ne 'ARRAY' ) {
+            $Param{ConfigSettings}->{$SettingFile}->{$SettingRoot} =
+                [ $Param{ConfigSettings}->{$SettingFile}->{$SettingRoot} ];
         }
 
         for my $Setting (
-            sort _SortYesNo @{ $Param{ConfigSettings}->{$SettingFile}->{ConfigItem} }
+            sort _SortYesNo @{ $Param{ConfigSettings}->{$SettingFile}->{$SettingRoot} }
             )
         {
 
@@ -364,13 +394,24 @@ sub _FormatSettings {
                 last DESCRIPTION;
             }
 
-            push @ConvertedSettings, {
-                title => $Setting->{Name} . ".",
-                para  => [
-                    "Group: $Setting->{Group}, Subgroup: $Setting->{SubGroup}.",
-                    $DescriptionContent,
-                ],
-            };
+            if ( $Param{ConfigVersion} == 1 ) {
+                push @ConvertedSettings, {
+                    title => $Setting->{Name} . ".",
+                    para  => [
+                        "Group: $Setting->{Group}, Subgroup: $Setting->{SubGroup}.",
+                        $DescriptionContent,
+                    ],
+                };
+            }
+            else {
+                push @ConvertedSettings, {
+                    title => $Setting->{Name} . ".",
+                    para  => [
+                        "Navigation: $Setting->{Navigation}.",
+                        $DescriptionContent,
+                    ],
+                };
+            }
         }
     }
 
