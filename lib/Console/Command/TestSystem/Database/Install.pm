@@ -8,6 +8,7 @@
 
 ## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
 ## nofilter(TidyAll::Plugin::OTRS::Perl::ObjectDependencies)
+## nofilter(TidyAll::Plugin::OTRS::Migrations::OTRS6::TimeObject)
 
 package Console::Command::TestSystem::Database::Install;
 
@@ -58,6 +59,13 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
+    $Self->AddOption(
+        Name => 'delete',
+        Description =>
+            "Delete existing tables before creation (removes old data). Note: removes only to standard OTRS Free tables.",
+        Required => 0,
+        HasValue => 0,
+    );
 
     return;
 }
@@ -80,7 +88,7 @@ sub PreRun {
     }
 
     if ( !-e $FrameworkDirectory . '/RELEASE' ) {
-        die "$FrameworkDirectory does not seams to be an OTRS framework directory";
+        die "$FrameworkDirectory does not seem to be an OTRS framework directory";
     }
 
     return;
@@ -148,6 +156,45 @@ sub Run {
             String => $XML,
         );
 
+        # Remove tables if requested.
+        if ( $Self->GetOption('delete') && $SchemaFile eq 'otrs-schema' ) {
+            $Self->Print("<yellow>Attempting to remove existing tables first...</yellow>\n");
+
+            my @TablesToDrop;
+            ARRAYKEY:
+            for my $ArrayKey (@XMLArray) {
+                next ARRAYKEY if $ArrayKey->{Tag} ne 'Table' && $ArrayKey->{Tag} ne 'TableCreate';
+                next ARRAYKEY if $ArrayKey->{TagType} ne 'Start';
+
+                push @TablesToDrop, $ArrayKey->{Name};
+            }
+            if (@TablesToDrop) {
+                my $TableList = join ', ', @TablesToDrop;
+                my $DBType = $CommonObject{DBObject}->{'DB::Type'};
+
+                if ( $DBType eq 'mysql' ) {
+
+                    # Drop all tables in same statement.
+                    $CommonObject{DBObject}->Do(
+                        SQL =>
+                            "SET FOREIGN_KEY_CHECKS = 0; DROP TABLE IF EXISTS $TableList; SET FOREIGN_KEY_CHECKS = 1",
+                    );
+                }
+                elsif ( $DBType eq 'postgresql' ) {
+
+                    # Drop all tables in same statement.
+                    $CommonObject{DBObject}->Do( SQL => "DROP TABLE IF EXISTS $TableList CASCADE" );
+                }
+                elsif ( $DBType eq 'oracle' ) {
+
+                    # Drop every table in a separate statement.
+                    for my $Table (@TablesToDrop) {
+                        $CommonObject{DBObject}->Do( SQL => "DROP TABLE $Table CASCADE CONSTRAINTS" );
+                    }
+                }
+            }
+        }
+
         my @SQL = $CommonObject{DBObject}->SQLProcessor(
             Database => \@XMLArray,
         );
@@ -160,6 +207,7 @@ sub Run {
         for my $SQL (@SQL) {
             $CommonObject{DBObject}->Do( SQL => $SQL );
         }
+
     }
 
     # Execute post SQL statements (indexes, constraints).
