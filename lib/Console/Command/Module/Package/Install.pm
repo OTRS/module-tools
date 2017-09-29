@@ -190,14 +190,14 @@ sub Run {
             my $LinkModule = Console::Command::Module::File::Link->new();
             $ExitCodes{Files} = $LinkModule->Execute( $ModuleDirectory, $FrameworkDirectory );
 
+            $Self->System( $Config{RebuildConfigCommand} );
+            $Self->System( $Config{DeleteCacheCommand} );
+
             my $DatabaseModule = Console::Command::Module::Database::Install->new();
             $ExitCodes{Database} = $DatabaseModule->Execute($ModuleFilePath);
 
             my $CodeModule = Console::Command::Module::Code::Install->new();
             $ExitCodes{Code} = $CodeModule->Execute($ModuleFilePath);
-
-            $Self->System( $Config{RebuildConfigCommand} );
-            $Self->System( $Config{DeleteCacheCommand} );
         }
 
         if ( $Self->GetOption('verbose') ) {
