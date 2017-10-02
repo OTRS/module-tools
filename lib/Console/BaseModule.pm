@@ -7,6 +7,7 @@
 # --
 
 ## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
+## nofilter(TidyAll::Plugin::OTRS::Migrations::OTRS6::TimeObject)
 package Console::BaseModule;
 
 use strict;
@@ -44,7 +45,7 @@ Performs a package Code action from its sopm file such as CodeInstall, CodeUpdat
     my $Success = $ModuleObject->CodeActionHandler(
         Module => /Packages/MyPackage/MyPackage.sopm,
         Action => 'Install',                                # Install, Uninstall, Upgrade, Reinstall
-        Type   => 'Pre',                                    # Pre, Post
+        Type   => 'pre',                                    # pre, post
     );
 
 Returns:
@@ -97,7 +98,9 @@ sub CodeActionHandler {
             }
         }
 
+        CODE:
         for my $Code (@Codes) {
+            next CODE if $Code->{Type} ne $Param{Type};
             my $Success = $CommonObject{PackageObject}->_Code(
                 Code      => [$Code],
                 Type      => $Code->{Type},
@@ -129,7 +132,8 @@ Performs a package Database action from its sopm file such as DatabaseInstall or
 
     my $Success = $ModuleObject->DatabaseActionHandler(
         Module => /Packages/MyPackage/MyPackage.sopm,
-        Action => 'Install',                                # Install, Uninstall
+        Action => 'Install',                                # Install, Uninstall, Upgrade
+        Type   => 'pre',                                    # pre, post
     );
 
 Returns:
@@ -174,20 +178,12 @@ sub DatabaseActionHandler {
 
     return 1 if !$Structure{$StructureKey};
 
-    if ( $Structure{$StructureKey}->{pre} ) {
-        my $Success = $CommonObject{PackageObject}->_Database(
-            Database => $Structure{$StructureKey}->{pre},
-        );
+    return 1 if !$Structure{$StructureKey}->{ $Param{Type} };
 
-        return if !$Success;
-    }
-    if ( $Structure{$StructureKey}->{post} ) {
-        my $Success = $CommonObject{PackageObject}->_Database(
-            Database => $Structure{$StructureKey}->{post},
-        );
-
-        return if !$Success;
-    }
+    my $Success = $CommonObject{PackageObject}->_Database(
+        Database => $Structure{$StructureKey}->{ $Param{Type} },
+    );
+    return if !$Success;
 
     return 1;
 }

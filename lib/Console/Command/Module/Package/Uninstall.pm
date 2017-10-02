@@ -131,6 +131,29 @@ sub Run {
 
     my $FrameworkDirectory = File::Spec->rel2abs( $Self->GetArgument('framework-directory') || '.' );
 
+    # Get OTRS major version number.
+    my $OTRSReleaseString = `cat $FrameworkDirectory/RELEASE`;
+    my $OTRSMajorVersion  = '';
+    if ( $OTRSReleaseString =~ m{ VERSION \s+ = \s+ (\d+) .* \z }xms ) {
+        $OTRSMajorVersion = $1;
+    }
+
+    my %Config = %{ $Self->{Config}->{TestSystem} || {} };
+
+    # Define some maintenance commands.
+    if ( $OTRSMajorVersion >= 5 ) {
+        $Config{RebuildConfigCommand}
+            = "sudo -u $Config{PermissionsOTRSUser} $FrameworkDirectory/bin/otrs.Console.pl Maint::Config::Rebuild --cleanup";
+        $Config{DeleteCacheCommand}
+            = "sudo -u $Config{PermissionsOTRSUser} $FrameworkDirectory/bin/otrs.Console.pl Maint::Cache::Delete";
+    }
+    else {
+        $Config{RebuildConfigCommand}
+            = "sudo -u $Config{PermissionsOTRSUser} perl $FrameworkDirectory/bin/otrs.RebuildConfig.pl";
+        $Config{DeleteCacheCommand}
+            = "sudo -u $Config{PermissionsOTRSUser} perl $FrameworkDirectory/bin/otrs.DeleteCache.pl";
+    }
+
     my $GlobalFail;
 
     MODULEDIRECTORY:
@@ -165,13 +188,20 @@ sub Run {
             $ModuleFilePath =~ s{$ModuleDirectory/}{$FrameworkDirectory/};
 
             my $CodeModule = Console::Command::Module::Code::Uninstall->new();
-            $ExitCodes{Code} = $CodeModule->Execute($ModuleFilePath);
+            $ExitCodes{CodePre} = $CodeModule->Execute( $ModuleFilePath, 'pre' );
 
             my $DatabaseModule = Console::Command::Module::Database::Uninstall->new();
-            $ExitCodes{Database} = $DatabaseModule->Execute($ModuleFilePath);
+            $ExitCodes{DatabasePre} = $DatabaseModule->Execute( $ModuleFilePath, 'pre' );
+
+            $ExitCodes{DatabasePost} = $DatabaseModule->Execute( $ModuleFilePath, 'post' );
+
+            $ExitCodes{CodePost} = $CodeModule->Execute( $ModuleFilePath, 'post' );
 
             my $LinkModule = Console::Command::Module::File::Unlink->new();
             $ExitCodes{Files} = $LinkModule->Execute( $ModuleDirectory, $FrameworkDirectory );
+
+            $Self->System( $Config{RebuildConfigCommand} );
+            $Self->System( $Config{DeleteCacheCommand} );
         }
 
         if ( $Self->GetOption('verbose') ) {
@@ -202,6 +232,19 @@ sub Run {
 
     $Self->Print("\n<green>Done.</green>\n");
     return $Self->ExitCodeOk();
+}
+
+sub System {
+    my ( $Self, $Command ) = @_;
+
+    my $Output = `$Command`;
+
+    if ($Output) {
+        $Output =~ s{^}{    }mg;
+        $Self->Print($Output);
+    }
+
+    return 1;
 }
 
 1;

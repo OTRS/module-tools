@@ -61,7 +61,15 @@ sub PreRun {
 sub Run {
     my ($Self) = @_;
 
-    $Self->Print("<yellow>Running module database upgrade...</yellow>\n\n");
+    my @Types;
+    if ( $Self->GetArgument('type') ) {
+        @Types = ( $Self->GetArgument('type') );
+    }
+    else {
+        @Types = ( 'pre', 'post' );
+    }
+
+    $Self->Print( "<yellow>Running module database upgrade (" . join( ',', @Types ) . ")...</yellow>\n\n" );
 
     my $Module = File::Spec->rel2abs( $Self->GetArgument('module-file-path') );
 
@@ -77,10 +85,13 @@ sub Run {
         # Redirect the standard error to a variable.
         open STDERR, ">>", \$ErrorMessage;
 
-        $Success = $Self->DatabaseActionHandler(
-            Module => $Module,
-            Action => 'Upgrade',
-        );
+        for my $Type (@Types) {
+            $Success = $Self->DatabaseActionHandler(
+                Module => $Module,
+                Action => 'Upgrade',
+                Type   => $Type,
+            );
+        }
     }
 
     $Self->Print("$ErrorMessage\n");

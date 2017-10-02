@@ -31,10 +31,17 @@ sub Configure {
     $Self->Description('Run database install from a module .sopm file.');
     $Self->AddArgument(
         Name        => 'module-file-path',
-        Description => "Specify a module .sopm file.",
+        Description => 'Specify a module .sopm file.',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddArgument(
+        Name        => 'type',
+        Description => "Specify if only 'pre' or 'post' type should be executed.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/\A(?:pre|post)\z/smx,
     );
 
     return;
@@ -61,7 +68,15 @@ sub PreRun {
 sub Run {
     my ($Self) = @_;
 
-    $Self->Print("<yellow>Running module database install...</yellow>\n\n");
+    my @Types;
+    if ( $Self->GetArgument('type') ) {
+        @Types = ( $Self->GetArgument('type') );
+    }
+    else {
+        @Types = ( 'pre', 'post' );
+    }
+
+    $Self->Print( "<yellow>Running module database install (" . join( ',', @Types ) . ")...</yellow>\n\n" );
 
     my $Module = File::Spec->rel2abs( $Self->GetArgument('module-file-path') );
 
@@ -77,10 +92,13 @@ sub Run {
         # Redirect the standard error to a variable.
         open STDERR, ">>", \$ErrorMessage;
 
-        $Success = $Self->DatabaseActionHandler(
-            Module => $Module,
-            Action => 'Install',
-        );
+        for my $Type (@Types) {
+            $Success = $Self->DatabaseActionHandler(
+                Module => $Module,
+                Action => 'Install',
+                Type   => $Type,
+            );
+        }
     }
 
     $Self->Print("$ErrorMessage\n");

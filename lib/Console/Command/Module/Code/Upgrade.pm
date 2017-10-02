@@ -43,6 +43,14 @@ sub Configure {
         ValueRegex  => qr/^\d+\.\d+\.\d+$/smx,
     );
 
+    $Self->AddArgument(
+        Name        => 'type',
+        Description => "Specify if only 'pre' or 'post' type should be executed.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/\A(?:pre|post)\z/smx,
+    );
+
     return;
 }
 
@@ -67,7 +75,15 @@ sub PreRun {
 sub Run {
     my ($Self) = @_;
 
-    $Self->Print("<yellow>Running module code install...</yellow>\n\n");
+    my @Types;
+    if ( $Self->GetArgument('type') ) {
+        @Types = ( $Self->GetArgument('type') );
+    }
+    else {
+        @Types = ( 'pre', 'post' );
+    }
+
+    $Self->Print( "<yellow>Running module code upgrade (" . join( ',', @Types ) . ")...</yellow>\n\n" );
 
     my $Module = File::Spec->rel2abs( $Self->GetArgument('module-file-path') );
 
@@ -83,17 +99,20 @@ sub Run {
         # Redirect the standard error to a variable.
         open STDERR, ">>", \$ErrorMessage;
 
-        $Success = $Self->CodeActionHandler(
-            Module  => $Module,
-            Action  => 'Upgrade',
-            Version => $Self->GetArgument('version') // '',
-        );
+        for my $Type (@Types) {
+            $Success = $Self->CodeActionHandler(
+                Module  => $Module,
+                Action  => 'Upgrade',
+                Version => $Self->GetArgument('version') // '',
+                Type    => $Type,
+            );
+        }
     }
 
     $Self->Print("$ErrorMessage\n");
 
     if ( !$Success || $ErrorMessage =~ m{error}i ) {
-        $Self->PrintError("Couldn't run code install correctly from $Module");
+        $Self->PrintError("Couldn't run code upgrade correctly from $Module");
         return $Self->ExitCodeError();
     }
 

@@ -35,6 +35,13 @@ sub Configure {
         Required    => 1,
         ValueRegex  => qr/.*/smx,
     );
+    $Self->AddArgument(
+        Name        => 'type',
+        Description => "Specify if only 'pre' or 'post' type should be executed.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/\A(?:pre|post)\z/smx,
+    );
 
     return;
 }
@@ -60,7 +67,15 @@ sub PreRun {
 sub Run {
     my ($Self) = @_;
 
-    $Self->Print("<yellow>Running module code reinstall...</yellow>\n\n");
+    my @Types;
+    if ( $Self->GetArgument('type') ) {
+        @Types = ( $Self->GetArgument('type') );
+    }
+    else {
+        @Types = ( 'pre', 'post' );
+    }
+
+    $Self->Print( "<yellow>Running module code reinstall (" . join( ',', @Types ) . ")...</yellow>\n\n" );
 
     my $Module = File::Spec->rel2abs( $Self->GetArgument('module-file-path') );
 
@@ -76,11 +91,13 @@ sub Run {
         # Redirect the standard error to a variable.
         open STDERR, ">>", \$ErrorMessage;
 
-        $Success = $Self->CodeActionHandler(
-            Module => $Module,
-            Action => 'Reinstall',
-            Type   => 'post',
-        );
+        for my $Type (@Types) {
+            $Success = $Self->CodeActionHandler(
+                Module => $Module,
+                Action => 'Reinstall',
+                Type   => $Type,
+            );
+        }
     }
 
     $Self->Print("$ErrorMessage\n");
