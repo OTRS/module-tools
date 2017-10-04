@@ -212,28 +212,58 @@ sub Run {
         }
     }
 
-    # Enable Service.
+    # Deploy system configuration (< OTRS6).
     if ( $CommonObject{SysConfigObject}->can('WriteDefault') ) {
         $CommonObject{SysConfigObject}->WriteDefault();
-    }
 
-    # Define the ZZZ files.
-    my @ZZZFiles = (
-        'ZZZAAuto.pm',
-        'ZZZAuto.pm',
-    );
+        # Define the ZZZ files.
+        my @ZZZFiles = (
+            'ZZZAAuto.pm',
+            'ZZZAuto.pm',
+        );
 
-    # Reload the ZZZ files (mod_perl workaround).
-    for my $ZZZFile (@ZZZFiles) {
-        PREFIX:
-        for my $Prefix (@INC) {
-            my $File = $Prefix . '/Kernel/Config/Files/' . $ZZZFile;
-            next PREFIX if !-f $File;
-            do $File;
-            last PREFIX;
+        # Reload the ZZZ files (mod_perl workaround).
+        for my $ZZZFile (@ZZZFiles) {
+            PREFIX:
+            for my $Prefix (@INC) {
+                my $File = $Prefix . '/Kernel/Config/Files/' . $ZZZFile;
+                next PREFIX if !-f $File;
+                do $File;
+                last PREFIX;
+            }
         }
     }
-    if ( $CommonObject{SysConfigObject}->can('ConfigItemUpdate') ) {
+
+    # Deploy system configuration (>= OTRS6).
+    elsif ( $CommonObject{SysConfigObject}->can('ConfigurationDeploy') ) {
+
+        $CommonObject{SysConfigObject}->ConfigurationDeploy(
+            Comments    => 'Deployed by TestSystem::Database::Fill.',
+            AllSettings => 1,
+            UserID      => 1,
+            Force       => 1,
+        );
+
+        # Remove the ZZZAAuto.pm from %INC to force reloading it.
+        delete $INC{'Kernel/Config/Files/ZZZAAuto.pm'};
+    }
+
+    # Enable service (< OTRS 6).
+    if ( $CommonObject{SysConfigObject}->can('SettingsSet') ) {
+        $CommonObject{SysConfigObject}->SettingsSet(
+            Settings => [
+                {
+                    Name           => 'Ticket::Service',
+                    IsValid        => 1,
+                    EffectiveValue => 1,
+                },
+            ],
+            UserID => 1,
+        );
+    }
+
+    # Enable service (>= OTRS 6).
+    elsif ( $CommonObject{SysConfigObject}->can('ConfigItemUpdate') ) {
         $CommonObject{SysConfigObject}->ConfigItemUpdate(
             Valid => 1,
             Key   => 'Ticket::Service',
