@@ -324,7 +324,7 @@ EOD
         push @DBIParam, {
             ora_session_mode => $DBD::Oracle::ORA_SYSDBA,    ## no critic
         };
-        $ENV{ORACLE_HOME} = "/u01/app/oracle/product/11.2.0/xe";
+        $ENV{ORACLE_HOME} = "/u01/app/oracle/product/11.2.0/xe";    ## no critic
     }
 
     my $DBH = DBI->connect(

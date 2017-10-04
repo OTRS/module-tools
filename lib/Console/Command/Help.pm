@@ -28,6 +28,8 @@ sub Configure {
         ValueRegex => qr/[a-zA-Z0-9:_]+/,
         Required   => 1,
     );
+
+    return;
 }
 
 sub Run {
