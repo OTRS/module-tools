@@ -8,6 +8,8 @@
 
 ## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
 ## nofilter(TidyAll::Plugin::OTRS::Perl::ObjectDependencies)
+## nofilter(TidyAll::Plugin::OTRS::Migrations::OTRS6::SysConfig)
+## nofilter(TidyAll::Plugin::OTRS::Migrations::OTRS6::TimeObject)
 
 package Console::Command::TestSystem::Database::Fill;
 
@@ -211,7 +213,9 @@ sub Run {
     }
 
     # Enable Service.
-    $CommonObject{SysConfigObject}->WriteDefault();
+    if ( $CommonObject{SysConfigObject}->can('WriteDefault') ) {
+        $CommonObject{SysConfigObject}->WriteDefault();
+    }
 
     # Define the ZZZ files.
     my @ZZZFiles = (
@@ -229,11 +233,13 @@ sub Run {
             last PREFIX;
         }
     }
-    my $Success = $CommonObject{SysConfigObject}->ConfigItemUpdate(
-        Valid => 1,
-        Key   => 'Ticket::Service',
-        Value => 1,
-    );
+    if ( $CommonObject{SysConfigObject}->can('ConfigItemUpdate') ) {
+        $CommonObject{SysConfigObject}->ConfigItemUpdate(
+            Valid => 1,
+            Key   => 'Ticket::Service',
+            Value => 1,
+        );
+    }
 
     # Add Services.
     my %ServicesNameToID;
