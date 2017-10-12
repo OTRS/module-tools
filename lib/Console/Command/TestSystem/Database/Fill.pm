@@ -37,6 +37,7 @@ eval {
     require Kernel::System::User;
     require Kernel::System::Group;
     require Kernel::System::CustomerUser;
+    require Kernel::System::CustomerCompany;
     require Kernel::System::Service;
     require Kernel::System::SLA;
 };
@@ -114,33 +115,35 @@ sub Run {
 
     my %CommonObject = ();
     if ($Kernel::OM) {
-        $CommonObject{ConfigObject}       = $Kernel::OM->Get('Kernel::Config');
-        $CommonObject{EncodeObject}       = $Kernel::OM->Get('Kernel::System::Encode');
-        $CommonObject{LogObject}          = $Kernel::OM->Get('Kernel::System::Log');
-        $CommonObject{TimeObject}         = $Kernel::OM->Get('Kernel::System::Time');
-        $CommonObject{MainObject}         = $Kernel::OM->Get('Kernel::System::Main');
-        $CommonObject{DBObject}           = $Kernel::OM->Get('Kernel::System::DB');
-        $CommonObject{SysConfigObject}    = $Kernel::OM->Get('Kernel::System::SysConfig');
-        $CommonObject{UserObject}         = $Kernel::OM->Get('Kernel::System::User');
-        $CommonObject{GroupObject}        = $Kernel::OM->Get('Kernel::System::Group');
-        $CommonObject{CustomerUserObject} = $Kernel::OM->Get('Kernel::System::CustomerUser');
-        $CommonObject{ServiceObject}      = $Kernel::OM->Get('Kernel::System::Service');
-        $CommonObject{SLAObject}          = $Kernel::OM->Get('Kernel::System::SLA');
+        $CommonObject{ConfigObject}          = $Kernel::OM->Get('Kernel::Config');
+        $CommonObject{EncodeObject}          = $Kernel::OM->Get('Kernel::System::Encode');
+        $CommonObject{LogObject}             = $Kernel::OM->Get('Kernel::System::Log');
+        $CommonObject{TimeObject}            = $Kernel::OM->Get('Kernel::System::Time');
+        $CommonObject{MainObject}            = $Kernel::OM->Get('Kernel::System::Main');
+        $CommonObject{DBObject}              = $Kernel::OM->Get('Kernel::System::DB');
+        $CommonObject{SysConfigObject}       = $Kernel::OM->Get('Kernel::System::SysConfig');
+        $CommonObject{UserObject}            = $Kernel::OM->Get('Kernel::System::User');
+        $CommonObject{GroupObject}           = $Kernel::OM->Get('Kernel::System::Group');
+        $CommonObject{CustomerUserObject}    = $Kernel::OM->Get('Kernel::System::CustomerUser');
+        $CommonObject{CustomerCompanyObject} = $Kernel::OM->Get('Kernel::System::CustomerCompany');
+        $CommonObject{ServiceObject}         = $Kernel::OM->Get('Kernel::System::Service');
+        $CommonObject{SLAObject}             = $Kernel::OM->Get('Kernel::System::SLA');
     }
     else {
         $CommonObject{ConfigObject} = Kernel::Config->new();
         $CommonObject{EncodeObject} = Kernel::System::Encode->new(%CommonObject);
         $CommonObject{LogObject}
             = Kernel::System::Log->new( %CommonObject, LogPrefix => 'OTRS-TestSystem::Database::Fill' );
-        $CommonObject{TimeObject}         = Kernel::System::Time->new(%CommonObject);
-        $CommonObject{MainObject}         = Kernel::System::Main->new(%CommonObject);
-        $CommonObject{DBObject}           = Kernel::System::DB->new(%CommonObject);
-        $CommonObject{SysConfigObject}    = Kernel::System::SysConfig->new(%CommonObject);
-        $CommonObject{UserObject}         = Kernel::System::User->new(%CommonObject);
-        $CommonObject{GroupObject}        = Kernel::System::Group->new(%CommonObject);
-        $CommonObject{CustomerUserObject} = Kernel::System::CustomerUser->new(%CommonObject);
-        $CommonObject{ServiceObject}      = Kernel::System::Service->new(%CommonObject);
-        $CommonObject{SLAObject}          = Kernel::System::SLA->new(%CommonObject);
+        $CommonObject{TimeObject}            = Kernel::System::Time->new(%CommonObject);
+        $CommonObject{MainObject}            = Kernel::System::Main->new(%CommonObject);
+        $CommonObject{DBObject}              = Kernel::System::DB->new(%CommonObject);
+        $CommonObject{SysConfigObject}       = Kernel::System::SysConfig->new(%CommonObject);
+        $CommonObject{UserObject}            = Kernel::System::User->new(%CommonObject);
+        $CommonObject{GroupObject}           = Kernel::System::Group->new(%CommonObject);
+        $CommonObject{CustomerUserObject}    = Kernel::System::CustomerUser->new(%CommonObject);
+        $CommonObject{CustomerCompanyObject} = Kernel::System::CustomerCompany->new(%CommonObject);
+        $CommonObject{ServiceObject}         = Kernel::System::Service->new(%CommonObject);
+        $CommonObject{SLAObject}             = Kernel::System::SLA->new(%CommonObject);
     }
 
     my %Config = %{ $Self->{Config}->{TestSystem} || {} };
@@ -181,6 +184,34 @@ sub Run {
                 );
             }
             $Self->Print("  Agent <yellow>$UserID</yellow> has been created.\n");
+        }
+    }
+
+    # Add Customer Companies.
+    CUSTOMERCOMPANY:
+    for my $CustomerCompany ( @{ $Config{CustomerCompanies} } ) {
+
+        next CUSTOMERCOMPANY if !$CustomerCompany;
+        next CUSTOMERCOMPANY if !%{$CustomerCompany};
+
+        # Check if this customer company already exists.
+        my %CustomerCompanyData = $CommonObject{CustomerCompanyObject}->CustomerCompanyGet(
+            CustomerID => $CustomerCompany->{CustomerID},
+        );
+        if ( $CustomerCompanyData{CustomerID} ) {
+            $Self->Print("  Customer company <red>$CustomerCompany->{CustomerID}</red> already exists. Continue...\n");
+            next CUSTOMERCOMPANY;
+        }
+
+        my $ID = $CommonObject{CustomerCompanyObject}->CustomerCompanyAdd(
+            %{$CustomerCompany},
+            Source  => 'CustomerCompany',
+            ValidID => 1,
+            UserID  => 1,
+        );
+
+        if ($ID) {
+            $Self->Print("  Customer company $ID has been created.\n");
         }
     }
 

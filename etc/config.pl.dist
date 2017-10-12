@@ -131,6 +131,20 @@ my $Config = {
             },
         ],
 
+        # Customer Companies data
+        CustomerCompanies => [
+            {
+                CustomerID              => 'customer-company-1',
+                CustomerCompanyName     => 'customer-company-1',
+                CustomerCompanyStreet   => 'customer-company-1',
+                CustomerCompanyZIP      => 'customer-company-1',
+                CustomerCompanyCity     => 'customer-company-1',
+                CustomerCompanyCountry  => 'customer-company-1',
+                CustomerCompanyURL      => 'customer-company-1',
+                CustomerCompanyComment  => 'customer-company-1',
+            },
+        ],
+
         # Customer data
         Customers => [
             {
