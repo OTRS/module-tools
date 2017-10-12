@@ -18,6 +18,8 @@ use File::Basename qw(dirname);
 
 use Getopt::Long();
 
+use Encode;
+
 our $SuppressANSI = 0;
 
 =head1 NAME
@@ -590,6 +592,75 @@ sub Print {
         print $Self->_ReplaceColorTags($Text);
     }
     return;
+}
+
+=head2 DirectoryRead()
+
+reads a directory and returns an array with results.
+
+    my @FilesInDirectory = $CommandObject->DirectoryRead(
+        Directory => '/tmp',
+        Filter    => 'Filenam*',
+    );
+
+=cut
+
+sub DirectoryRead {
+    my ( $Self, %Param ) = @_;
+
+    # Check needed params.
+    for my $Needed (qw(Directory Filter)) {
+        if ( !$Param{$Needed} ) {
+            return;
+        }
+    }
+
+    # If directory doesn't exists stop.
+    if ( !-d $Param{Directory} ) {
+        return;
+    }
+
+    # Prepare non array filter.
+    if ( ref $Param{Filter} ne 'ARRAY' ) {
+        $Param{Filter} = [ $Param{Filter} ];
+    }
+
+    # Executes glob for every filter.
+    my @GlobResults;
+    my %Seen;
+
+    for my $Filter ( @{ $Param{Filter} } ) {
+        my @Glob = glob "$Param{Directory}/$Filter";
+
+        # Look for repeated values.
+        NAME:
+        for my $GlobName (@Glob) {
+
+            next NAME if !-e $GlobName;
+            if ( !$Seen{$GlobName} ) {
+                push @GlobResults, $GlobName;
+                $Seen{$GlobName} = 1;
+            }
+        }
+    }
+
+    # If no results.
+    return if !@GlobResults;
+
+    # Compose normalize every name in the file list.
+    my @Results;
+    for my $Filename (@GlobResults) {
+
+        # First convert filename to utf-8 if utf-8 is used internally.
+        Encode::_utf8_on($Filename);
+
+        push @Results, $Filename;
+    }
+
+    # Always sort the result.
+    @Results = sort @Results;
+
+    return @Results;
 }
 
 =head2 _ParseGlobalOptions()
