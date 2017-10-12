@@ -174,14 +174,31 @@ sub Run {
 
         if ($UserID) {
             for my $GroupID (qw(1 2 3)) {
-                my $Success = $CommonObject{GroupObject}->GroupMemberAdd(
-                    GID        => $GroupID,
-                    UID        => $UserID,
-                    Permission => {
-                        rw => 1,
-                    },
-                    UserID => 1,
-                );
+                if ( $CommonObject{GroupObject}->can('GroupMemberAdd') ) {
+                    my $Success = $CommonObject{GroupObject}->GroupMemberAdd(
+                        GID        => $GroupID,
+                        UID        => $UserID,
+                        Permission => {
+                            rw => 1,
+                        },
+                        UserID => 1,
+                    );
+                }
+                if ( $CommonObject{GroupObject}->can('PermissionGroupUserAdd') ) {
+                    my $Success = $CommonObject{GroupObject}->PermissionGroupUserAdd(
+                        GID        => $GroupID,
+                        UID        => $UserID,
+                        Permission => {
+                            ro        => 1,
+                            move_into => 1,
+                            create    => 1,
+                            owner     => 1,
+                            priority  => 1,
+                            rw        => 1,
+                        },
+                        UserID => 1,
+                    );
+                }
             }
             $Self->Print("  Agent <yellow>$UserID</yellow> has been created.\n");
         }
