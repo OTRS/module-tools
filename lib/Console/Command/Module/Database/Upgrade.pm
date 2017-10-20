@@ -36,6 +36,13 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
+    $Self->AddArgument(
+        Name        => 'type',
+        Description => "Specify if only 'pre' or 'post' type should be executed.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/\A(?:pre|post)\z/smx,
+    );
 
     return;
 }
