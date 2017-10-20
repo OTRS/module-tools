@@ -180,6 +180,40 @@ sub DatabaseActionHandler {
 
     return 1 if !$Structure{$StructureKey}->{ $Param{Type} };
 
+    if ( $Param{Version} ) {
+        my %RelevantStructure;
+
+        my $CheckVersion = sprintf "%d%03d%03d", split /\./, $Param{Version};
+
+        my $Inside;
+
+        PART:
+        for my $Part ( @{ $Structure{$StructureKey}->{ $Param{Type} } || [] } ) {
+            next PART if !$Part->{Version} && !$Inside;
+
+            if ( $Part->{TagType} eq 'Start' && !$Inside && $Part->{Version} ) {
+                $Inside = $Part->{Tag};
+            }
+
+            my $PartVersion = sprintf "%d%03d%03d", split /\./, $Part->{Version} || ("0.0.0");
+
+            if ( ( 0 + $PartVersion ) && $CheckVersion > $PartVersion ) {
+                $Inside = undef;
+                next PART;
+            }
+
+            next PART if !$Inside;
+
+            push @{ $RelevantStructure{ $Param{Type} } }, $Part;
+
+            if ( $Part->{TagType} eq 'End' && $Inside eq $Part->{Tag} ) {
+                $Inside = undef;
+            }
+        }
+
+        $Structure{$StructureKey} = \%RelevantStructure;
+    }
+
     my $Success = $CommonObject{PackageObject}->_Database(
         Database => $Structure{$StructureKey}->{ $Param{Type} },
     );
