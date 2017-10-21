@@ -490,6 +490,11 @@ sub ExecuteCommand {
 
         my $ModuleObject = $Param{Module}->new();
 
+        # Allow running as root, if parent command has been allowed to do so.
+        if ( $Self->{AllowRoot} ) {
+            unshift @{ $Param{Params} }, '--allow-root';
+        }
+
         $ModuleObject->Execute( @{ $Param{Params} } );
     }
 

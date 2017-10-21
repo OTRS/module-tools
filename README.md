@@ -27,3 +27,8 @@ Developers can use the tools by invoking console command under OTRS user:
 
     # Install test instance of OTRS
     sudo -u otrs /path/to/module-tools/bin/otrs.ModuleTools.pl TestSystem::Instance::Setup --framework-directory /path/to/otrs --fred-directory /path/to/Fred
+
+On some systems it may be required to run instance setup as root user:
+
+    # Install test intance of OTRS as root
+    sudo /path/to/module-tools/bin/otrs.ModuleTools.pl TestSystem::Instance::Setup --allow-root --framework-directory /path/to/otrs --fred-directory /path/to/Fred

@@ -371,6 +371,11 @@ sub Execute {
 
     my $ParsedGlobalOptions = $Self->_ParseGlobalOptions( \@CommandlineArguments );
 
+    # Store allow root global option for future use.
+    if ( $ParsedGlobalOptions->{'allow-root'} ) {
+        $Self->{AllowRoot} = 1;
+    }
+
     # Don't allow to run these scripts as root.
     if ( !$ParsedGlobalOptions->{'allow-root'} && $> == 0 ) {    # $EFFECTIVE_USER_ID
         $Self->PrintError(
