@@ -41,6 +41,13 @@ sub Configure {
         HasValue    => 0,
         ValueRegex  => qr/.*/smx,
     );
+    $Self->AddOption(
+        Name        => 'directory',
+        Description => "Specify a directory to update.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
 
     return;
 }
@@ -62,6 +69,11 @@ sub Run {
 
     if ( $Self->GetOption('all') ) {
         push @DevelDirectories, @{ $Config{AdditionalDevelDirectories} || [] };
+    }
+
+    if ( $Self->GetOption('directory') ) {
+
+        push @DevelDirectories, $Self->GetOption('directory');
     }
 
     # Get a list of all git directories and OTRSCodePolicy directories.
