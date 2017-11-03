@@ -142,8 +142,15 @@ sub Run {
 
     # Define some maintenance commands.
     if ( $OTRSMajorVersion >= 5 ) {
+
+        my $CleanupPart = '--cleanup';
+        if ( $OTRSMajorVersion == 5 ) {
+
+            $CleanupPart .= '-user-config';
+        }
+
         $Config{RebuildConfigCommand}
-            = "sudo -u $Config{PermissionsOTRSUser} $FrameworkDirectory/bin/otrs.Console.pl Maint::Config::Rebuild --cleanup";
+            = "sudo -u $Config{PermissionsOTRSUser} $FrameworkDirectory/bin/otrs.Console.pl Maint::Config::Rebuild $CleanupPart";
         $Config{DeleteCacheCommand}
             = "sudo -u $Config{PermissionsOTRSUser} $FrameworkDirectory/bin/otrs.Console.pl Maint::Cache::Delete";
     }
