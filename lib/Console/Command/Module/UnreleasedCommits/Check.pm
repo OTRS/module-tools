@@ -84,14 +84,15 @@ sub Run {
 
     my $Module               = $Self->GetArgument('module');
     my $ModuleDirectoryParam = File::Spec->rel2abs($Module);
-    if ( -e $ModuleDirectoryParam ) {
-        push @Directories, $ModuleDirectoryParam;
-    }
-    else {
-        @Directories = @{ $Self->{Config}->{ModuleCollection}->{$Module} // [] };
-    }
 
     my $ParentDirectory = $Self->GetOption('parent-directory');
+
+    if ( -e $ModuleDirectoryParam && !$ParentDirectory->[0] ) {
+        push @Directories, $ModuleDirectoryParam;
+    }
+    elsif ($Module) {
+        @Directories = @{ $Self->{Config}->{ModuleCollection}->{$Module} // [] };
+    }
 
     # TODO: This could be in a base class, reusable for other commands.
     if ( ref $ParentDirectory eq 'ARRAY' ) {
