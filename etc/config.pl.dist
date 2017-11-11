@@ -62,6 +62,8 @@ my $Config = {
 
         # Define your own configuration here if you would like to override default one. You may use
         #  following variables: $SystemName, %Config.
+        # This configurations will be injected into Kernel/Config.pm.
+
 #         ConfigInject => <<'EOD'
 #
 #     \$Self->{'SecureMode'} = 1;
@@ -181,6 +183,122 @@ my $Config = {
             {
                 Name         => 'SLA 2',
                 ServiceNames => [ 'Service 2', 'Service 1' ],
+            },
+        ],
+
+        # Dynamic Field data
+        DynamicFields => [
+            {
+                InternalField => 0,
+                Name        => 'Test1',
+                Label       => 'Test1',
+                FieldOrder  => 9999,
+                FieldType   => 'Text',
+                ObjectType  => 'Ticket',
+                Config      => {
+                    DefaultValue => '',
+                    Link         => '',
+                    LinkPreview  => '',
+                    RegExList    => [ ],
+                },
+            },
+            {
+                InternalField => 0,
+                Name        => 'Test2',
+                Label       => 'Test2',
+                FieldOrder  => 9999,
+                FieldType   => 'TextArea',
+                ObjectType  => 'Ticket',
+                Config      => {
+                    Cols         => '',
+                    DefaultValue => '',
+                    RegExList    => [ ],
+                    Rows         => '',
+                },
+            },
+            {
+                InternalField => 0,
+                Name        => 'Test3',
+                Label       => 'Test3',
+                FieldOrder  => 9999,
+                FieldType   => 'Checkbox',
+                ObjectType  => 'Ticket',
+                Config      => {
+                    DefaultValue => '0',
+                },
+            },
+            {
+                InternalField => 0,
+                Name        => 'Test4',
+                Label       => 'Test4',
+                FieldOrder  => 9999,
+                FieldType   => 'Dropdown',
+                ObjectType  => 'Ticket',
+                Config      => {
+                    DefaultValue   => '',
+                    Link           => '',
+                    LinkPreview    => '',
+                    PossibleNone   => '0',
+                    PossibleValues => {
+                      A => '1',
+                      B => '2',
+                      C => '3',
+                    },
+                    TranslatableValues => '0',
+                    TreeView           => '0',
+                },
+            },
+            {
+                InternalField => 0,
+                Name        => 'Test5',
+                Label       => 'Test5',
+                FieldOrder  => 9999,
+                FieldType   => 'Multiselect',
+                ObjectType  => 'Ticket',
+                Config      => {
+                    DefaultValue   => ['',],
+                    PossibleNone   => '0',
+                    PossibleValues => {
+                      A => '1',
+                      B => '2',
+                      C => '3',
+                    },
+                    TranslatableValues => '0',
+                    TreeView           => '0',
+                },
+            },            {
+                InternalField => 0,
+                Name        => 'Test6',
+                Label       => 'Test6',
+                FieldOrder  => 9999,
+                FieldType   => 'Date',
+                ObjectType  => 'Ticket',
+                Config      => {
+                    DateRestriction => '',
+                    DefaultValue    => 0,
+                    Link            => '',
+                    LinkPreview     => '',
+                    YearsInFuture   => '5',
+                    YearsInPast     => '5',
+                    YearsPeriod => '0',
+                },
+            },
+            {
+                InternalField => 0,
+                Name        => 'Test7',
+                Label       => 'Test7',
+                FieldOrder  => 9999,
+                FieldType   => 'DateTime',
+                ObjectType  => 'Ticket',
+                Config      => {
+                    DateRestriction => '',
+                    DefaultValue    => 0,
+                    Link            => '',
+                    LinkPreview     => '',
+                    YearsInFuture   => '5',
+                    YearsInPast     => '5',
+                    YearsPeriod => '0',
+                },
             },
         ],
     },

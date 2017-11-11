@@ -401,7 +401,7 @@ sub Run {
 
     # Add Dynamic Fields.
     DYNAMICFIELD:
-    for my $DynamicField ( @{ $Config{DynamicFields} } ) {
+    for my $DynamicField ( reverse @{ $Config{DynamicFields} } ) {
 
         next DYNAMICFIELD if !$DynamicField;
         next DYNAMICFIELD if !$DynamicField;
