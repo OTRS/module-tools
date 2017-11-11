@@ -40,6 +40,7 @@ eval {
     require Kernel::System::CustomerCompany;
     require Kernel::System::Service;
     require Kernel::System::SLA;
+    require Kernel::System::DynamicField;
 };
 
 use parent qw(Console::BaseCommand);
@@ -128,6 +129,7 @@ sub Run {
         $CommonObject{CustomerCompanyObject} = $Kernel::OM->Get('Kernel::System::CustomerCompany');
         $CommonObject{ServiceObject}         = $Kernel::OM->Get('Kernel::System::Service');
         $CommonObject{SLAObject}             = $Kernel::OM->Get('Kernel::System::SLA');
+        $CommonObject{DynamicFieldObject}    = $Kernel::OM->Get('Kernel::System::DynamicField');
     }
     else {
         $CommonObject{ConfigObject} = Kernel::Config->new();
@@ -144,6 +146,8 @@ sub Run {
         $CommonObject{CustomerCompanyObject} = Kernel::System::CustomerCompany->new(%CommonObject);
         $CommonObject{ServiceObject}         = Kernel::System::Service->new(%CommonObject);
         $CommonObject{SLAObject}             = Kernel::System::SLA->new(%CommonObject);
+        $CommonObject{DynamicFieldObject}    = Kernel::System::DynamicField->new(%CommonObject);
+
     }
 
     my %Config = %{ $Self->{Config}->{TestSystem} || {} };
@@ -392,6 +396,35 @@ sub Run {
 
         if ($SLAID) {
             $Self->Print("  SLA <yellow>$SLAID</yellow> has been created.\n");
+        }
+    }
+
+    # Add Dynamic Fields.
+    DYNAMICFIELD:
+    for my $DynamicField ( @{ $Config{DynamicFields} } ) {
+
+        next DYNAMICFIELD if !$DynamicField;
+        next DYNAMICFIELD if !$DynamicField;
+
+        # Check if this dynamic field already exists.
+        my $DynamicFieldData = $CommonObject{DynamicFieldObject}->DynamicFieldGet(
+            Name => $DynamicField->{Name},
+        );
+
+        if ( $DynamicFieldData->{ID} ) {
+            $Self->Print("  Dynamic Field <red>$DynamicField->{Name}</red> already exists. Continue...\n");
+            next DYNAMICFIELD;
+        }
+
+        my $ID = $CommonObject{DynamicFieldObject}->DynamicFieldAdd(
+            %{$DynamicField},
+            Reorder => 1,
+            ValidID => 1,
+            UserID  => 1,
+        );
+
+        if ($ID) {
+            $Self->Print("  Dynamic Field $ID has been created.\n");
         }
     }
 
