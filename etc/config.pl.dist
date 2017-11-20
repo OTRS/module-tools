@@ -83,6 +83,8 @@ my $Config = {
 #     \$Self->{'AdminEmail'}          = 'root\@localhost';
 #     \$Self->{'Package::Timeout'}    = '120';
 #     \$Self->{'SendmailModule'}      =  'Kernel::System::Email::DoNotSendEmail';
+#     \$Self->{'SwitchToAgent'}       = 1;
+#     \$Self->{'SwitchToCustomer'}    = 1;
 #
 #     # Fred
 #     \$Self->{'Fred::BackgroundColor'} = '#006ea5';
