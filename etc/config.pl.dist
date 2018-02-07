@@ -121,18 +121,38 @@ my $Config = {
         # Agent data
         Agents => [
             {
-                UserFirstname => 'agent-1',
-                UserLastname  => 'agent-1',
-                UserLogin     => 'agent-1',
-                UserPw        => 'agent-1',
-                UserEmail     => 'agent-1@localhost',
+                UserFirstname   => 'agent-1',
+                UserLastname    => 'agent-1',
+                UserLogin       => 'agent-1',
+                UserPw          => 'agent-1',
+                UserEmail       => 'agent-1@localhost',
+                UserPreferences => [
+                    {
+                        Key   => 'UserTimeZone',
+                        Value => 'Europe/Berlin',
+                    },
+                    {
+                        Key   => 'UserLanguage',
+                        Value => 'de',
+                    },
+                ],
             },
             {
-                UserFirstname => 'agent-2',
-                UserLastname  => 'agent-2',
-                UserLogin     => 'agent-2',
-                UserPw        => 'agent-2',
-                UserEmail     => 'agent-2@localhost',
+                UserFirstname   => 'agent-2',
+                UserLastname    => 'agent-2',
+                UserLogin       => 'agent-2',
+                UserPw          => 'agent-2',
+                UserEmail       => 'agent-2@localhost',
+                UserPreferences => [
+                    {
+                        Key   => 'UserTimeZone',
+                        Value => 'Europe/London',
+                    },
+                    {
+                        Key   => 'UserLanguage',
+                        Value => 'en_GB',
+                    },
+                ],
             },
         ],
 

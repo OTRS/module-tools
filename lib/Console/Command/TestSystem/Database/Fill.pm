@@ -204,6 +204,20 @@ sub Run {
                     );
                 }
             }
+
+            # Agent preferences.
+            if ( $Agent->{UserPreferences} && $CommonObject{UserObject}->can('SetPreferences') ) {
+
+                for my $Preference ( @{ $Agent->{UserPreferences} } ) {
+
+                    $CommonObject{UserObject}->SetPreferences(
+                        Key    => $Preference->{Key},
+                        Value  => $Preference->{Value},
+                        UserID => $UserID,
+                    );
+                }
+            }
+
             $Self->Print("  Agent <yellow>$UserID</yellow> has been created.\n");
         }
     }
