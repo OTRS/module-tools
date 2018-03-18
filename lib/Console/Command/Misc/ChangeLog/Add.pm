@@ -156,7 +156,7 @@ sub Run {
 
     # If bug does not exist, this will stop the script.
     if ($Bug) {
-        my $Result = GetBugSummary($Bug);
+        my $Result = $Self->GetBugSummary($Bug);
         if ( !$Result->{Success} ) {
             $Self->PrintError("Could not find Bug $Bug.\n");
             return $Self->ExitCodeError();
@@ -249,17 +249,27 @@ sub Run {
 }
 
 sub GetBugSummary {
-    my $Bug = shift;
+    my ( $Self, $Bug ) = @_;
+
+    my %Config = %{ $Self->{Config}->{Bugzilla} || {} };
+
+    # Define request params (add user and password if set in the config).
+    my %Param = (
+        ids => [$Bug],
+    );
+    if ( defined $Config{Bugzilla_login} && defined $Config{Bugzilla_password} ) {
+        $Param{Bugzilla_login}    = $Config{Bugzilla_login};
+        $Param{Bugzilla_password} = $Config{Bugzilla_password};
+    }
 
     # Get bug description from bug tracker,
     #   if bug does not exist we automatically get an error message and the script dies
     my $Proxy  = XMLRPC::Lite->proxy('https://bugs.otrs.org/xmlrpc.cgi');
     my $Result = $Proxy->call(
         'Bug.get',
-        {
-            ids => [$Bug],
-        },
+        \%Param,
     )->result();
+
     if ( !$Result || !$Result->{bugs} || !@{ $Result->{bugs} } ) {
         return {
             Success => 0,
@@ -324,13 +334,3 @@ sub FormatChangesLine {
 }
 
 1;
-
-=head1 TERMS AND CONDITIONS
-
-This software is part of the OTRS project (L<http://otrs.org/>).
-
-This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut

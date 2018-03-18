@@ -339,6 +339,12 @@ my $Config = {
         CodePolicyRegisterCommand => '/path/to/your/OTRSCodePolicy/scripts/install-git-hooks.pl',
     },
 
+    # Bugzilla settings
+    Bugzilla => {
+        # Bugzilla_login    => 'firstname.lastname@otrs.com',
+        # Bugzilla_password => 'mypassword',
+    },
+
     # Collections of modules to be used by Files::Link, Files::Unlink, Module::Install, Module::UnInstall.
     ModuleCollection => {
         itsm5 => [
