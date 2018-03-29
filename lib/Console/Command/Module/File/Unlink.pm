@@ -17,7 +17,7 @@ use parent qw(Console::BaseCommand);
 
 =head1 NAME
 
-Console::Command::Module::File::Link - Console command to unlink module files into a framework.
+Console::Command::Module::File::Unlink - Console command to unlink module files into a framework.
 
 =head1 DESCRIPTION
 

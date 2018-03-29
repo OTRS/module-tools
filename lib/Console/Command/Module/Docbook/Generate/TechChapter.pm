@@ -25,7 +25,7 @@ use parent qw(Console::BaseCommand Console::BaseDocbook);
 
 =head1 NAME
 
-Console::Command::Module::Docbook::Generate::ConfigChapter - Console command to generate module technical implementation chapter in docbook format.
+Console::Command::Module::Docbook::Generate::TechChapter - Console command to generate module technical implementation chapter in docbook format.
 
 =head1 DESCRIPTION
 

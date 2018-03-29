@@ -35,7 +35,7 @@ eval {
 
 =head1 NAME
 
-BaseModule - base class for module commands
+Console::BaseModule - base class for module commands
 
 =head1 PUBLIC INTERFACE
 

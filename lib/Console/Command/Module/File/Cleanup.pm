@@ -17,7 +17,7 @@ use parent qw(Console::BaseCommand);
 
 =head1 NAME
 
-Console::Command::Module::File::Link - Console command to to remove not needed files form a module.
+Console::Command::Module::File::Cleanup - Console command to to remove not needed files form a module.
 
 =head1 DESCRIPTION
 
