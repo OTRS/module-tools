@@ -115,7 +115,7 @@ use vars (qw($Self));
         CustomerUserSearchSuffix           => '*',
         CustomerUserSearchListLimit        => 250,
         CustomerUserPostMasterSearchFields => ['mail'],
-        CustomerUserNameFields => [ 'givenname', 'sn' ],
+        CustomerUserNameFields             => [ 'givenname', 'sn' ],
 
         # show now own tickets in customer panel, CompanyTickets
         CustomerUserExcludePrimaryCustomerID => 0,

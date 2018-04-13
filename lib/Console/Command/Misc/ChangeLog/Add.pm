@@ -92,13 +92,13 @@ sub PreRun {
     my $Message = $Self->GetOption('message');
 
     if ( !$Bug && !$Message ) {
-        die "bug or message are needed!"
+        die "bug or message are needed!";
     }
 
     my $TargetPath = $Self->GetOption('target-path') // '';
 
     if ( $TargetPath && -r $TargetPath ) {
-        die "Could not read file $TargetPath!"
+        die "Could not read file $TargetPath!";
     }
 
     return;

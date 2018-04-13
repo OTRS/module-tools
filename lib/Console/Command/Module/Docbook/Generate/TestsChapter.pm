@@ -126,7 +126,7 @@ sub Run {
     # Set output file.
     my $OutputFile = $Self->GetOption('target-filename') // 'TestsChapter';
     $OutputFile .= '.xml';
-    my $Language = $Self->GetOption('language') // 'en';
+    my $Language       = $Self->GetOption('language') // 'en';
     my $TargetLocation = $ModuleDirectory . '/doc/' . $Language . '/' . $OutputFile;
 
     # wWite the XML file in the file system.
@@ -138,7 +138,7 @@ sub Run {
     );
 
     if ( !$WriteFileSuccess ) {
-        return $Self->ExitCodeError()
+        return $Self->ExitCodeError();
     }
 
     $Self->Print(" <green>Done.</green>\n\n<green>Done.</green>\n");
@@ -198,7 +198,7 @@ sub _CreateDocbookUnittestChapter {
 XML
 
     if ( !@{ $Param{FileList} } ) {
-        $Chapter .= '<!--'
+        $Chapter .= '<!--';
     }
 
     $Chapter .= <<"XML";
@@ -222,7 +222,7 @@ XML
 XML
 
     if ( !@{ $Param{FileList} } ) {
-        $Chapter .= 'shell> perl bin/otrs.Console.pl Dev::UnitTest::Run -- test'
+        $Chapter .= 'shell> perl bin/otrs.Console.pl Dev::UnitTest::Run -- test';
     }
 
     for my $File ( sort { "\L$a" cmp "\L$b" } @{ $Param{FileList} } ) {

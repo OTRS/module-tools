@@ -69,7 +69,7 @@ sub PreRun {
 
     my $ModuleDirectory = File::Spec->rel2abs( $Self->GetOption('module-directory') );
     if ($ModuleDirectory) {
-        push @Directories, $ModuleDirectory
+        push @Directories, $ModuleDirectory;
     }
 
     push @Directories, File::Spec->rel2abs( $Self->GetArgument('target-directory') || '.' );

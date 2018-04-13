@@ -144,7 +144,7 @@ sub Run {
     # Set output file.
     my $OutputFile = $Self->GetOption('target-filename') // 'TechChapter';
     $OutputFile .= '.xml';
-    my $Language = $Self->GetOption('language') // 'en';
+    my $Language       = $Self->GetOption('language') // 'en';
     my $TargetLocation = $ModuleDirectory . '/doc/' . $Language . '/' . $OutputFile;
 
     # Write the XML file in the file system.
@@ -156,7 +156,7 @@ sub Run {
     );
 
     if ( !$WriteFileSuccess ) {
-        return $Self->ExitCodeError()
+        return $Self->ExitCodeError();
     }
 
     $Self->Print(" <green>Done.</green>\n\n<green>Done.</green>\n");
@@ -339,7 +339,7 @@ sub _GetDecription {
 
         # Add specific description if language was found.
         if ( $LanguageCode && $DefaultUsedLanguages{$LanguageCode} ) {
-            $DescriptionContent = "$DefaultUsedLanguages{$LanguageCode} translation file for this package."
+            $DescriptionContent = "$DefaultUsedLanguages{$LanguageCode} translation file for this package.";
         }
     }
     else {

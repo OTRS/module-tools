@@ -59,7 +59,7 @@ sub PreRun {
     my $Module    = $Self->GetArgument('module');
 
     if ( !$RemoveAll && !$Module ) {
-        die "module or remove-all are needed!"
+        die "module or remove-all are needed!";
     }
 
     my @Directories;

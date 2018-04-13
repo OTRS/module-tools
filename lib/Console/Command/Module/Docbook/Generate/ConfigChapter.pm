@@ -156,7 +156,7 @@ sub Run {
         FormatedSettings => \@FormatedSettings,
     );
     if ( !$ConfigChapter ) {
-        return $Self->ExitCodeError()
+        return $Self->ExitCodeError();
     }
 
     $Self->Print(" <green>done</green>\n");
@@ -175,7 +175,7 @@ sub Run {
     );
 
     if ( !$WriteFileSuccess ) {
-        return $Self->ExitCodeError()
+        return $Self->ExitCodeError();
     }
 
     $Self->Print(" <green>Done.</green>\n\n<green>Done.</green>\n");
@@ -311,7 +311,7 @@ sub _ParseConfigFile {
         }
     }
     else {
-        delete $ParsedSettings->{$SettingRoot}->{$ValueAttribute}
+        delete $ParsedSettings->{$SettingRoot}->{$ValueAttribute};
     }
 
     # Check for conversion errors.

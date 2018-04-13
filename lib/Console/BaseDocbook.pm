@@ -86,7 +86,7 @@ XML
         return;
     }
 
-    return 1
+    return 1;
 }
 
 =head1 PRIVATE INTERFACE
@@ -307,7 +307,7 @@ sub _FileWrite {
 
     # lock file (Exclusive Lock)
     if ( !flock $FH, 2 ) {
-        print "Can't lock '$Param{Location}': $!"
+        print "Can't lock '$Param{Location}': $!";
     }
 
     # empty file first (needed if file is open by '+<')
