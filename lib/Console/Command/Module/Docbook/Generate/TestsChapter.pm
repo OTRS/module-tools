@@ -187,7 +187,7 @@ sub _CreateDocbookUnittestChapter {
 <chapter>
     <title>Tests</title>
     <para>
-        This module has been tested on the current state of the art in quality.
+        This module has been quality assured according to the current OTRS guidelines.
     </para>
     <section>
         <title>Test Cases</title>
