@@ -250,9 +250,11 @@ EOD
 
     # Copy apache mod perl file.
     my $ApacheModPerlFile = "$Config{ApacheCFGDir}$SystemName.apache2-perl-startup.pl";
-    $Self->System(
-        "sudo cp -p $FrameworkDirectory/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
-    );
+    if ( -e $ApacheModPerlFile) {
+        $Self->System(
+            "sudo cp -p $FrameworkDirectory/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
+        );
+    }
 
     $Self->Print("\n  <yellow>Editing Apache config...</yellow>\n");
     {
@@ -272,7 +274,9 @@ EOD
     }
 
     $Self->Print("\n  <yellow>Editing Apache mod perl config...</yellow>\n");
-    {
+
+    if ( -e $ApacheModPerlFile ) {
+
         my $ApacheModPerlConfigStr = $Self->ReadFile($ApacheModPerlFile);
 
         # Set correct path.
