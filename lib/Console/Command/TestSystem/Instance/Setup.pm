@@ -229,11 +229,28 @@ EOD
             print "    Overriding default configuration...\n    Done.\n";
         }
 
+        # Remove ScriptAlias and Frontend::WebPath for OTRS 7 and higher
+        if ( $OTRSMajorVersion >= 7 ) {
+            $ConfigStr =~ s{ ^ .* 'ScriptAlias' .* $ }{}xm;
+            $ConfigStr =~ s{ ^ .* 'Frontend::WebPath' .* $ }{}xm;
+        }
+
         $ConfigStr =~ s{\# \s* \$Self->\{CheckMXRecord\} \s* = \s* 0;}{$ConfigInjectStr}xms;
         my $Success = $Self->WriteFile( $FrameworkDirectory . '/Kernel/Config.pm', $ConfigStr );
         if ( !$Success ) {
             return $Self->ExitCodeError();
         }
+    }
+
+    # Copy WebApp.conf file.
+    my $WebAppConfFile = $FrameworkDirectory . '/Kernel/WebApp.conf';
+    my $WebAppConfDistFile = $WebAppConfFile . '.dist';
+    if ( -e $WebAppConfDistFile ) {
+
+        $Self->Print("\n  <yellow>Editing and copying WebApp.conf...</yellow>\n");
+        $Self->System(
+            "sudo cp -p $WebAppConfDistFile $WebAppConfFile"
+        );
     }
 
     # Check apache config.
