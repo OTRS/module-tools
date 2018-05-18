@@ -87,12 +87,12 @@ sub PreRun {
     }
 
     if ( !-e $FrameworkDirectory . '/RELEASE' ) {
-        die "$FrameworkDirectory does not seam to be an OTRS framework directory";
+        die "$FrameworkDirectory does not seem to be an OTRS framework directory";
     }
 
     if ($FredDirectory) {
         if ( !-e $FredDirectory . '/Fred.sopm' ) {
-            die "$FrameworkDirectory does not seam to be a Fred module directory";
+            die "$FrameworkDirectory does not seem to be a Fred module directory";
         }
     }
 
@@ -146,6 +146,17 @@ sub Run {
     $DatabaseSystemName =~ s{-}{_}xmsg;     # replace - by _ (hyphens not allowed in database name)
     $DatabaseSystemName =~ s{\.}{_}xmsg;    # replace . by _ (hyphens not allowed in database name)
     $DatabaseSystemName = substr( $DatabaseSystemName, 0, 16 );    # shorten the string (mysql requirement)
+
+    # Copy WebApp.conf file.
+    my $WebAppConfFile = $FrameworkDirectory . '/Kernel/WebApp.conf';
+    my $WebAppConfDistFile = $WebAppConfFile . '.dist';
+    if ( -e $WebAppConfDistFile ) {
+
+        $Self->Print("\n  <yellow>Editing and copying WebApp.conf...</yellow>\n");
+        $Self->System(
+            "sudo cp -p $WebAppConfDistFile $WebAppConfFile"
+        );
+    }
 
     # Edit Config.pm.
     $Self->Print("\n  <yellow>Editing and copying Config.pm...</yellow>\n");
@@ -229,8 +240,8 @@ EOD
             print "    Overriding default configuration...\n    Done.\n";
         }
 
-        # Remove ScriptAlias and Frontend::WebPath for OTRS 7 and higher
-        if ( $OTRSMajorVersion >= 7 ) {
+        # Remove ScriptAlias and Frontend::WebPath for OTRS 7 and higher (only if WebAppConfDist file exists.)
+        if ( $OTRSMajorVersion >= 7 && -e $WebAppConfDistFile ) {
             $ConfigStr =~ s{ ^ .* 'ScriptAlias' .* $ }{}xm;
             $ConfigStr =~ s{ ^ .* 'Frontend::WebPath' .* $ }{}xm;
         }
@@ -240,17 +251,6 @@ EOD
         if ( !$Success ) {
             return $Self->ExitCodeError();
         }
-    }
-
-    # Copy WebApp.conf file.
-    my $WebAppConfFile = $FrameworkDirectory . '/Kernel/WebApp.conf';
-    my $WebAppConfDistFile = $WebAppConfFile . '.dist';
-    if ( -e $WebAppConfDistFile ) {
-
-        $Self->Print("\n  <yellow>Editing and copying WebApp.conf...</yellow>\n");
-        $Self->System(
-            "sudo cp -p $WebAppConfDistFile $WebAppConfFile"
-        );
     }
 
     # Check apache config.
