@@ -148,14 +148,19 @@ sub Run {
     $DatabaseSystemName = substr( $DatabaseSystemName, 0, 16 );    # shorten the string (mysql requirement)
 
     # Copy WebApp.conf file.
-    my $WebAppConfFile = $FrameworkDirectory . '/Kernel/WebApp.conf';
-    my $WebAppConfDistFile = $WebAppConfFile . '.dist';
+    my $WebAppConfFile     = $FrameworkDirectory . '/Kernel/WebApp.conf';
+    my $WebAppConfDistFile = $FrameworkDirectory . '/Kernel/WebApp.conf.dist';
     if ( -e $WebAppConfDistFile ) {
 
         $Self->Print("\n  <yellow>Editing and copying WebApp.conf...</yellow>\n");
-        $Self->System(
-            "sudo cp -p $WebAppConfDistFile $WebAppConfFile"
-        );
+
+        my $WebAppConfStr = $Self->ReadFile($WebAppConfDistFile);
+        $WebAppConfStr =~ s{(prefix_path \s+ => \s+ ') (.*) (',)}{$1/${SystemName}$3}xms;
+
+        my $Success = $Self->WriteFile( $WebAppConfFile, $WebAppConfStr );
+        if ( !$Success ) {
+            return $Self->ExitCodeError();
+        }
     }
 
     # Edit Config.pm.
@@ -240,13 +245,15 @@ EOD
             print "    Overriding default configuration...\n    Done.\n";
         }
 
-        # Remove ScriptAlias and Frontend::WebPath for OTRS 7 and higher (only if WebAppConfDist file exists.)
-        if ( $OTRSMajorVersion >= 7 && -e $WebAppConfDistFile ) {
-            $ConfigStr =~ s{ ^ .* 'ScriptAlias' .* $ }{}xm;
-            $ConfigStr =~ s{ ^ .* 'Frontend::WebPath' .* $ }{}xm;
+        $ConfigStr =~ s{\# \s* \$Self->\{CheckMXRecord\} \s* = \s* 0;}{$ConfigInjectStr}xms;
+
+        # Replace ScriptAlias and Frontend::WebPath for if WebAppConfDist file exists.
+        if ( -e $WebAppConfDistFile ) {
+
+            $ConfigStr =~ s{(\$Self->{'ScriptAlias'} \s+ = \s+ ') [^']+ (';)}{$1${SystemName}$2}xms;
+            $ConfigStr =~ s{(\$Self->{'Frontend::WebPath'} \s+ = \s+ ') [^']+ (';)}{$1/${SystemName}/htdocs/$2}xms;
         }
 
-        $ConfigStr =~ s{\# \s* \$Self->\{CheckMXRecord\} \s* = \s* 0;}{$ConfigInjectStr}xms;
         my $Success = $Self->WriteFile( $FrameworkDirectory . '/Kernel/Config.pm', $ConfigStr );
         if ( !$Success ) {
             return $Self->ExitCodeError();
@@ -267,7 +274,7 @@ EOD
 
     # Copy apache mod perl file.
     my $ApacheModPerlFile = "$Config{ApacheCFGDir}$SystemName.apache2-perl-startup.pl";
-    if ( -e $ApacheModPerlFile) {
+    if ( -e $ApacheModPerlFile ) {
         $Self->System(
             "sudo cp -p $FrameworkDirectory/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
         );
@@ -283,6 +290,25 @@ EOD
         $ApacheConfigStr =~ s{/otrs-web/}{/$SystemName-web/}xmsg;
         $ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perlOFF.c>}xmsg;
         $ApacheConfigStr =~ s{<Location \s+ /otrs>}{<Location /$SystemName>}xms;
+
+        if ( -e $WebAppConfDistFile ) {
+
+            my $ApacheConfigStrInject = <<"EOD";
+<Location /$SystemName/>
+    ProxyPass http://localhost:3000/
+    #ProxyPass http://localhost:8080/
+</Location>
+
+<Location /$SystemName/websocket>
+    ProxyPass ws://localhost:3000/websocket
+    #ProxyPass ws://localhost:8080/websocket
+</Location>
+
+EOD
+
+            $ApacheConfigStr
+                =~ s{ \A .* (\# \s+ The \s+ following \s+ modules \s+ must \s+ be \s+ loaded: .*) }{${ApacheConfigStrInject}$1}xms;
+        }
 
         my $Success = $Self->WriteFile( $ApacheConfigFile, $ApacheConfigStr );
         if ( !$Success ) {
@@ -446,6 +472,14 @@ EOD
         $Self->System(
             "sudo perl $FrameworkDirectory/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $FrameworkDirectory"
         );
+    }
+
+    if ( -e $WebAppConfDistFile ) {
+        $Self->Print("\n  <yellow>Installing npm dependencies...</yellow>\n");
+        $Self->System(
+            "cd $FrameworkDirectory && npm install"
+        );
+        $Self->Print("\n  <yellow>Start the webserver with bin/otrs.Console.pl Dev::Tools::WebServer</yellow>\n");
     }
 
     $Self->Print("\n<green>Done.</green>\n");
