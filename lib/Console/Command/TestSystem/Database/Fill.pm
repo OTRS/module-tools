@@ -414,31 +414,34 @@ sub Run {
     }
 
     # Add Dynamic Fields.
-    DYNAMICFIELD:
-    for my $DynamicField ( reverse @{ $Config{DynamicFields} } ) {
+    if ( @{ $Config{DynamicFields} } ) {
 
-        next DYNAMICFIELD if !$DynamicField;
-        next DYNAMICFIELD if !$DynamicField;
+        DYNAMICFIELD:
+        for my $DynamicField ( reverse @{ $Config{DynamicFields} } ) {
 
-        # Check if this dynamic field already exists.
-        my $DynamicFieldData = $CommonObject{DynamicFieldObject}->DynamicFieldGet(
-            Name => $DynamicField->{Name},
-        );
+            next DYNAMICFIELD if !$DynamicField;
+            next DYNAMICFIELD if !$DynamicField;
 
-        if ( $DynamicFieldData->{ID} ) {
-            $Self->Print("  Dynamic Field <red>$DynamicField->{Name}</red> already exists. Continue...\n");
-            next DYNAMICFIELD;
-        }
+            # Check if this dynamic field already exists.
+            my $DynamicFieldData = $CommonObject{DynamicFieldObject}->DynamicFieldGet(
+                Name => $DynamicField->{Name},
+            );
 
-        my $ID = $CommonObject{DynamicFieldObject}->DynamicFieldAdd(
-            %{$DynamicField},
-            Reorder => 1,
-            ValidID => 1,
-            UserID  => 1,
-        );
+            if ( $DynamicFieldData->{ID} ) {
+                $Self->Print("  Dynamic Field <red>$DynamicField->{Name}</red> already exists. Continue...\n");
+                next DYNAMICFIELD;
+            }
 
-        if ($ID) {
-            $Self->Print("  Dynamic Field $ID has been created.\n");
+            my $ID = $CommonObject{DynamicFieldObject}->DynamicFieldAdd(
+                %{$DynamicField},
+                Reorder => 1,
+                ValidID => 1,
+                UserID  => 1,
+            );
+
+            if ($ID) {
+                $Self->Print("  Dynamic Field $ID has been created.\n");
+            }
         }
     }
 
