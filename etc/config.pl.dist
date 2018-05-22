@@ -66,25 +66,26 @@ my $Config = {
 
 #         ConfigInject => <<'EOD'
 #
-#     \$Self->{'SecureMode'} = 1;
-#     \$Self->{'SystemID'}            = '54';
-#     \$Self->{'SessionName'}         = '$SystemName';
-#     \$Self->{'ProductName'}         = '$SystemName';
-#     \$Self->{'ScriptAlias'}         = '$SystemName/';
-#     \$Self->{'Frontend::WebPath'}   = '/$SystemName-web/';
-#     \$Self->{'CheckEmailAddresses'} = 0;
-#     \$Self->{'CheckMXRecord'}       = 0;
-#     \$Self->{'Organization'}        = '';
-#     \$Self->{'LogModule'}           = 'Kernel::System::Log::File';
-#     \$Self->{'LogModule::LogFile'}  = '$Config{EnvironmentRoot}$SystemName/var/log/otrs.log';
-#     \$Self->{'FQDN'}                = 'localhost';
-#     \$Self->{'DefaultLanguage'}     = 'de';
-#     \$Self->{'DefaultCharset'}      = 'utf-8';
-#     \$Self->{'AdminEmail'}          = 'root\@localhost';
-#     \$Self->{'Package::Timeout'}    = '120';
-#     \$Self->{'SendmailModule'}      =  'Kernel::System::Email::DoNotSendEmail';
-#     \$Self->{'SwitchToAgent'}       = 1;
-#     \$Self->{'SwitchToCustomer'}    = 1;
+#     \$Self->{'SecureMode'}                        = 1;
+#     \$Self->{'SystemID'}                          = '54';
+#     \$Self->{'SessionName'}                       = '$SystemName';
+#     \$Self->{'ProductName'}                       = '$SystemName';
+#     \$Self->{'ScriptAlias'}                       = '$SystemName/';
+#     \$Self->{'Frontend::WebPath'}                 = '/$SystemName-web/';
+#     \$Self->{'CheckEmailAddresses'}               = 0;
+#     \$Self->{'CheckMXRecord'}                     = 0;
+#     \$Self->{'Organization'}                      = '';
+#     \$Self->{'LogModule'}                         = 'Kernel::System::Log::File';
+#     \$Self->{'LogModule::LogFile'}                = '$Config{EnvironmentRoot}$SystemName/var/log/otrs.log';
+#     \$Self->{'FQDN'}                              = 'localhost';
+#     \$Self->{'DefaultLanguage'}                   = 'de';
+#     \$Self->{'DefaultCharset'}                    = 'utf-8';
+#     \$Self->{'AdminEmail'}                        = 'root\@localhost';
+#     \$Self->{'Package::Timeout'}                  = '120';
+#     \$Self->{'SendmailModule'}                    =  'Kernel::System::Email::DoNotSendEmail';
+#     \$Self->{'SwitchToAgent'}                     = 1;
+#     \$Self->{'SwitchToCustomer'}                  = 1;
+#     \$Self->{'Package::AllowNotVerifiedPackages'} = 1;
 #
 #     # Fred
 #     \$Self->{'Fred::BackgroundColor'} = '#006ea5';
