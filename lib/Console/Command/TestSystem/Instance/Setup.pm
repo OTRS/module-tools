@@ -250,7 +250,7 @@ EOD
         # Replace ScriptAlias and Frontend::WebPath for if WebAppConfDist file exists.
         if ( -e $WebAppConfDistFile ) {
 
-            $ConfigStr =~ s{(\$Self->\{'ScriptAlias'\} \s+ = \s+ ') [^']+ (';)}{$1${SystemName}$2}xms;
+            $ConfigStr =~ s{(\$Self->\{'ScriptAlias'\} \s+ = \s+ ') [^']+ (';)}{$1${SystemName}/otrs/$2}xms;
             $ConfigStr =~ s{(\$Self->\{'Frontend::WebPath'\} \s+ = \s+ ') [^']+ (';)}{$1/${SystemName}/htdocs/$2}xms;
         }
 
