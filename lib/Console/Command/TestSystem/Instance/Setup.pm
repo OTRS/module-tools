@@ -152,10 +152,9 @@ sub Run {
     my $WebAppConfDistFile = $FrameworkDirectory . '/Kernel/WebApp.conf.dist';
     if ( -e $WebAppConfDistFile ) {
 
-        $Self->Print("\n  <yellow>Editing and copying WebApp.conf...</yellow>\n");
+        $Self->Print("\n  <yellow>Copying WebApp.conf...</yellow>\n");
 
         my $WebAppConfStr = $Self->ReadFile($WebAppConfDistFile);
-        $WebAppConfStr =~ s{(prefix_path \s+ => \s+ ') (.*) (',)}{$1/${SystemName}$3}xms;
 
         my $Success = $Self->WriteFile( $WebAppConfFile, $WebAppConfStr );
         if ( !$Success ) {
@@ -247,113 +246,99 @@ EOD
 
         $ConfigStr =~ s{\# \s* \$Self->\{CheckMXRecord\} \s* = \s* 0;}{$ConfigInjectStr}xms;
 
-        # Replace ScriptAlias and Frontend::WebPath for if WebAppConfDist file exists.
+        # Comment out ScriptAlias and Frontend::WebPath so the default can be used.
         if ( -e $WebAppConfDistFile ) {
 
-            $ConfigStr =~ s{(\$Self->\{'ScriptAlias'\} \s+ = \s+ ') [^']+ (';)}{$1${SystemName}/otrs/$2}xms;
-            $ConfigStr =~ s{(\$Self->\{'Frontend::WebPath'\} \s+ = \s+ ') [^']+ (';)}{$1/${SystemName}/htdocs/$2}xms;
+            $ConfigStr =~ s{(\$Self->\{'ScriptAlias'\} \s+ = \s+ ') [^']+ (';)}{# $1${SystemName}/otrs/$2}xms;
+            $ConfigStr =~ s{(\$Self->\{'Frontend::WebPath'\} \s+ = \s+ ') [^']+ (';)}{# $1/${SystemName}/htdocs/$2}xms;
         }
 
         my $Success = $Self->WriteFile( $FrameworkDirectory . '/Kernel/Config.pm', $ConfigStr );
+
         if ( !$Success ) {
             return $Self->ExitCodeError();
         }
     }
 
-    # Check apache config.
-    if ( !-e $FrameworkDirectory . '/scripts/apache2-httpd.include.conf' ) {
-        $Self->PrintError("/scripts/apache2-httpd.include.conf cannot be opened\n");
-        return $Self->ExitCodeError();
-    }
+    # Only for OTRS < 7
+    if ( !-e $WebAppConfDistFile ) {
 
-    # Copy apache config file.
-    my $ApacheConfigFile = "$Config{ApacheCFGDir}$SystemName.conf";
-    $Self->System(
-        "sudo cp -p $FrameworkDirectory/scripts/apache2-httpd.include.conf $ApacheConfigFile"
-    );
+        # Check apache config.
+        if ( !-e $FrameworkDirectory . '/scripts/apache2-httpd.include.conf' ) {
+            $Self->PrintError("/scripts/apache2-httpd.include.conf cannot be opened\n");
+            return $Self->ExitCodeError();
+        }
 
-    # Copy apache mod perl file.
-    my $ApacheModPerlFile = "$Config{ApacheCFGDir}$SystemName.apache2-perl-startup.pl";
-    if ( -e $ApacheModPerlFile ) {
+        # Copy apache config file.
+        my $ApacheConfigFile = "$Config{ApacheCFGDir}$SystemName.conf";
         $Self->System(
-            "sudo cp -p $FrameworkDirectory/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
+            "sudo cp -p $FrameworkDirectory/scripts/apache2-httpd.include.conf $ApacheConfigFile"
         );
-    }
 
-    $Self->Print("\n  <yellow>Editing Apache config...</yellow>\n");
-    {
-        my $ApacheConfigStr = $Self->ReadFile($ApacheConfigFile);
-        $ApacheConfigStr
-            =~ s{Perlrequire \s+ /opt/otrs/scripts/apache2-perl-startup\.pl}{Perlrequire $ApacheModPerlFile}xms;
-        $ApacheConfigStr =~ s{/opt/otrs}{$FrameworkDirectory}xmsg;
-        $ApacheConfigStr =~ s{/otrs/}{/$SystemName/}xmsg;
-        $ApacheConfigStr =~ s{/otrs-web/}{/$SystemName-web/}xmsg;
-        $ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perlOFF.c>}xmsg;
-        $ApacheConfigStr =~ s{<Location \s+ /otrs>}{<Location /$SystemName>}xms;
+        # Copy apache mod perl file.
+        my $ApacheModPerlFile = "$Config{ApacheCFGDir}$SystemName.apache2-perl-startup.pl";
+        if ( -e $ApacheModPerlFile ) {
+            $Self->System(
+                "sudo cp -p $FrameworkDirectory/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
+            );
+        }
 
-        if ( -e $WebAppConfDistFile ) {
-
-            my $ApacheConfigStrInject = <<"EOD";
-<Location /$SystemName/>
-    ProxyPass http://localhost:3000/
-    #ProxyPass http://localhost:8080/
-</Location>
-
-<Location /$SystemName/websocket>
-    ProxyPass ws://localhost:3000/websocket
-    #ProxyPass ws://localhost:8080/websocket
-</Location>
-
-EOD
-
+        $Self->Print("\n  <yellow>Editing Apache config...</yellow>\n");
+        {
+            my $ApacheConfigStr = $Self->ReadFile($ApacheConfigFile);
             $ApacheConfigStr
-                =~ s{ \A .* (\# \s+ The \s+ following \s+ modules \s+ must \s+ be \s+ loaded: .*) }{${ApacheConfigStrInject}$1}xms;
+                =~ s{Perlrequire \s+ /opt/otrs/scripts/apache2-perl-startup\.pl}{Perlrequire $ApacheModPerlFile}xms;
+            $ApacheConfigStr =~ s{/opt/otrs}{$FrameworkDirectory}xmsg;
+            $ApacheConfigStr =~ s{/otrs/}{/$SystemName/}xmsg;
+            $ApacheConfigStr =~ s{/otrs-web/}{/$SystemName-web/}xmsg;
+            $ApacheConfigStr =~ s{<IfModule \s* mod_perl.c>}{<IfModule mod_perlOFF.c>}xmsg;
+            $ApacheConfigStr =~ s{<Location \s+ /otrs>}{<Location /$SystemName>}xms;
+
+            my $Success = $Self->WriteFile( $ApacheConfigFile, $ApacheConfigStr );
+            if ( !$Success ) {
+                return $Self->ExitCodeError();
+            }
         }
 
-        my $Success = $Self->WriteFile( $ApacheConfigFile, $ApacheConfigStr );
-        if ( !$Success ) {
-            return $Self->ExitCodeError();
+        $Self->Print("\n  <yellow>Editing Apache mod perl config...</yellow>\n");
+
+        if ( -e $ApacheModPerlFile ) {
+
+            my $ApacheModPerlConfigStr = $Self->ReadFile($ApacheModPerlFile);
+
+            # Set correct path.
+            $ApacheModPerlConfigStr =~ s{/opt/otrs}{$FrameworkDirectory}xmsg;
+
+            # Enable lines for MySQL.
+            if ( $DatabaseType eq 'Mysql' ) {
+                $ApacheModPerlConfigStr =~ s{^#(use DBD::mysql \(\);)$}{$1}msg;
+                $ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::mysql;)$}{$1}msg;
+            }
+
+            # Enable lines for PostgreSQL.
+            elsif ( $DatabaseType eq 'Postgresql' ) {
+                $ApacheModPerlConfigStr =~ s{^#(use DBD::Pg \(\);)$}{$1}msg;
+                $ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::postgresql;)$}{$1}msg;
+            }
+
+            # Enable lines for Oracle.
+            elsif ( $DatabaseType eq 'Oracle' ) {
+                $ApacheModPerlConfigStr
+                    =~ s{^(\$ENV\{MOD_PERL\}.*?;)$}{$1\n\n\$ENV{ORACLE_HOME}     = "/u01/app/oracle/product/11.2.0/xe";\n\$ENV{NLS_DATE_FORMAT} = "YYYY-MM-DD HH24:MI:SS";\n\$ENV{NLS_LANG}        = "AMERICAN_AMERICA.AL32UTF8";}msg;
+                $ApacheModPerlConfigStr =~ s{^#(use DBD::Oracle \(\);)$}{$1}msg;
+                $ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::oracle;)$}{$1}msg;
+            }
+
+            my $Success = $Self->WriteFile( $ApacheModPerlFile, $ApacheModPerlConfigStr );
+            if ( !$Success ) {
+                return $Self->ExitCodeError();
+            }
         }
+
+        # Restart apache.
+        $Self->Print("\n  <yellow>Restarting apache...</yellow>\n");
+        $Self->System("sudo $Config{ApacheRestartCommand}");
     }
-
-    $Self->Print("\n  <yellow>Editing Apache mod perl config...</yellow>\n");
-
-    if ( -e $ApacheModPerlFile ) {
-
-        my $ApacheModPerlConfigStr = $Self->ReadFile($ApacheModPerlFile);
-
-        # Set correct path.
-        $ApacheModPerlConfigStr =~ s{/opt/otrs}{$FrameworkDirectory}xmsg;
-
-        # Enable lines for MySQL.
-        if ( $DatabaseType eq 'Mysql' ) {
-            $ApacheModPerlConfigStr =~ s{^#(use DBD::mysql \(\);)$}{$1}msg;
-            $ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::mysql;)$}{$1}msg;
-        }
-
-        # Enable lines for PostgreSQL.
-        elsif ( $DatabaseType eq 'Postgresql' ) {
-            $ApacheModPerlConfigStr =~ s{^#(use DBD::Pg \(\);)$}{$1}msg;
-            $ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::postgresql;)$}{$1}msg;
-        }
-
-        # Enable lines for Oracle.
-        elsif ( $DatabaseType eq 'Oracle' ) {
-            $ApacheModPerlConfigStr
-                =~ s{^(\$ENV\{MOD_PERL\}.*?;)$}{$1\n\n\$ENV{ORACLE_HOME}     = "/u01/app/oracle/product/11.2.0/xe";\n\$ENV{NLS_DATE_FORMAT} = "YYYY-MM-DD HH24:MI:SS";\n\$ENV{NLS_LANG}        = "AMERICAN_AMERICA.AL32UTF8";}msg;
-            $ApacheModPerlConfigStr =~ s{^#(use DBD::Oracle \(\);)$}{$1}msg;
-            $ApacheModPerlConfigStr =~ s{^#(use Kernel::System::DB::oracle;)$}{$1}msg;
-        }
-
-        my $Success = $Self->WriteFile( $ApacheModPerlFile, $ApacheModPerlConfigStr );
-        if ( !$Success ) {
-            return $Self->ExitCodeError();
-        }
-    }
-
-    # Restart apache.
-    $Self->Print("\n  <yellow>Restarting apache...</yellow>\n");
-    $Self->System("sudo $Config{ApacheRestartCommand}");
 
     my $DSN;
     my @DBIParam;
@@ -479,7 +464,9 @@ EOD
         $Self->System(
             "cd $FrameworkDirectory && npm install"
         );
-        $Self->Print("\n  <yellow>Start the webserver with bin/otrs.Console.pl Dev::Tools::WebServer</yellow>\n");
+        $Self->Print("\n  <yellow>Start the development webserver with bin/otrs.Console.pl Dev::Tools::WebServer</yellow>\n");
+        $Self->Print("\n  <yellow>You can access the external interface with http://localhost:3001/external</yellow>\n");
+        $Self->Print("\n  <yellow>You can access the agent interface with http://localhost:3000/otrs/index.pl</yellow>\n");
     }
 
     $Self->Print("\n<green>Done.</green>\n");
