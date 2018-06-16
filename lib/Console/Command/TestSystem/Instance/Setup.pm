@@ -464,9 +464,12 @@ EOD
         $Self->System(
             "cd $FrameworkDirectory && npm install"
         );
-        $Self->Print("\n  <yellow>Start the development webserver with bin/otrs.Console.pl Dev::Tools::WebServer</yellow>\n");
-        $Self->Print("\n  <yellow>You can access the external interface with http://localhost:3001/external</yellow>\n");
-        $Self->Print("\n  <yellow>You can access the agent interface with http://localhost:3000/otrs/index.pl</yellow>\n");
+        $Self->Print(
+            "\n  <yellow>Start the development webserver with bin/otrs.Console.pl Dev::Tools::WebServer</yellow>\n");
+        $Self->Print(
+            "\n  <yellow>You can access the external interface with http://localhost:3001/external</yellow>\n");
+        $Self->Print(
+            "\n  <yellow>You can access the agent interface with http://localhost:3000/otrs/index.pl</yellow>\n");
     }
 
     $Self->Print("\n<green>Done.</green>\n");
