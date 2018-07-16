@@ -133,7 +133,7 @@ sub Run {
         $Self->Print("    Parsed file: <yellow>$FileName</yellow>\n");
     }
 
-    # Convert OTRS SysConfig settings into Docbook friendly format.
+    # Convert OTRS system configuration settings into Docbook friendly format.
     $Self->Print("\n  Formating settings...");
 
     my @FormatedSettings = $Self->_FormatSettings(
@@ -396,7 +396,7 @@ sub _FormatSettings {
 
             if ( $Param{ConfigVersion} == 1 ) {
                 push @ConvertedSettings, {
-                    title => $Setting->{Name} . ".",
+                    title => $Setting->{Name},
                     para  => [
                         "Group: $Setting->{Group}, Subgroup: $Setting->{SubGroup}.",
                         $DescriptionContent,
@@ -405,7 +405,7 @@ sub _FormatSettings {
             }
             else {
                 push @ConvertedSettings, {
-                    title => $Setting->{Name} . ".",
+                    title => $Setting->{Name},
                     para  => [
                         "Navigation: $Setting->{Navigation}.",
                         $DescriptionContent,
@@ -427,7 +427,7 @@ sub _CreateDocbookConfigChapter {
         chapter => {
             title => 'Configuration',
             para =>
-                'The package can be configured via the SysConfig in the Admin Interface. The following configuration options are available:',
+                'The package can be configured via the System Configuration in the Admin Interface. The following configuration options are available:',
             section => $Param{FormatedSettings} // [],
         },
     );

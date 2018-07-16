@@ -233,7 +233,7 @@ sub _FormatFiles {
         }
 
         push @ProcessedFiles, {
-            title => "$File.",
+            title => $File,
             para  => [
                 "$Type: $DescriptionContent",
             ],
