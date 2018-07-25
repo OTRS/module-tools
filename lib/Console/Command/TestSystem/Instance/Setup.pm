@@ -195,8 +195,10 @@ sub Run {
         \$Self->{'SystemID'}            = '54';
         \$Self->{'SessionName'}         = '$SystemName';
         \$Self->{'ProductName'}         = '$SystemName';
+
         \$Self->{'ScriptAlias'}         = '$SystemName/';
         \$Self->{'Frontend::WebPath'}   = '/$SystemName-web/';
+
         \$Self->{'CheckEmailAddresses'} = 0;
         \$Self->{'CheckMXRecord'}       = 0;
         \$Self->{'Organization'}        = '';
