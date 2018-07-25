@@ -303,7 +303,7 @@ my $Config = {
                     LinkPreview     => '',
                     YearsInFuture   => '5',
                     YearsInPast     => '5',
-                    YearsPeriod => '0',
+                    YearsPeriod     => '0',
                 },
             },
             {
@@ -320,7 +320,7 @@ my $Config = {
                     LinkPreview     => '',
                     YearsInFuture   => '5',
                     YearsInPast     => '5',
-                    YearsPeriod => '0',
+                    YearsPeriod     => '0',
                 },
             },
         ],
