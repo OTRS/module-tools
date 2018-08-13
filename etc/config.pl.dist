@@ -97,6 +97,9 @@ my $Config = {
 #     \$Self->{'Loader::Enabled::CSS'}  = 0;
 #     \$Self->{'Loader::Enabled::JS'}   = 0;
 #
+#     # Activate this setting for OTRS 7 and higher
+#     #\$Self->{'TestHTTPHostname'} = 'localhost:3001';
+
 #     # Selenium
 #     \$Self->{'SeleniumTestsConfig'} = {
 #         remote_server_addr  => '192.168.56.1',
