@@ -6,9 +6,6 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
-## nofilter(TidyAll::Plugin::OTRS::Perl::ObjectDependencies)
-
 package Console::Command::TestSystem::Instance::Setup;
 
 use strict;
@@ -23,10 +20,6 @@ use Console::Command::Module::File::Link;
 use Console::Command::TestSystem::Database::Install;
 use Console::Command::TestSystem::Database::Fill;
 
-eval {
-    require Kernel::System::DB;
-};
-
 use parent qw(Console::BaseCommand);
 
 =head1 NAME
@@ -39,7 +32,6 @@ Configure settings, Database and Apache of a testing otrs instance
 
 =cut
 
-## nofilter(TidyAll::Plugin::OTRS::Perl::ObjectManagerCreation)
 sub Configure {
     my ( $Self, %Param ) = @_;
 
@@ -203,8 +195,10 @@ sub Run {
         \$Self->{'SystemID'}            = '54';
         \$Self->{'SessionName'}         = '$SystemName';
         \$Self->{'ProductName'}         = '$SystemName';
+
         \$Self->{'ScriptAlias'}         = '$SystemName/';
         \$Self->{'Frontend::WebPath'}   = '/$SystemName-web/';
+
         \$Self->{'CheckEmailAddresses'} = 0;
         \$Self->{'CheckMXRecord'}       = 0;
         \$Self->{'Organization'}        = '';
@@ -391,36 +385,8 @@ EOD
     $Self->Print("\n  <yellow>Creating database user and privileges...\n</yellow>");
     {
         if ( $DatabaseType eq 'Mysql' ) {
-
-            local $Kernel::OM;
-            if ( eval 'require Kernel::System::ObjectManager' ) {    ## no critic
-
-                # Create object manager.
-                $Kernel::OM = Kernel::System::ObjectManager->new(
-                    'Kernel::System::Log' => {
-                        LogPrefix => 'OTRS-TestSystem::Instance::Setup',
-                    },
-                );
-            }
-            my $Version = $Kernel::OM->Get('Kernel::System::DB')->Version();
-
-            $DBH->do("DROP USER IF EXISTS $DatabaseSystemName\@localhost");
-            if ( $Version =~ /^MySQL (\d{1,3})\.(\d{1,3}).*/ && $1 >= 8 ) {
-
-          # Special handling for MySQL 8, as the default caching_sha2_password can only be used over secure connections.
-          # Older mysql versions don't support IDENTIFIED WITH ... yet.
-                $DBH->do(
-                    "CREATE USER $DatabaseSystemName\@localhost IDENTIFIED WITH mysql_native_password BY '$DatabaseSystemName';"
-                );
-            }
-            else {
-                $DBH->do(
-                    "CREATE USER $DatabaseSystemName\@localhost IDENTIFIED BY '$DatabaseSystemName';"
-                );
-            }
-
             $DBH->do(
-                "GRANT ALL PRIVILEGES ON $DatabaseSystemName.* TO $DatabaseSystemName\@localhost;"
+                "GRANT ALL PRIVILEGES ON $DatabaseSystemName.* TO $DatabaseSystemName\@localhost IDENTIFIED BY '$DatabaseSystemName' WITH GRANT OPTION;"
             );
             $DBH->do('FLUSH PRIVILEGES');
         }
