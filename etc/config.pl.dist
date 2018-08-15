@@ -103,17 +103,20 @@ my $Config = {
 #     # DocumentSearch pefix for OTRS 7 and higher
 #     \$Self->{'DocumentSearch::IndexPrefix'} = '$SystemName-documentsearch';
 #
-#     # Selenium
+#     # Add Selenium config
 #     \$Self->{'SeleniumTestsConfig'} = {
-#         remote_server_addr  => '192.168.56.1',
-#         port                => '8901',
-#         browser_name        => 'firefox',
+#         remote_server_addr  => 'localhost',
+#         port                => '4444',
+#         browser_name        => 'chrome',
 #         platform            => 'ANY',
-#         extra_capabilities  => {
-#             marionette => \0,
+#         extra_capabilities => {
+#             chromeOptions => {
+#                 # disable-infobars makes sure window size calculations are ok
+#                 args => [ "disable-infobars" ],
+#             },
 #         },
-#         # window_height => 1200,    # optional, default 1000
-#         # window_width  => 1600,    # optional, default 1200
+#         # window_height       => 1200,
+#         # window_width        => 1600,
 #     };
 #
 #    \$Self->{TestDatabase} = {
