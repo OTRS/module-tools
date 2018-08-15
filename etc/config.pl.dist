@@ -99,7 +99,10 @@ my $Config = {
 #
 #     # Activate this setting for OTRS 7 and higher
 #     #\$Self->{'TestHTTPHostname'} = 'localhost:3001';
-
+#
+#     # DocumentSearch pefix for OTRS 7 and higher
+#     \$Self->{'DocumentSearch::IndexPrefix'} = '$SystemName-documentsearch';
+#
 #     # Selenium
 #     \$Self->{'SeleniumTestsConfig'} = {
 #         remote_server_addr  => '192.168.56.1',
