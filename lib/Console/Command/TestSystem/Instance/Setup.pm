@@ -407,8 +407,8 @@ EOD
             $DBH->do("DROP USER IF EXISTS $DatabaseSystemName\@localhost");
             if ( $Version =~ /^MySQL (\d{1,3})\.(\d{1,3}).*/ && $1 >= 8 ) {
 
-          # Special handling for MySQL 8, as the default caching_sha2_password can only be used over secure connections.
-          # Older mysql versions don't support IDENTIFIED WITH ... yet.
+                # Special handling for MySQL 8, as the default caching_sha2_password can only be used
+                # over secure connections. Older mysql versions don't support IDENTIFIED WITH ... yet.
                 $DBH->do(
                     "CREATE USER $DatabaseSystemName\@localhost IDENTIFIED WITH mysql_native_password BY '$DatabaseSystemName';"
                 );
