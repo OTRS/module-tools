@@ -195,10 +195,8 @@ sub Run {
         \$Self->{'SystemID'}            = '54';
         \$Self->{'SessionName'}         = '$SystemName';
         \$Self->{'ProductName'}         = '$SystemName';
-
         \$Self->{'ScriptAlias'}         = '$SystemName/';
         \$Self->{'Frontend::WebPath'}   = '/$SystemName-web/';
-
         \$Self->{'CheckEmailAddresses'} = 0;
         \$Self->{'CheckMXRecord'}       = 0;
         \$Self->{'Organization'}        = '';
@@ -385,8 +383,31 @@ EOD
     $Self->Print("\n  <yellow>Creating database user and privileges...\n</yellow>");
     {
         if ( $DatabaseType eq 'Mysql' ) {
+
+            # Get MySQL version to avoid issues with MySQL 8.
+            my $SQL = $DBH->prepare( "SELECT CONCAT( IF (INSTR( VERSION(),'MariaDB'),'MariaDB ','MySQL '), SUBSTRING_INDEX(VERSION(),'-',1))" );
+            my $Res = $SQL->execute;
+
+            my @Row = $SQL->fetchrow_array;
+
+            my $Version = $Row[0];
+
+            # Special handling for MySQL 8, as the default caching_sha2_password can only be used
+            # over secure connections. Older mysql versions don't support IDENTIFIED WITH ... yet.
+            $DBH->do("DROP USER IF EXISTS $DatabaseSystemName\@localhost");
+            if ( $Version =~ /^MySQL (\d{1,3})\.(\d{1,3}).*/ && $1 >= 8 ) {
+                $DBH->do(
+                    "CREATE USER $DatabaseSystemName\@localhost IDENTIFIED WITH mysql_native_password BY '$DatabaseSystemName';"
+                );
+            }
+            else {
+                $DBH->do(
+                    "CREATE USER $DatabaseSystemName\@localhost IDENTIFIED BY '$DatabaseSystemName';"
+                );
+            }
+
             $DBH->do(
-                "GRANT ALL PRIVILEGES ON $DatabaseSystemName.* TO $DatabaseSystemName\@localhost IDENTIFIED BY '$DatabaseSystemName' WITH GRANT OPTION;"
+                "GRANT ALL PRIVILEGES ON $DatabaseSystemName.* TO $DatabaseSystemName\@localhost;"
             );
             $DBH->do('FLUSH PRIVILEGES');
         }
