@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Console::Command::TestSystem::Instance::Setup;
@@ -385,10 +385,13 @@ EOD
         if ( $DatabaseType eq 'Mysql' ) {
 
             # Get MySQL version to avoid issues with MySQL 8.
-            my $SQL = $DBH->prepare( "SELECT CONCAT( IF (INSTR( VERSION(),'MariaDB'),'MariaDB ','MySQL '), SUBSTRING_INDEX(VERSION(),'-',1))" );
-            my $Res = $SQL->execute;
+            my $SQL
+                = $DBH->prepare(
+                "SELECT CONCAT( IF (INSTR( VERSION(),'MariaDB'),'MariaDB ','MySQL '), SUBSTRING_INDEX(VERSION(),'-',1))"
+                );
+            my $Res = $SQL->execute();
 
-            my @Row = $SQL->fetchrow_array;
+            my @Row = $SQL->fetchrow_array();
 
             my $Version = $Row[0];
 
