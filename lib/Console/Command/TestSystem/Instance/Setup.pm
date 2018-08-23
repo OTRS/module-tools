@@ -385,10 +385,9 @@ EOD
         if ( $DatabaseType eq 'Mysql' ) {
 
             # Get MySQL version to avoid issues with MySQL 8.
-            my $SQL
-                = $DBH->prepare(
+            my $SQL = $DBH->prepare(
                 "SELECT CONCAT( IF (INSTR( VERSION(),'MariaDB'),'MariaDB ','MySQL '), SUBSTRING_INDEX(VERSION(),'-',1))"
-                );
+            );
             my $Res = $SQL->execute();
 
             my @Row = $SQL->fetchrow_array();
