@@ -487,7 +487,7 @@ EOD
     if ( -e $WebAppConfDistFile ) {
         $Self->Print("\n  <yellow>Installing npm dependencies...</yellow>\n");
         $Self->System(
-            "cd $FrameworkDirectory && npm install"
+            "cd $FrameworkDirectory && npm install --no-save"
         );
         $Self->Print(
             "\n  <yellow>Start the development webserver with bin/otrs.Console.pl Dev::Tools::WebServer</yellow>\n"
