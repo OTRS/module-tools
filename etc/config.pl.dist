@@ -22,6 +22,8 @@ use strict;
 use warnings;
 use utf8;
 
+##nofilter(TidyAll::Plugin::OTRS::Legal::LicenseValidator)
+
 my $Config = {
 
     # settings used by TestSystem::Instance::Setup and TestSystem::Database::Fill.
