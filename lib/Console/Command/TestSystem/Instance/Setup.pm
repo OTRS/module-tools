@@ -244,13 +244,17 @@ EOD
             print "    Overriding default configuration...\n    Done.\n";
         }
 
-        $ConfigStr =~ s{\# \s* \$Self->\{CheckMXRecord\} \s* = \s* 0;}{$ConfigInjectStr}xms;
-
-        # Comment out ScriptAlias and Frontend::WebPath so the default can be used.
+        # Insert config overrides in the designated area of the file.
+        #   Special handling for OTRS 7+ style configuration file which lacks some defaults.
         if ( -e $WebAppConfDistFile ) {
+            $ConfigStr =~ s{(\# [ ] [-]{52} [ ] \# \s* \# [ ] [-]{52} [ ] \# \s)}{$1$ConfigInjectStr}xms;
 
+            # Comment out ScriptAlias and Frontend::WebPath so the default can be used.
             $ConfigStr =~ s{(\$Self->\{'ScriptAlias'\} \s+ = \s+ ') [^']+ (';)}{# $1${SystemName}/otrs/$2}xms;
             $ConfigStr =~ s{(\$Self->\{'Frontend::WebPath'\} \s+ = \s+ ') [^']+ (';)}{# $1/${SystemName}/htdocs/$2}xms;
+        }
+        else {
+            $ConfigStr =~ s{\# \s* \$Self->\{CheckMXRecord\} \s* = \s* 0;}{$ConfigInjectStr}xms;
         }
 
         my $Success = $Self->WriteFile( $FrameworkDirectory . '/Kernel/Config.pm', $ConfigStr );
