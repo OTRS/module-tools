@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Console::Command::Git::Directory::Update;
+package Console::Command::Git::Directory::Tidy;
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ use parent qw(Console::BaseCommand Console::BaseDirectory);
 
 =head1 NAME
 
-Console::Command::Git::Directory::Update - Console command to update git directories
+Console::Command::Git::Directory::Tidy - Console command to update git directories
 
 =head1 DESCRIPTION
 
@@ -26,21 +26,7 @@ Pulls and optimize git directories
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Update defined git repositories.');
-    $Self->AddOption(
-        Name        => 'optimize',
-        Description => "Performs a git cleanup on directories.",
-        Required    => 0,
-        HasValue    => 0,
-        ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
-        Name        => 'pull-only',
-        Description => "Only performs a git pull on directories.",
-        Required    => 0,
-        HasValue    => 0,
-        ValueRegex  => qr/.*/smx,
-    );
+    $Self->Description('Tidy git repositories.');
     $Self->AddOption(
         Name        => 'all',
         Description => "Include additional directories and aliases defined in /etc/config.pl.",
@@ -55,7 +41,6 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
-
     $Self->AddOption(
         Name        => 'directory-alias',
         Description => "Specify a directory alias to update.",
@@ -71,17 +56,13 @@ sub Configure {
 sub PreRun {
     my ($Self) = @_;
 
-    if ( $Self->GetOption('optimize') && $Self->GetOption('pull-only') ) {
-        die "Could not use optimize and pull-only at the same time!\n\n";
-    }
-
     return;
 }
 
 sub Run {
     my ($Self) = @_;
 
-    $Self->Print("\n<yellow>Updating git directories...</yellow>\n");
+    $Self->Print("\n<yellow>Tidying git directories...</yellow>\n");
 
     my %Config = %{ $Self->{Config}->{DevelDir} || {} };
 
@@ -113,75 +94,48 @@ sub Run {
         GitDirsModified      => \@GitDirsModified,
     );
 
-    my @GitDirsUpdated;
+    my @GitDirsTidied;
+    my @GitDirsTidyProblems;
 
-    my $SummaryComment = '';
-
-    # Update clean directories.
+    # Tidy clean directories.
     DIRECTORY:
     for my $Directory ( sort @GitDirsClean ) {
 
         next DIRECTORY if !$Directory;
         next DIRECTORY if !-d $Directory;
 
-        my $GitRemoteOutput = `cd $Directory && git remote`;
+        $Self->Print("  Tidying clean directory <yellow>$Directory</yellow>\n");
 
-        next DIRECTORY if !$GitRemoteOutput;
+        my $TidyOutput = `cd $Directory && $Config{CodePolicyTidyCommand}`;
 
-        $Self->Print("  Updating clean directory <yellow>$Directory</yellow>\n");
-
-        my $GitUpdateOutput;
-
-        if ( $Self->GetOption('pull-only') ) {
-            $GitUpdateOutput = `cd $Directory && git pull`;
-            $SummaryComment  = 'in pull only mode';
+        if ( $TidyOutput =~ m{ \Qdid not pass tidyall check\E }xms ) {
+            push @GitDirsTidyProblems, $Directory;
         }
-        else {
-            $GitUpdateOutput = `cd $Directory && git pull && git remote prune origin`;
-
-            next DIRECTORY if $GitUpdateOutput =~ m{ \QAlready up-to-date.\E }xms;
-
-            COUNT:
-            for my $Count ( 1 .. 10 ) {
-
-                my $GitPullOutput = `cd $Directory && git pull`;
-
-                next COUNT if $GitPullOutput !~ m{ \QAlready up-to-date.\E }xms;
-
-                push @GitDirsUpdated, $Directory;
-
-                last COUNT;
-            }
-
-            # Cleanup local git repository.
-            if ( $Self->GetOption('optimize') ) {
-                my $GitGcOutput    = `cd $Directory && git gc > /dev/null 2>&1`;
-                my $SummaryComment = 'in optimize mode';
-            }
+        elsif ( $TidyOutput =~ m{ \Q[tidied]\E }xms ) {
+            push @GitDirsTidied, $Directory;
         }
-    }
-
-    # Register OTRS code policy.
-    DIRECTORY:
-    for my $Directory (@CodePolicyDirectoryList) {
-
-        next DIRECTORY if !$Directory;
-        next DIRECTORY if !-d $Directory;
-
-        my $CodePolicyRegisterOutput = `cd $Directory && $Config{CodePolicyRegisterCommand}`;
     }
 
     my $InspectedDirectories = scalar @GitDirectoryList;
 
     $Self->Print("\n  <yellow>Summary</yellow>\n");
-    $Self->Print("    $InspectedDirectories directories inspected $SummaryComment\n");
+    $Self->Print("    $InspectedDirectories directories inspected\n");
 
-    if (@GitDirsUpdated) {
+    if (@GitDirsTidied) {
 
-        $Self->Print("\n    <yellow>Updated directories:</yellow>\n");
+        $Self->Print("\n    <yellow>Tidied directories:</yellow>\n");
 
-        for my $Dir ( sort @GitDirsUpdated ) {
+        for my $Dir ( sort @GitDirsTidied ) {
             $Self->Print("       $Dir\n");
+        }
+    }
+
+    if (@GitDirsTidyProblems) {
+
+        $Self->Print("\n    <yellow>Tidy problem directories:</yellow>\n");
+
+        for my $Dir ( sort @GitDirsTidyProblems ) {
+            print STDOUT "   $Dir\n";
         }
     }
 

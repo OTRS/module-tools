@@ -349,6 +349,16 @@ my $Config = {
             #    '/path/to/ignore/',
         ],
         CodePolicyRegisterCommand => '/path/to/your/OTRSCodePolicy/scripts/install-git-hooks.pl',
+        CodePolicyTidyCommand     => 'perl /path/to/your/OTRSCodePolicy/bin/otrs.CodePolicy.pl --all',
+
+        DirectoryAlias => {
+            AliasName => [
+                '/path/to/your/OTRSCodePolicy/',
+                # ...
+            ],
+            # ...
+        },
+
     },
 
     # Bugzilla settings
