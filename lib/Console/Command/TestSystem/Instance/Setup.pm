@@ -245,9 +245,9 @@ EOD
         }
 
         # Insert config overrides in the designated area of the file.
-        #   Special handling for OTRS 7+ style configuration file which lacks some defaults.
+        #   Special handling for OTRS 7+ style configuration file which has been cleaned up.
         if ( -e $WebAppConfDistFile ) {
-            $ConfigStr =~ s{(\# [ ] [-]{52} [ ] \# \s* \# [ ] [-]{52} [ ] \# \s)}{$1$ConfigInjectStr}xms;
+            $ConfigStr =~ s{( \s+ return [ ] 1; \s \} )}{$ConfigInjectStr$1}xms;
 
             # Comment out ScriptAlias and Frontend::WebPath so the default can be used.
             $ConfigStr =~ s{(\$Self->\{'ScriptAlias'\} \s+ = \s+ ') [^']+ (';)}{# $1${SystemName}/otrs/$2}xms;
