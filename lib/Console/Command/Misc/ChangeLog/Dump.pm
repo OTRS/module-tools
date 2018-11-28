@@ -35,6 +35,13 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
 
+    $Self->AddArgument(
+        Name        => 'version',
+        Description => "Specify specific version section in the change log.",
+        Required    => 0,
+        ValueRegex  => qr/\d+\.\d+\.\d+(?:\.\w+\d)?/smx,
+    );
+
     return;
 }
 
@@ -71,9 +78,19 @@ sub Run {
     # Only current section.
     my $Section;
 
+    my @Version = split /\./, ( $Self->GetArgument('version') || '' );
+
+    my $SelectedSection = '\d+ \. \d+ \.';
+    if (@Version) {
+        $SelectedSection = join "\\.", @Version;
+        $SelectedSection .= ' [ ]';
+    }
+
     # Format in new style, markdown.
     if ( $Content =~ m{\A\#\d} ) {
-        ($Section) = $Content =~ m{ ( ^ \# \d+ \. \d+ \. .*? ) ^ \# \d+ \. \d+ \. }smx;
+        ($Section) = $Content =~ m{ ( ^ \# $SelectedSection .*? ) ^ \# \d+ \. \d+ \. }smx;
+
+        $Section //= '';
 
         # Generate wiki-style list, cut out dates.
         $Section =~ s{ ^ [ ] - [ ] \d{4}-\d{2}-\d{2} [ ] }{   * }smxg;
@@ -85,7 +102,9 @@ sub Run {
 
     # Format in old style.
     else {
-        ($Section) = $Content =~ m{ ( ^ \d+ \. \d+ \. .*? ) ^ \d+ \. \d+ \. }smx;
+        ($Section) = $Content =~ m{ ( ^ $SelectedSection .*? ) ^ \d+ \. \d+ \. }smx;
+
+        $Section //= '';
 
         # Generate wiki-style list, cut out dates.
         $Section =~ s{ ^ [ ] - [ ] \d{4}-\d{2}-\d{2} [ ] }{   * }smxg;
