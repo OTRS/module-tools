@@ -99,7 +99,7 @@ sub Run {
     my $ModuleVersionFile2MD5;
     my $ModuleDirectory = $Self->GetOption('module-directory');
     if ($ModuleDirectory) {
-        $ModuleDirectory = File::Spec->rel2abs($ModuleDirectory);
+        $ModuleDirectory       = File::Spec->rel2abs($ModuleDirectory);
         $ModuleVersionFile2MD5 = $Self->FindFilesOfVersion($ModuleDirectory) || {};
     }
 

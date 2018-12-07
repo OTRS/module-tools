@@ -170,7 +170,7 @@ sub Run {
             }
             if (@TablesToDrop) {
                 my $TableList = join ', ', @TablesToDrop;
-                my $DBType = $CommonObject{DBObject}->{'DB::Type'};
+                my $DBType    = $CommonObject{DBObject}->{'DB::Type'};
 
                 if ( $DBType eq 'mysql' ) {
 

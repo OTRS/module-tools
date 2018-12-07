@@ -103,7 +103,7 @@ sub Run {
     my ($Self) = @_;
 
     my $FrameworkDirectory = File::Spec->rel2abs( $Self->GetOption('framework-directory') );
-    my $DatabaseType = ucfirst( $Self->GetOption('database-type') || 'Mysql' );
+    my $DatabaseType       = ucfirst( $Self->GetOption('database-type') || 'Mysql' );
 
     my $FredDirectory = $Self->GetOption('fred-directory');
     if ($FredDirectory) {

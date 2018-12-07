@@ -94,7 +94,7 @@ sub Run {
     $ModuleDirectory =~ s{(.+)/\z}{$1}smx;
 
     my $Language = $Self->_GetLanguage(
-        Language => $Self->GetOption('language') || '',
+        Language        => $Self->GetOption('language') || '',
         ModuleDirectory => $ModuleDirectory,
     );
 

@@ -508,7 +508,7 @@ sub GetUsageHelp {
         if ( !$Option->{Required} ) {
             $OptionShort = "[$OptionShort]";
         }
-        $UsageText .= " $OptionShort";
+        $UsageText   .= " $OptionShort";
         $OptionsText .= sprintf " <green>%-30s</green> - %s", $OptionShort, $Option->{Description} . "\n";
     }
 
@@ -527,7 +527,7 @@ sub GetUsageHelp {
         if ( !$Argument->{Required} ) {
             $ArgumentShort = "[$ArgumentShort]";
         }
-        $UsageText .= " $ArgumentShort";
+        $UsageText     .= " $ArgumentShort";
         $ArgumentsText .= sprintf " <green>%-30s</green> - %s", $ArgumentShort,
             $Argument->{Description} . "\n";
     }
