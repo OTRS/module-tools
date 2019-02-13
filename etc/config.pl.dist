@@ -88,6 +88,9 @@ my $Config = {
 #     \$Self->{'SwitchToAgent'}                     = 1;
 #     \$Self->{'SwitchToCustomer'}                  = 1;
 #     \$Self->{'Package::AllowNotVerifiedPackages'} = 1;
+#     \$Self->{'PasswordPolicy::ExceptAgentPasswordChangeAfterFirstLogin'}->{'001-Framework'} =  [
+#         'root@localhost',
+#     ];
 #
 #     # Fred
 #     \$Self->{'Fred::BackgroundColor'} = '#006ea5';
