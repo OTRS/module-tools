@@ -147,7 +147,6 @@ sub Run {
         $CommonObject{ServiceObject}         = Kernel::System::Service->new(%CommonObject);
         $CommonObject{SLAObject}             = Kernel::System::SLA->new(%CommonObject);
         $CommonObject{DynamicFieldObject}    = Kernel::System::DynamicField->new(%CommonObject);
-
     }
 
     my %Config = %{ $Self->{Config}->{TestSystem} || {} };
@@ -413,7 +412,7 @@ sub Run {
         }
     }
 
-    # Add Dynamic Fields.
+    # Adding configured dynamic fields.
     if ( @{ $Config{DynamicFields} } ) {
 
         DYNAMICFIELD:
@@ -423,24 +422,57 @@ sub Run {
             next DYNAMICFIELD if !$DynamicField;
 
             # Check if this dynamic field already exists.
-            my $DynamicFieldData = $CommonObject{DynamicFieldObject}->DynamicFieldGet(
-                Name => $DynamicField->{Name},
-            );
+            if ( $CommonObject{DynamicFieldObject}->can('DynamicFieldGet') ) {
 
-            if ( $DynamicFieldData->{ID} ) {
-                $Self->Print("  Dynamic Field <red>$DynamicField->{Name}</red> already exists. Continue...\n");
-                next DYNAMICFIELD;
+                my $DynamicFieldData = $CommonObject{DynamicFieldObject}->DynamicFieldGet(
+                    Name => $DynamicField->{Name},
+                );
+
+                if ( $DynamicFieldData->{ID} ) {
+                    $Self->Print("  Dynamic Field <red>$DynamicField->{Name}</red> already exists. Continue...\n");
+                    next DYNAMICFIELD;
+                }
+            }
+            else {
+
+                my $Field = $CommonObject{DynamicFieldObject}->FieldGet(
+                    Name => $DynamicField->{Name},
+                );
+
+                if ( $Field && $Field->ID() ) {
+                    $Self->Print("  Dynamic Field <red>$DynamicField->{Name}</red> already exists. Continue...\n");
+                    next DYNAMICFIELD;
+                }
             }
 
-            my $ID = $CommonObject{DynamicFieldObject}->DynamicFieldAdd(
-                %{$DynamicField},
-                Reorder => 1,
-                ValidID => 1,
-                UserID  => 1,
-            );
+            # adding the dynamic field
+            if ( $CommonObject{DynamicFieldObject}->can('DynamicFieldAdd') ) {
 
-            if ($ID) {
-                $Self->Print("  Dynamic Field $ID has been created.\n");
+                my $ID = $CommonObject{DynamicFieldObject}->DynamicFieldAdd(
+                    %{$DynamicField},
+                    Reorder => 1,
+                    ValidID => 1,
+                    UserID  => 1,
+                );
+
+                if ($ID) {
+                    $Self->Print("  Dynamic Field $ID has been created.\n");
+                }
+            }
+            else {
+
+                my $Field = $CommonObject{DynamicFieldObject}->FieldAdd(
+                    %{$DynamicField},
+                    Reorder => 1,
+                    ValidID => 1,
+                    UserID  => 1,
+                );
+
+                my $ID = $Field->ID();
+
+                if ($ID) {
+                    $Self->Print("  Dynamic Field $ID has been created.\n");
+                }
             }
         }
     }

@@ -1,2 +1,4 @@
 .project
 /etc/config.pl
+.vscode
+.vstags
