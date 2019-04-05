@@ -128,7 +128,10 @@ sub Run {
 
         next DIRECTORY if !$GitRemoteOutput;
 
-        $Self->Print("  Updating clean directory <yellow>$Directory</yellow>\n");
+        my $Branch = `cd $Directory && git rev-parse --abbrev-ref HEAD`;
+        $Branch =~ s{\s+}{}msxg;
+
+        $Self->Print("  Updating clean directory <yellow>$Directory ($Branch)</yellow> \n");
 
         my $GitUpdateOutput;
 
