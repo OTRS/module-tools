@@ -1,0 +1,14 @@
+---+ Internal Release Notes for [PACKAGENAME] [MAYOR] Patch Level [PATHCHLEVEL]
+
+---++ Requirements
+[FRAMRWORKVERSIONREQUIREMENT]
+
+---++ Enhancements
+[ENHANCEMENTSLIST]
+
+---++ Bug Fixes
+[BUGFIXLIST]
+
+---++ File-List and MD5 message digest (128-bit) checksums
+|*MD5 Sum*|*File*|
+| =[MD5]= | [PACKAGENAME]-[MAYOR].0.[PATHCHLEVEL].opm |

@@ -1,0 +1,36 @@
+---+ Internal Release Notes for OTRS 5 Patch Level [PATHCHLEVEL]
+
+---++ Important for Updating
+
+   * From a previous version of OTRS 5:
+      * Make sure you run =bin/otrs.Console.pl Maint::Config::Rebuild= after the upgrade so that the configuration is refreshed. Otherwise the system may not work.
+      * If you upgrade from OTRS 5 Patchlevel 2 or earlier, please run =scripts/DBUpdate-to-5.pl= once during the upgrade to fix possible issues with dysfunctional notification tags.
+      * if you upgrade from OTRS 5 Beta 5 or earlier, you should manually update all ticket notifications that are set to be shown in agent preferences. In the ticket notification management admin screen for each notification, scroll down to "Notification Methods" and check the  "Send by default" checkbox from the "Email" section on each notification.
+         * Background information: "Send by default" is a new feature introduced in OTRS 5 RC1 that adds a new layer of control to administrators to decide if an enabled notification method is used by default or not if an agent has not directly specified this preference. This option is now set by default on new systems or upgrades.
+   * From OTRS 4.x: Please consult our [[http://otrs.github.io/doc/manual/admin/5.0/en/html/upgrading.html][admin manual]] for detailed instructions.
+[ADVISORIES]
+---++ Improvements
+[ENHANCEMENTSLIST]
+
+
+---++ Bug Fixes
+[BUGFIXLIST]
+
+The detailed !ChangeLog can be found at: https://github.com/OTRS/otrs/blob/rel-5_0_[PATHCHLEVEL]/CHANGES.md.
+
+---++ Browser Support
+
+   * !JavaScript is required to use OTRS.
+
+These browsers are not supported:
+
+   * Microsoft Internet Explorer before version 10
+   * Firefox before version 10
+   * Safari before version 5
+
+We recommend to use the latest version of your browser, because it has the best !JavaScript and rendering performance. Dramatical performance varieties between the used browsers can occur with big data or big systems. We are happy to consult you on that matter.
+
+---++ List of files and MD5 message digest (128-bit) checksums
+
+| *MD5 Sum* | *File* |
+[FILELIST]
