@@ -272,6 +272,8 @@ sub _ParseChangeLog {
     my %SeenLogLines;
     my $BugFixList;
     my $EnhancementsList;
+    my $LastMove = 'bug';
+
     LINE:
     for my $Line (@LogEntries) {
 
@@ -294,14 +296,29 @@ sub _ParseChangeLog {
         $SeenLogLines{$Line} = 1;
 
         $Line .= "\n";
+
+        # Move complementary lines to the last part.
+        if ($Line !~ m{^\s{3}\*}msx) {
+            if ( $LastMove eq 'bug') {
+                $BugFixList .= $Line;
+            }
+            else {
+                $EnhancementsList .= $Line;
+            }
+            next LINE;
+        }
+
         if ( $Line =~ m{Bug\#}msxi ) {
             $BugFixList .= $Line;
+            $LastMove = 'bug';
         }
         elsif ( $Line =~ m{follow-up\#}msxi ) {
             $BugFixList .= $Line;
+            $LastMove = 'bug';
         }
         else {
             $EnhancementsList .= $Line;
+            $LastMove = 'enhancement';
         }
     }
 
