@@ -298,8 +298,8 @@ sub _ParseChangeLog {
         $Line .= "\n";
 
         # Move complementary lines to the last part.
-        if ($Line !~ m{^\s{3}\*}msx) {
-            if ( $LastMove eq 'bug') {
+        if ( $Line !~ m{^\s{3}\*}msx ) {
+            if ( $LastMove eq 'bug' ) {
                 $BugFixList .= $Line;
             }
             else {
