@@ -156,6 +156,7 @@ EOF
     $Template =~ s{\[ADVISORIES\]}{<green>$Advisories</green>};
     $Template =~ s{\[ENHANCEMENTSLIST\]}{<green>$EnhancementsList</green>};
     $Template =~ s{\[BUGFIXLIST\]}{<green>$BugFixList</green>};
+
     if ($MD5) {
         $Template =~ s{\[MD5\]}{<green>$MD5</green>};
     }
