@@ -93,48 +93,48 @@ my $Config = {
 #     \$Self->{'Agent::AuthTwoFactor::RequiredSetup'}    = 0;
 #     \$Self->{'Customer::AuthTwoFactor::RequiredSetup'} = 0;
 #
-#    my \@ExcludeAgentsFromPasswordStuff = (
-#        'root\@localhost',
+#    my @ExcludeAgentsFromPasswordStuff = (
+#        'root@localhost',
 #        'agent-1',
 #    );
 #
-#    my \@ExcludeCustomersFromPasswordStuff = (
+#    my @ExcludeCustomersFromPasswordStuff = (
 #        'customer-1',
 #        'customer-2',
 #    );
 #
 #    # Agent Password Settings
-#    /$Self->{'PasswordPolicy::ExceptAgentPasswordChangeAfterFirstLogin'}->{'001-Framework'} =  [
-#        \@ExcludeAgentsFromPasswordStuff,
+#    \$Self->{'PasswordPolicy::ExceptAgentPasswordChangeAfterFirstLogin'}->{'001-Framework'} =  [
+#        @ExcludeAgentsFromPasswordStuff,
 #    ];
 #
-#    /$Self->{'PasswordPolicy:ExceptAgentPasswordHistory'}->{'001-Framework'} =  [
-#        \@ExcludeAgentsFromPasswordStuff,
+#    \$Self->{'PasswordPolicy:ExceptAgentPasswordHistory'}->{'001-Framework'} =  [
+#        @ExcludeAgentsFromPasswordStuff,
 #    ];
 #
-#    /$Self->{'PasswordPolicy:ExceptAgentPasswordTTL'}->{'001-Framework'} =  [
-#        \@ExcludeAgentsFromPasswordStuff,
+#    \$Self->{'PasswordPolicy:ExceptAgentPasswordTTL'}->{'001-Framework'} =  [
+#        @ExcludeAgentsFromPasswordStuff,
 #    ];
 #
-#    /$Self->{'PasswordPolicy:ExceptAgentPasswordComplexity'}->{'001-Framework'} =  [
-#        \@ExcludeAgentsFromPasswordStuff,
+#    \$Self->{'PasswordPolicy:ExceptAgentPasswordComplexity'}->{'001-Framework'} =  [
+#        @ExcludeAgentsFromPasswordStuff,
 #    ];
 #
 #    # Customer Password Settings
-#    /$Self->{'PasswordPolicy::ExceptCustomerPasswordChangeAfterFirstLogin'}->{'001-Framework'} =  [
-#        \@ExcludeCustomersFromPasswordStuff,
+#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordChangeAfterFirstLogin'}->{'001-Framework'} =  [
+#        @ExcludeCustomersFromPasswordStuff,
 #    ];
 #
-#    /$Self->{'PasswordPolicy:ExceptCustomerPasswordHistory'}->{'001-Framework'} =  [
-#        \@ExcludeCustomersFromPasswordStuff,
+#    \$Self->{'PasswordPolicy:ExceptCustomerPasswordHistory'}->{'001-Framework'} =  [
+#        @ExcludeCustomersFromPasswordStuff,
 #    ];
 #
-#    /$Self->{'PasswordPolicy:ExceptCustomerPasswordTTL'}->{'001-Framework'} =  [
-#        \@ExcludeCustomersFromPasswordStuff,
+#    \$Self->{'PasswordPolicy:ExceptCustomerPasswordTTL'}->{'001-Framework'} =  [
+#        @ExcludeCustomersFromPasswordStuff,
 #    ];
 #
-#    /$Self->{'PasswordPolicy:ExceptCustomerPasswordComplexity'}->{'001-Framework'} =  [
-#        \@ExcludeCustomersFromPasswordStuff,
+#    \$Self->{'PasswordPolicy:ExceptCustomerPasswordComplexity'}->{'001-Framework'} =  [
+#        @ExcludeCustomersFromPasswordStuff,
 #    ];
 #
 #     # Misc
