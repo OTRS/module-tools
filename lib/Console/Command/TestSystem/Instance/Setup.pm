@@ -281,7 +281,7 @@ EOD
 
         # Copy apache mod perl file.
         my $ApacheModPerlFile = "$Config{ApacheCFGDir}$SystemName.apache2-perl-startup.pl";
-        if ( -e $ApacheModPerlFile ) {
+        if ( -e "$FrameworkDirectory/scripts/apache2-perl-startup.pl" ) {
             $Self->System(
                 "sudo cp -p $FrameworkDirectory/scripts/apache2-perl-startup.pl $ApacheModPerlFile"
             );
