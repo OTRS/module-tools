@@ -96,6 +96,7 @@ my $Config = {
 #    my @ExcludeAgentsFromPasswordStuff = (
 #        'root@localhost',
 #        'agent-1',
+#        'agent-2',
 #    );
 #
 #    my @ExcludeCustomersFromPasswordStuff = (
@@ -104,36 +105,36 @@ my $Config = {
 #    );
 #
 #    # Agent Password Settings
-#    \$Self->{'PasswordPolicy::ExceptAgentPasswordChangeAfterFirstLogin'}->{'001-Framework'} =  [
+#    \$Self->{'PasswordPolicy::ExceptAgentPasswordChangeAfterFirstLogin'}->{'999-Custom'} =  [
 #        @ExcludeAgentsFromPasswordStuff,
 #    ];
 #
-#    \$Self->{'PasswordPolicy:ExceptAgentPasswordHistory'}->{'001-Framework'} =  [
+#    \$Self->{'PasswordPolicy::ExceptAgentPasswordHistory'}->{'999-Custom'} =  [
 #        @ExcludeAgentsFromPasswordStuff,
 #    ];
 #
-#    \$Self->{'PasswordPolicy:ExceptAgentPasswordTTL'}->{'001-Framework'} =  [
+#    \$Self->{'PasswordPolicy::ExceptAgentPasswordTTL'}->{'999-Custom'} =  [
 #        @ExcludeAgentsFromPasswordStuff,
 #    ];
 #
-#    \$Self->{'PasswordPolicy:ExceptAgentPasswordComplexity'}->{'001-Framework'} =  [
+#    \$Self->{'PasswordPolicy::ExceptAgentPasswordComplexity'}->{'999-Custom'} =  [
 #        @ExcludeAgentsFromPasswordStuff,
 #    ];
 #
 #    # Customer Password Settings
-#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordChangeAfterFirstLogin'}->{'001-Framework'} =  [
+#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordChangeAfterFirstLogin'}->{'999-Custom'} =  [
 #        @ExcludeCustomersFromPasswordStuff,
 #    ];
 #
-#    \$Self->{'PasswordPolicy:ExceptCustomerPasswordHistory'}->{'001-Framework'} =  [
+#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordHistory'}->{'999-Custom'} =  [
 #        @ExcludeCustomersFromPasswordStuff,
 #    ];
 #
-#    \$Self->{'PasswordPolicy:ExceptCustomerPasswordTTL'}->{'001-Framework'} =  [
+#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordTTL'}->{'999-Custom'} =  [
 #        @ExcludeCustomersFromPasswordStuff,
 #    ];
 #
-#    \$Self->{'PasswordPolicy:ExceptCustomerPasswordComplexity'}->{'001-Framework'} =  [
+#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordComplexity'}->{'999-Custom'} =  [
 #        @ExcludeCustomersFromPasswordStuff,
 #    ];
 #
@@ -156,7 +157,7 @@ my $Config = {
 #         extra_capabilities => {
 #             chromeOptions => {
 #                 # disable-infobars makes sure window size calculations are ok
-#                 args => ['disable-infoba
+#                 args => ['disable-infobars'],
 #                 # Explicitly turn off the W3C compatibility mode, as it is still incomplete.
 #                 #   Starting with chromedriver v75 default value of this flag was changed. Consider removing this
 #                 #   override, once the feature parity of the W3C mode is on par with the old JSON Wire Protocol.
@@ -164,6 +165,7 @@ my $Config = {
 #                 # https://chromium.googlesource.com/chromium/src/+/master/docs/chromedriver_status.md
 #                 w3c => \0,
 #             },
+#         },
 #         # window_height       => 1200,
 #         # window_width        => 1600,
 #     };
