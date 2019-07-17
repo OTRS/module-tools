@@ -169,6 +169,9 @@ sub Run {
             next AGENT;
         }
 
+        my $UserPreferences = $Agent->{UserPreferences};
+        delete $Agent->{UserPreferences} if $Agent->{UserPreferences};
+
         my $UserID = $CommonObject{UserObject}->UserAdd(
             %{$Agent},
             ValidID      => 1,
@@ -205,9 +208,9 @@ sub Run {
             }
 
             # Agent preferences.
-            if ( $Agent->{UserPreferences} && $CommonObject{UserObject}->can('SetPreferences') ) {
+            if ( $UserPreferences && $CommonObject{UserObject}->can('SetPreferences') ) {
 
-                for my $Preference ( @{ $Agent->{UserPreferences} } ) {
+                for my $Preference ( @{$UserPreferences} ) {
 
                     $CommonObject{UserObject}->SetPreferences(
                         Key    => $Preference->{Key},
