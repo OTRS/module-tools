@@ -89,54 +89,60 @@ my $Config = {
 #     \$Self->{'SwitchToCustomer'}                  = 1;
 #     \$Self->{'Package::AllowNotVerifiedPackages'} = 1;
 #
-#     # Password related settings.
-#     \$Self->{'Agent::AuthTwoFactor::RequiredSetup'}    = 0;
-#     \$Self->{'Customer::AuthTwoFactor::RequiredSetup'} = 0;
+#     my @ExcludeAgentsFromPasswordStuff = (
+#         'root@localhost',
+#         'agent-1',
+#         'agent-2',
+#     );
 #
-#    my @ExcludeAgentsFromPasswordStuff = (
-#        'root@localhost',
-#        'agent-1',
-#        'agent-2',
-#    );
+#     my @ExcludeCustomersFromPasswordStuff = (
+#         'customer-1',
+#         'customer-2',
+#     );
 #
-#    my @ExcludeCustomersFromPasswordStuff = (
-#        'customer-1',
-#        'customer-2',
-#    );
+#     # Agent Password Settings
+#     \$Self->{'PasswordPolicy::ExceptAgentPasswordChangeAfterFirstLogin'}->{'999-Custom'} =  [
+#         @ExcludeAgentsFromPasswordStuff,
+#     ];
 #
-#    # Agent Password Settings
-#    \$Self->{'PasswordPolicy::ExceptAgentPasswordChangeAfterFirstLogin'}->{'999-Custom'} =  [
-#        @ExcludeAgentsFromPasswordStuff,
-#    ];
+#     \$Self->{'PasswordPolicy::ExceptAgentPasswordHistory'}->{'999-Custom'} =  [
+#         @ExcludeAgentsFromPasswordStuff,
+#     ];
 #
-#    \$Self->{'PasswordPolicy::ExceptAgentPasswordHistory'}->{'999-Custom'} =  [
-#        @ExcludeAgentsFromPasswordStuff,
-#    ];
+#     \$Self->{'PasswordPolicy::ExceptAgentPasswordTTL'}->{'999-Custom'} =  [
+#         @ExcludeAgentsFromPasswordStuff,
+#     ];
 #
-#    \$Self->{'PasswordPolicy::ExceptAgentPasswordTTL'}->{'999-Custom'} =  [
-#        @ExcludeAgentsFromPasswordStuff,
-#    ];
+#     \$Self->{'PasswordPolicy::ExceptAgentPasswordComplexity'}->{'999-Custom'} =  [
+#         @ExcludeAgentsFromPasswordStuff,
+#     ];
 #
-#    \$Self->{'PasswordPolicy::ExceptAgentPasswordComplexity'}->{'999-Custom'} =  [
-#        @ExcludeAgentsFromPasswordStuff,
-#    ];
+#     # Customer Password Settings
+#     \$Self->{'PasswordPolicy::ExceptCustomerPasswordChangeAfterFirstLogin'}->{'999-Custom'} =  [
+#         @ExcludeCustomersFromPasswordStuff,
+#     ];
 #
-#    # Customer Password Settings
-#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordChangeAfterFirstLogin'}->{'999-Custom'} =  [
-#        @ExcludeCustomersFromPasswordStuff,
-#    ];
+#     \$Self->{'PasswordPolicy::ExceptCustomerPasswordHistory'}->{'999-Custom'} =  [
+#         @ExcludeCustomersFromPasswordStuff,
+#     ];
 #
-#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordHistory'}->{'999-Custom'} =  [
-#        @ExcludeCustomersFromPasswordStuff,
-#    ];
+#     \$Self->{'PasswordPolicy::ExceptCustomerPasswordTTL'}->{'999-Custom'} =  [
+#         @ExcludeCustomersFromPasswordStuff,
+#     ];
 #
-#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordTTL'}->{'999-Custom'} =  [
-#        @ExcludeCustomersFromPasswordStuff,
-#    ];
+#     \$Self->{'PasswordPolicy::ExceptCustomerPasswordComplexity'}->{'999-Custom'} =  [
+#         @ExcludeCustomersFromPasswordStuff,
+#     ];
 #
-#    \$Self->{'PasswordPolicy::ExceptCustomerPasswordComplexity'}->{'999-Custom'} =  [
-#        @ExcludeCustomersFromPasswordStuff,
-#    ];
+#     # Agent 2FA required setup exceptions.
+#     \$Self->{'Agent::AuthTwoFactor::RequiredSetupException'}->{'999-Custom'} = [
+#         @ExcludeAgentsFromPasswordStuff,
+#     ];
+#
+#     # Customer 2FA required setup exceptions.
+#     \$Self->{'Customer::AuthTwoFactor::RequiredSetupException'}->{'999-Custom'} = [
+#         @ExcludeCustomersFromPasswordStuff,
+#     ];
 #
 #     # Misc
 #     \$Self->{'Loader::Enabled::CSS'}  = 0;
@@ -148,7 +154,7 @@ my $Config = {
 #     # DocumentSearch pefix for OTRS 7 and higher
 #     \$Self->{'DocumentSearch::IndexPrefix'} = '$SystemName-documentsearch';
 #
-#     # Add Selenium config
+#     # Add Selenium config (CC).
 #     \$Self->{'SeleniumTestsConfig'} = {
 #         remote_server_addr  => 'localhost',
 #         port                => '4444',
@@ -169,6 +175,16 @@ my $Config = {
 #         # window_height       => 1200,
 #         # window_width        => 1600,
 #     };
+#
+#    # # Add Selenium config (FF).
+#    # \$Self->{'SeleniumTestsConfig'} = {
+#    #     remote_server_addr  => 'localhost',
+#    #     port                => '4444',
+#    #     browser_name        => 'firefox',
+#    #     platform            => 'ANY',
+#    #     # window_height       => 1200,
+#    #     # window_width        => 1600,
+#    # };
 #
 #    \$Self->{TestDatabase} = {
 #        DatabaseDSN  => 'DBI:mysql:database=otrs_test;host=127.0.0.1;',
