@@ -14,7 +14,9 @@ use utf8;
 
 use vars (qw($Self));
 
-{
+sub Load {
+    my ( $File, $Self ) = @_;
+
     # --------------------------------------------------- #
     # customer authentication settings                    #
     # (enable what you need, auth against LDAP directory  #
@@ -147,6 +149,8 @@ use vars (qw($Self));
             # [ 'UserRoom',       'Room',        'physicalDeliveryOfficeName', 1, 0, 'var', '', 0 ],
         ],
     };
+
+    return;
 }
 
 1;
