@@ -1,7 +1,7 @@
 ---+ Internal Release Notes for OTRS [MAYOR] Patch Level [PATHCHLEVEL]
 
 ---++ Important for Upgrading
-   * Please consult our [[https://doc.otrs.com/doc/manual/installation/[MAYOR].0/en/content/updating.html][admin manual]] for detailed instructions.
+   * Please consult our [[https://doc.otrs.com/doc/manual/admin/[MAYOR].0/en/html/updating.html][admin manual]] for detailed instructions.
 [ADVISORIES]
 ---++ Enhancements
 [ENHANCEMENTSLIST]
