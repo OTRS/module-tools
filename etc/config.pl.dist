@@ -88,6 +88,8 @@ my $Config = {
 #     \$Self->{'SwitchToAgent'}                     = 1;
 #     \$Self->{'SwitchToCustomer'}                  = 1;
 #     \$Self->{'Package::AllowNotVerifiedPackages'} = 1;
+
+#     \$Self->{'AgentFrontend::NotifyModule'}->{'3000-SystemContract'} = undef;
 #
 #     my @ExcludeAgentsFromPasswordStuff = (
 #         'root@localhost',
