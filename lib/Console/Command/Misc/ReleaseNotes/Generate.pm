@@ -246,9 +246,9 @@ sub _GetGitLog {
 
     # Convert all bug fixes to Wiki style.
     $GitLog
-        =~ s{(?:Fixed:[ ]) (.*) [ ]\( bug\# (\d{4,6}) \)}{Bug#[[http://bugs.otrs.org/show_bug.cgi?id=$2][$2]] - $1}ismxg;
+        =~ s{(?:Fixed:[ ]) (.*) [ ]\( bug\# (\d{4,6}) \)}{Bug#[[http://bugs.otrs.org/show_bug.cgi?id=$2][$2]] - $1}imxg;
     $GitLog
-        =~ s{(?:Fixed[:]?[ ]) bug\#(\d{4,6}) [ ] (.*)}{Bug#[[http://bugs.otrs.org/show_bug.cgi?id=$1][$1]] - $2}ismxg;
+        =~ s{(?:Fixed[:]?[ ]) bug\#(\d{4,6}) [ ] (.*)}{Bug#[[http://bugs.otrs.org/show_bug.cgi?id=$1][$1]] - $2}imxg;
 
     # Add Wiki section indentation.
     $GitLog =~ s{^(.*?)$}{   * $1}ismxg;
