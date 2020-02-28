@@ -88,7 +88,7 @@ my $Config = {
 #     \$Self->{'SwitchToAgent'}                     = 1;
 #     \$Self->{'SwitchToCustomer'}                  = 1;
 #     \$Self->{'Package::AllowNotVerifiedPackages'} = 1;
-
+#
 #     \$Self->{'AgentFrontend::NotifyModule'}->{'3000-SystemContract'} = undef;
 #
 #     my @ExcludeAgentsFromPasswordStuff = (
@@ -153,10 +153,10 @@ my $Config = {
 #     # Activate this setting for OTRS 7 and higher
 #     #\$Self->{'TestHTTPHostname'} = 'localhost:3001';
 #
-#     # DocumentSearch pefix for OTRS 7 and higher
+#     # DocumentSearch prefix for OTRS 7 and higher
 #     \$Self->{'DocumentSearch::IndexPrefix'} = '$SystemName-documentsearch';
 #
-#     # Add Selenium config (CC).
+#     # Add Selenium config (Chrome).
 #     \$Self->{'SeleniumTestsConfig'} = {
 #         remote_server_addr  => 'localhost',
 #         port                => '4444',
@@ -178,7 +178,7 @@ my $Config = {
 #         # window_width        => 1600,
 #     };
 #
-#    # # Add Selenium config (FF).
+#    # Add Selenium config (Firefox).
 #    # \$Self->{'SeleniumTestsConfig'} = {
 #    #     remote_server_addr  => 'localhost',
 #    #     port                => '4444',
