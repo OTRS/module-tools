@@ -75,9 +75,9 @@ sub Run {
     my $Version      = $Self->GetArgument('version') || '';
     my @VersionParts = split /\./, ($Version);
 
-    my $PatchLevel = $VersionParts[2];
+    my $PatchLevel = "Patch Level $VersionParts[2]";
     if ( $VersionParts[3] ) {
-        $PatchLevel .= $VersionParts[3];
+        $PatchLevel = ucfirst $VersionParts[3];
     }
 
     my $ChangesFile;
