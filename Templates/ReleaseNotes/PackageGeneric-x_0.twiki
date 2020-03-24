@@ -1,4 +1,4 @@
----+ Internal Release Notes for [PACKAGENAME] [MAYOR] Patch Level [PATHCHLEVEL]
+---+ Internal Release Notes for [PACKAGENAME] [MAYOR] [PATHCHLEVELLONG]
 
 ---++ Requirements
 [FRAMRWORKVERSIONREQUIREMENT]
