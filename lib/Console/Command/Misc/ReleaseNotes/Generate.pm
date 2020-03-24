@@ -75,9 +75,11 @@ sub Run {
     my $Version      = $Self->GetArgument('version') || '';
     my @VersionParts = split /\./, ($Version);
 
-    my $PatchLevel = "Patch Level $VersionParts[2]";
+    my $PatchLevel     = $VersionParts[2];
+    my $PatchLevelLong = "Patch Level $PatchLevel";
     if ( $VersionParts[3] ) {
-        $PatchLevel = ucfirst $VersionParts[3];
+        $PatchLevel .= "_$VersionParts[3]";
+        $PatchLevelLong = ucfirst $VersionParts[3];
     }
 
     my $ChangesFile;
@@ -152,6 +154,7 @@ EOF
     $Template =~ s{\[PACKAGENAME\]}{<green>$PackageName</green>}g;
     $Template =~ s{\[MAYOR\]}{<green>$VersionParts[0]</green>}g;
     $Template =~ s{\[PATHCHLEVEL\]}{<green>$PatchLevel</green>}g;
+    $Template =~ s{\[PATHCHLEVELLONG\]}{<green>$PatchLevelLong</green>}g;
     $Template =~ s{\[FRAMRWORKVERSIONREQUIREMENT\]}{<green>$FrameworkVersionRequirement</green>};
     $Template =~ s{\[ADVISORIES\]}{<green>$Advisories</green>};
     $Template =~ s{\[ENHANCEMENTSLIST\]}{<green>$EnhancementsList</green>};
