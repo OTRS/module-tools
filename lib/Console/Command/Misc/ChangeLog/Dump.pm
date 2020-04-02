@@ -88,7 +88,7 @@ sub Run {
 
     # Format in new style, markdown.
     if ( $Content =~ m{\A\#[ ]?\d} ) {
-        ($Section) = $Content =~ m{ ( ^ \# [ ]? $SelectedSection .*? ) ^ \# \d+ \. \d+ \. }smx;
+        ($Section) = $Content =~ m{ ( ^ \# [ ]? $SelectedSection .*? ) ^ \# [ ]? \d+ \. \d+ \. }smx;
         $Section //= '';
 
         # Generate wiki-style list, cut out dates.

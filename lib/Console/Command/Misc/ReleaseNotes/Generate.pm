@@ -284,7 +284,7 @@ sub _ParseChangeLog {
         next LINE if !$Line;
 
         # Skip version headers e.g. #7.0.1 ????-??-??.
-        next LINE if $Line =~ m{^\#(?:\d+\.){2}\d+.}msx;
+        next LINE if $Line =~ m{^\#[ ]?(?:\d+\.){2}\d+.}msx;
 
         # Skip console command output lines.
         next LINE if $Line eq 'Dumping change log entries...';
