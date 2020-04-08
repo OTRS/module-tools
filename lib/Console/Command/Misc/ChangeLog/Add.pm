@@ -203,10 +203,10 @@ sub Run {
 
         my $Printed            = 0;
         my $ReleaseHeaderFound = 0;
-        my $ReleaseHeaderRegex = qr{^[#]?\d+[.]\d+[.]\d+[ ]};    # 1.2.3
+        my $ReleaseHeaderRegex = qr{^[#]?[ ]?\d+[.]\d+[.]\d+[ ]};    # 1.2.3
         my $Version            = $Self->GetOption('version');
         if ($Version) {
-            $ReleaseHeaderRegex = qr{^[#]?$Version[.]\d+[.]\d+};
+            $ReleaseHeaderRegex = qr{^[#]?[ ]?$Version[.]\d+[.]\d+};
         }
         for my $Line (@Changes) {
             if ( !$ReleaseHeaderFound && $Line =~ m{$ReleaseHeaderRegex} ) {
