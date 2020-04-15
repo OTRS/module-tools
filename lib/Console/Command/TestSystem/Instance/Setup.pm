@@ -123,7 +123,7 @@ sub Run {
     # Copy WebApp.conf file.
     my $WebAppConfFile     = $FrameworkDirectory . '/Kernel/WebApp.conf';
     my $WebAppConfDistFile = $FrameworkDirectory . '/Kernel/WebApp.conf.dist';
-    if ( -e $WebAppConfDistFile ) {
+    if ( $OTRSMajorVersion >= 7 ) {
 
         $Self->Print("\n  <yellow>Copying WebApp.conf...</yellow>\n");
 
@@ -213,7 +213,7 @@ EOD
 
         # Insert config overrides in the designated area of the file.
         #   Special handling for OTRS 7+ style configuration file which has been cleaned up.
-        if ( -e $WebAppConfDistFile ) {
+        if ( $OTRSMajorVersion >= 7 ) {
             $ConfigStr =~ s{( \s+ return [ ] 1; \s \} )}{$ConfigInjectStr$1}xms;
 
             # Comment out ScriptAlias and Frontend::WebPath so the default can be used.
@@ -232,7 +232,7 @@ EOD
     }
 
     # Only for OTRS < 7
-    if ( !-e $WebAppConfDistFile ) {
+    if ( $OTRSMajorVersion < 7 ) {
 
         # Check apache config.
         if ( !-e $FrameworkDirectory . '/scripts/apache2-httpd.include.conf' ) {
@@ -344,7 +344,7 @@ EOD
             $DBH->do("DROP DATABASE IF EXISTS $DatabaseSystemName");
 
             my $Charset = 'utf8mb4';
-            if ($OTRSMajorVersion < 8 ) {
+            if ( $OTRSMajorVersion < 8 ) {
                 $Charset = 'utf8';
             }
 
@@ -452,7 +452,7 @@ EOD
         );
     }
 
-    if ( -e $WebAppConfDistFile ) {
+    if ( $OTRSMajorVersion >= 7 ) {
         $Self->Print("\n  <yellow>Installing npm dependencies...</yellow>\n");
         $Self->System(
             "cd $FrameworkDirectory && npm install --no-save"
