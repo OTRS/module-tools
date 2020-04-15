@@ -50,13 +50,6 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr{^(mysql|postgresql|oracle)$}ismx,
     );
-    $Self->AddOption(
-        Name        => 'fred-directory',
-        Description => "Specify directory of the OTRS module Fred.",
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
 
     return;
 }
@@ -67,15 +60,6 @@ sub PreRun {
     my $FrameworkDirectory = File::Spec->rel2abs( $Self->GetOption('framework-directory') );
 
     my @Directories = ($FrameworkDirectory);
-
-    my $FredDirectory = $Self->GetOption('fred-directory');
-    if ($FredDirectory) {
-        $FredDirectory = File::Spec->rel2abs($FredDirectory);
-    }
-
-    if ($FredDirectory) {
-        push @Directories, $FredDirectory;
-    }
 
     for my $Directory (@Directories) {
         if ( !-e $Directory ) {
@@ -90,12 +74,6 @@ sub PreRun {
         die "$FrameworkDirectory does not seem to be an OTRS framework directory";
     }
 
-    if ($FredDirectory) {
-        if ( !-e $FredDirectory . '/Fred.sopm' ) {
-            die "$FrameworkDirectory does not seem to be a Fred module directory";
-        }
-    }
-
     return;
 }
 
@@ -104,11 +82,6 @@ sub Run {
 
     my $FrameworkDirectory = File::Spec->rel2abs( $Self->GetOption('framework-directory') );
     my $DatabaseType       = ucfirst( $Self->GetOption('database-type') || 'Mysql' );
-
-    my $FredDirectory = $Self->GetOption('fred-directory');
-    if ($FredDirectory) {
-        $FredDirectory = File::Spec->rel2abs($FredDirectory);
-    }
 
     # Remove possible slash at the end.
     $FrameworkDirectory =~ s{ / \z }{}xms;
@@ -208,12 +181,6 @@ sub Run {
         \$Self->{'AdminEmail'}          = 'root\@localhost';
         \$Self->{'Package::Timeout'}    = '120';
         \$Self->{'SendmailModule'}      =  'Kernel::System::Email::DoNotSendEmail';
-
-        # Fred
-        \$Self->{'Fred::BackgroundColor'} = '#006ea5';
-        \$Self->{'Fred::SystemName'}      = '$SystemName';
-        \$Self->{'Fred::ConsoleOpacity'}  = '0.7';
-        \$Self->{'Fred::ConsoleWidth'}    = '30%';
 
         # Misc
         \$Self->{'Loader::Enabled::CSS'}  = 0;
@@ -443,15 +410,6 @@ EOD
 
     # Make sure we've got the correct rights set (e.g. in case you've downloaded the files as root).
     $Self->System("sudo chown -R $Config{PermissionsOTRSUser}:$Config{PermissionsOTRSGroup} $FrameworkDirectory");
-
-    # Link fred module.
-    if ($FredDirectory) {
-        $Self->Print("\n  <yellow>Linking Fred module into $SystemName...</yellow>\n");
-        $Self->ExecuteCommand(
-            Module => 'Console::Command::Module::File::Link',
-            Params => [ $FredDirectory, $FrameworkDirectory ],
-        );
-    }
 
     # Setting permissions.
     $Self->Print("\n  <yellow>Setting permissions...</yellow>\n");
