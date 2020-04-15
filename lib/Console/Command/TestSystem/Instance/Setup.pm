@@ -375,7 +375,13 @@ EOD
     {
         if ( $DatabaseType eq 'Mysql' ) {
             $DBH->do("DROP DATABASE IF EXISTS $DatabaseSystemName");
-            $DBH->do("CREATE DATABASE $DatabaseSystemName charset utf8");
+
+            my $Charset = 'utf8mb4';
+            if ($OTRSMajorVersion < 8 ) {
+                $Charset = 'utf8';
+            }
+
+            $DBH->do("CREATE DATABASE $DatabaseSystemName charset $Charset");
             $DBH->do("use $DatabaseSystemName");
         }
         elsif ( $DatabaseType eq 'Postgresql' ) {
