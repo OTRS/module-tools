@@ -7,7 +7,6 @@
 # --
 
 ## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
-## nofilter(TidyAll::Plugin::OTRS::Migrations::OTRS6::TimeObject)
 package Console::BaseModule;
 
 use strict;
@@ -77,7 +76,6 @@ sub CodeActionHandler {
     );
     $CommonObject{MainObject}    = Kernel::System::Main->new(%CommonObject);
     $CommonObject{DBObject}      = Kernel::System::DB->new(%CommonObject);
-    $CommonObject{TimeObject}    = Kernel::System::Time->new(%CommonObject);
     $CommonObject{XMLObject}     = Kernel::System::XML->new(%CommonObject);
     $CommonObject{PackageObject} = Kernel::System::Package->new(%CommonObject);
 
@@ -164,7 +162,6 @@ sub DatabaseActionHandler {
     );
     $CommonObject{MainObject}    = Kernel::System::Main->new(%CommonObject);
     $CommonObject{DBObject}      = Kernel::System::DB->new(%CommonObject);
-    $CommonObject{TimeObject}    = Kernel::System::Time->new(%CommonObject);
     $CommonObject{XMLObject}     = Kernel::System::XML->new(%CommonObject);
     $CommonObject{PackageObject} = Kernel::System::Package->new(%CommonObject);
 

@@ -9,7 +9,6 @@
 ## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
 ## nofilter(TidyAll::Plugin::OTRS::Perl::ObjectDependencies)
 ## nofilter(TidyAll::Plugin::OTRS::Migrations::OTRS6::SysConfig)
-## nofilter(TidyAll::Plugin::OTRS::Migrations::OTRS6::TimeObject)
 
 package Console::Command::TestSystem::Database::Fill;
 
@@ -119,7 +118,6 @@ sub Run {
         $CommonObject{ConfigObject}          = $Kernel::OM->Get('Kernel::Config');
         $CommonObject{EncodeObject}          = $Kernel::OM->Get('Kernel::System::Encode');
         $CommonObject{LogObject}             = $Kernel::OM->Get('Kernel::System::Log');
-        $CommonObject{TimeObject}            = $Kernel::OM->Get('Kernel::System::Time');
         $CommonObject{MainObject}            = $Kernel::OM->Get('Kernel::System::Main');
         $CommonObject{DBObject}              = $Kernel::OM->Get('Kernel::System::DB');
         $CommonObject{SysConfigObject}       = $Kernel::OM->Get('Kernel::System::SysConfig');
@@ -136,7 +134,6 @@ sub Run {
         $CommonObject{EncodeObject} = Kernel::System::Encode->new(%CommonObject);
         $CommonObject{LogObject}
             = Kernel::System::Log->new( %CommonObject, LogPrefix => 'OTRS-TestSystem::Database::Fill' );
-        $CommonObject{TimeObject}            = Kernel::System::Time->new(%CommonObject);
         $CommonObject{MainObject}            = Kernel::System::Main->new(%CommonObject);
         $CommonObject{DBObject}              = Kernel::System::DB->new(%CommonObject);
         $CommonObject{SysConfigObject}       = Kernel::System::SysConfig->new(%CommonObject);
@@ -416,10 +413,10 @@ sub Run {
     }
 
     # Adding configured dynamic fields.
-    if ( @{ $Config{DynamicFields} } ) {
+    if ( @{ $Config{DynamicFields} // [] } ) {
 
         DYNAMICFIELD:
-        for my $DynamicField ( reverse @{ $Config{DynamicFields} } ) {
+        for my $DynamicField ( reverse @{ $Config{DynamicFields} // [] } ) {
 
             next DYNAMICFIELD if !$DynamicField;
             next DYNAMICFIELD if !$DynamicField;

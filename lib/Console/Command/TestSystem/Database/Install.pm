@@ -8,7 +8,6 @@
 
 ## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
 ## nofilter(TidyAll::Plugin::OTRS::Perl::ObjectDependencies)
-## nofilter(TidyAll::Plugin::OTRS::Migrations::OTRS6::TimeObject)
 
 package Console::Command::TestSystem::Database::Install;
 
@@ -119,7 +118,6 @@ sub Run {
         $CommonObject{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
         $CommonObject{EncodeObject} = $Kernel::OM->Get('Kernel::System::Encode');
         $CommonObject{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-        $CommonObject{TimeObject}   = $Kernel::OM->Get('Kernel::System::Time');
         $CommonObject{MainObject}   = $Kernel::OM->Get('Kernel::System::Main');
         $CommonObject{DBObject}     = $Kernel::OM->Get('Kernel::System::DB');
         $CommonObject{XMLObject}    = $Kernel::OM->Get('Kernel::System::XML');
@@ -129,7 +127,6 @@ sub Run {
         $CommonObject{EncodeObject} = Kernel::System::Encode->new(%CommonObject);
         $CommonObject{LogObject}
             = Kernel::System::Log->new( %CommonObject, LogPrefix => 'OTRS-TestSystem::Database::Install' );
-        $CommonObject{TimeObject} = Kernel::System::Time->new(%CommonObject);
         $CommonObject{MainObject} = Kernel::System::Main->new(%CommonObject);
         $CommonObject{DBObject}   = Kernel::System::DB->new(%CommonObject);
         $CommonObject{XMLObject}  = Kernel::System::XML->new(%CommonObject);
