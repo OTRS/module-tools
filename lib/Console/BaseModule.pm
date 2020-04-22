@@ -27,7 +27,6 @@ eval {
     require Kernel::System::Log;
     require Kernel::System::Main;
     require Kernel::System::DB;
-    require Kernel::System::Time;
     require Kernel::System::Package;
     require Kernel::System::XML;
 };
