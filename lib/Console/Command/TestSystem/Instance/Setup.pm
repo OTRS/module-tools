@@ -477,16 +477,14 @@ EOD
 sub ReadFile {
     my ( $Self, $Path ) = @_;
 
-    my $FileHandle;
-
-    if ( !-e $FileHandle ) {
-        $Self->PrintError("Could find $FileHandle");
+    if ( !-e $Path ) {
+        $Self->PrintError("Could find $Path");
     }
-    if ( !-r $FileHandle ) {
-        $Self->PrintError("Couldn't open file $FileHandle!");
+    if ( !-r $Path ) {
+        $Self->PrintError("Couldn't open file $Path!");
     }
 
-    my $Content = path($FileHandle)->slurp_raw();
+    my $Content = path($Path)->slurp_raw();
     return $Content;
 }
 
