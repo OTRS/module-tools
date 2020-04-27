@@ -16,6 +16,8 @@ use DBI;
 use File::Find;
 use File::Spec ();
 
+use Path::Tiny qw(path);
+
 use Console::Command::Module::File::Link;
 use Console::Command::TestSystem::Database::Install;
 use Console::Command::TestSystem::Database::Fill;
@@ -70,7 +72,7 @@ sub PreRun {
         }
     }
 
-    if ( !-e $FrameworkDirectory . '/RELEASE' ) {
+    if ( !-e ( $FrameworkDirectory . '/RELEASE' ) ) {
         die "$FrameworkDirectory does not seem to be an OTRS framework directory";
     }
 
@@ -138,7 +140,7 @@ sub Run {
     # Edit Config.pm.
     $Self->Print("\n  <yellow>Editing and copying Config.pm...</yellow>\n");
     {
-        if ( !-e $FrameworkDirectory . '/Kernel/Config.pm.dist' ) {
+        if ( !-e ( $FrameworkDirectory . '/Kernel/Config.pm.dist' ) ) {
             $Self->PrintError("/Kernel/Config.pm.dist cannot be opened\n");
             return $Self->ExitCodeError();
         }
@@ -235,7 +237,7 @@ EOD
     if ( $OTRSMajorVersion < 7 ) {
 
         # Check apache config.
-        if ( !-e $FrameworkDirectory . '/scripts/apache2-httpd.include.conf' ) {
+        if ( !-e ( $FrameworkDirectory . '/scripts/apache2-httpd.include.conf' ) ) {
             $Self->PrintError("/scripts/apache2-httpd.include.conf cannot be opened\n");
             return $Self->ExitCodeError();
         }
@@ -477,13 +479,14 @@ sub ReadFile {
 
     my $FileHandle;
 
-    if ( !open $FileHandle, $Path ) {    ## no critic
-        $Self->PrintError("Couldn't open $Path $!");
-        return '';
+    if ( !-e $FileHandle ) {
+        $Self->PrintError("Could find $FileHandle");
     }
-    my $Content = join( "", <$FileHandle> );
-    close $FileHandle;
+    if ( !-r $FileHandle ) {
+        $Self->PrintError("Couldn't open file $FileHandle!");
+    }
 
+    my $Content = path($FileHandle)->slurp_raw();
     return $Content;
 }
 

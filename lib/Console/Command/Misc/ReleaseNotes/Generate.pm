@@ -15,6 +15,7 @@ use Cwd;
 use File::Basename;
 use FindBin qw($RealBin);
 use lib dirname($RealBin);
+use Path::Tiny qw(path);
 
 use Console::Command::Misc::ChangeLog::Dump;
 
@@ -340,14 +341,16 @@ sub _GetFrameworkVersionRequirement {
 
     return '' if !$Param{PackageName};
 
-    my $FH;
-    my $Success = open( $FH, '<', "$Param{PackageName}.sopm" );    ## no critic
-    if ( !$Success ) {
-        $Self->PrintError("Cannot open template file $Param{PackageName}.sopm");
-        return;
+    my $SOPMPath = "$Param{PackageName}.sopm";
+
+    if ( !-e $SOPMPath ) {
+        $Self->PrintError(".sopm file $SOPMPath does not extists!");
     }
-    my $SOPM = join( '', <$FH> );
-    close($FH);
+    if ( !-r $SOPMPath ) {
+        $Self->PrintError("Couldn't open .sopm file $SOPMPath!");
+    }
+
+    my $SOPM = path($SOPMPath)->slurp_raw();
 
     my $FrameworkVersionRequirement = '';
 
@@ -394,7 +397,7 @@ sub _GetTemplate {
 
     TEMPLATEALTERNATIVE:
     for my $TemplateAlternative (@TemplateAlternatives) {
-        if ( -e $TemplateFilename . $TemplateAlternative ) {
+        if ( -e ( $TemplateFilename . $TemplateAlternative ) ) {
             $TemplateFilename .= $TemplateAlternative;
             last TEMPLATEALTERNATIVE;
         }
@@ -403,16 +406,12 @@ sub _GetTemplate {
     if ( !-e $TemplateFilename ) {
         $Self->PrintError("Could not find the correct template for $Product");
     }
+    if ( !-r $TemplateFilename ) {
+        $Self->PrintError("Couldn't open template file $TemplateFilename!");
+    }
 
     # Read the template.
-    my $FH;
-    my $Success = open( $FH, '<', $TemplateFilename );    ## no critic
-    if ( !$Success ) {
-        $Self->PrintError("Can not open template file $TemplateFilename");
-        return;
-    }
-    my $Template = join( '', <$FH> );
-    close($FH);
+    my $Template = path($TemplateFilename)->slurp_raw();
     return $Template;
 }
 

@@ -657,7 +657,7 @@ sub DirectoryRead {
     for my $Filename (@GlobResults) {
 
         # First convert filename to utf-8 if utf-8 is used internally.
-        Encode::_utf8_on($Filename);
+        Encode::_utf8_on($Filename);    ## no critic
 
         push @Results, $Filename;
     }

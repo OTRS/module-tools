@@ -141,7 +141,7 @@ sub Run {
     for my $ModuleDirectory ( sort { "\L$a" cmp "\L$b" } @Directories ) {
 
         # check if its a framework directory
-        if ( -e $ModuleDirectory . '/RELEASE' ) {
+        if ( -e ( $ModuleDirectory . '/RELEASE' ) ) {
             next MODULEDIRECTORY;
         }
 

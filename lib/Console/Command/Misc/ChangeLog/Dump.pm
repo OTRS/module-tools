@@ -11,6 +11,8 @@ package Console::Command::Misc::ChangeLog::Dump;
 use strict;
 use warnings;
 
+use Path::Tiny qw(path);
+
 use parent qw(Console::BaseCommand);
 
 =head1 NAME
@@ -51,7 +53,7 @@ sub PreRun {
     my $SourcePath = $Self->GetArgument('source-path');
 
     if ( !-r $SourcePath ) {
-        die "Cannot open file $SourcePath\n";
+        die "Couldn't open file $SourcePath\n";
     }
 
     return;
@@ -64,16 +66,14 @@ sub Run {
 
     my $SourcePath = $Self->GetArgument('source-path');
 
-    my $FH;
-    my $Success = open( $FH, '<', $SourcePath );    ## no critic
-    if ( !$Success ) {
-        $Self->PrintError('Cannot open file');
-        return $Self->ExitCodeError();
+    if ( !-e $SourcePath ) {
+        $Self->PrintError("$SourcePath does not extists!");
+    }
+    if ( !-r $SourcePath ) {
+        $Self->PrintError("Couldn't open file $SourcePath!");
     }
 
-    my $Content = join( '', <$FH> );
-
-    close($FH);
+    my $Content = path($SourcePath)->slurp_raw();
 
     # Only current section.
     my $Section;

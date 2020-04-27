@@ -107,7 +107,7 @@ sub Run {
     # Get configuration directory inside the module.
     my $ConfigDirectory = $ModuleDirectory . $ConfigVersion1Path;
 
-    if ( -e $ModuleDirectory . $ConfigVersion2Path && -d $ModuleDirectory . $ConfigVersion2Path ) {
+    if ( -e ( $ModuleDirectory . $ConfigVersion2Path ) && -d ( $ModuleDirectory . $ConfigVersion2Path ) ) {
         $ConfigDirectory = $ModuleDirectory . $ConfigVersion2Path;
         $ConfigVersion   = 2;
     }
@@ -218,11 +218,10 @@ sub _GetLanguage {
             if $TranslationFile =~ m{ \A ( .+ ) / ( [^/]+ ) \.pm \z }xms;
 
         {
-            @ISA = ("Kernel::Language::$Module");
+            @ISA = ("Kernel::Language::$Module");    ## no critic
             push @INC, "$Path";
             eval {
-                require $Module;    ## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
-
+                require $Module;                     ## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
             };
             $Self->Data();
         }

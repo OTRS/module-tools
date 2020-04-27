@@ -86,7 +86,7 @@ sub PreRun {
         die "$FrameworkDirectory is not a directory";
     }
 
-    if ( !-e $FrameworkDirectory . '/RELEASE' ) {
+    if ( !-e ( $FrameworkDirectory . '/RELEASE' ) ) {
         die "$FrameworkDirectory does not seem to be an OTRS framework directory";
     }
 
@@ -141,7 +141,7 @@ sub Run {
 
         my $Path = "$FrameworkDirectory/scripts/database/";
 
-        if ( !-f $Path . $SchemaFile . '.xml' ) {
+        if ( !-f ( $Path . $SchemaFile . '.xml' ) ) {
             $Self->PrintError( $Path . $SchemaFile . ".xml not found!\n" );
         }
 

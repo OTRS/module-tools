@@ -73,7 +73,7 @@ sub Run {
     my $SourcePath = File::Spec->rel2abs( $Self->GetOption('source-path') );
     my $TargetPath = File::Spec->rel2abs( $Self->GetOption('target-path') );
 
-    my @Directories = split( '/', $SourcePath );
+    my @Directories = split( /\//, $SourcePath );
     splice( @Directories, 0, 1 ) if $Directories[0] eq '';
 
     my ( $RepositoryDirectory, $RelativeFilename );
