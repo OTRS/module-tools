@@ -28,7 +28,6 @@ eval {
     require Kernel::Config;
     require Kernel::System::Encode;
     require Kernel::System::Log;
-    require Kernel::System::Time;
     require Kernel::System::Main;
     require Kernel::System::DB;
     require Kernel::System::XML;
