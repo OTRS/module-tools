@@ -5,3 +5,4 @@ requires 'Term::ANSIColor';
 requires 'String::Similarity';
 requires 'XMLRPC::Lite';
 requires 'Path::Tiny';
+requires 'XML::Simple';
