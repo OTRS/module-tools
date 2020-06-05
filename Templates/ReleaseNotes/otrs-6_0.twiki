@@ -23,7 +23,10 @@ These browsers are not supported:
 
 We recommend to use the latest version of your browser, because it has the best !JavaScript and rendering performance. Dramatical performance varieties between the used browsers can occur with big data or big systems. We are happy to consult you on that matter.
 
-*Note:* OTRS 9 will not support Internet Explorer anymore.
+*Notes:*
+   * OTRS 9 will not support Internet Explorer anymore.
+   * OTRS 9 will not support Oracle as application database anymore.
+
 ---++ List of files and MD5 message digest (128-bit) checksums
 
 | *MD5 Sum* | *File* |
