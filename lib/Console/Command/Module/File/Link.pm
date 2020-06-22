@@ -152,6 +152,57 @@ sub _Link {
 
     my $SourceDirectory = $Param{SourceDirectory};
 
+    my $LinkDirectory;
+
+    # In case of nested thirdparty directories, link to the directory instead and skip linking to the files.
+    if ( $SourceDirectory =~ m{/node_modules$} ) {
+        $LinkDirectory = 1;
+    }
+
+    if ($LinkDirectory) {
+        my $OrigDirectory     = $SourceDirectory;
+        my $RelativeDirectory = $SourceDirectory =~ s{$Param{ModuleDirectory}}{}r;
+
+        my $DestDirectory = "$Param{FrameworkDirectory}/$RelativeDirectory";
+
+        if ( -l "$DestDirectory" ) {
+
+            # Skip if already linked correctly.
+            if ( readlink($DestDirectory) eq $OrigDirectory ) {
+                $Self->Print("  Directory link from $DestDirectory is <green>OK</green>\n");
+                return 1;
+            }
+
+            my $Success = unlink("$DestDirectory");
+            if ( !$Success ) {
+                $Self->PrintError("  Can't unlink directory symlink: $DestDirectory!\n");
+                return;
+            }
+        }
+
+        if ( -e "$DestDirectory" ) {
+            if ( rename( "$DestDirectory", "$DestDirectory.old" ) ) {
+                $Self->Print("  Backup: <yellow>$DestDirectory.old</yellow>\n");
+            }
+            else {
+                $Self->PrintError("Can't rename $DestDirectory to $DestDirectory.old!\n");
+                return;
+            }
+        }
+
+        if ( !-e $OrigDirectory ) {
+            $Self->PrintError("No such orig directory: $OrigDirectory");
+        }
+        elsif ( !symlink( $OrigDirectory, "$DestDirectory" ) ) {
+            $Self->PrintError("Can't link $RelativeDirectory: $!");
+        }
+        else {
+            $Self->Print("  Directory link: $OrigDirectory -> \n");
+            $Self->Print("        <green>$DestDirectory</green>\n");
+        }
+        return 1;
+    }
+
     my @List = glob("$SourceDirectory/*");
 
     FILE:

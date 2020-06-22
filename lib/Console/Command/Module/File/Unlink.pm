@@ -185,6 +185,40 @@ sub _UnlinkFiles {
 
     my $SourceDirectory = $Param{SourceDirectory};
 
+    my $OrigDirectory = $SourceDirectory;
+    my $DestDirectory = $SourceDirectory;
+
+    if ( defined $Param{ModuleDirectory} ) {
+        my $RelativeDirectory = $SourceDirectory =~ s{$Param{ModuleDirectory}}{}r;
+        $DestDirectory = "$Param{FrameworkDirectory}/$RelativeDirectory";
+    }
+
+    # Check if there exists a link to the source directory. We need to clean this up separately.
+    if ( -l "$DestDirectory" && -d "$DestDirectory" ) {
+
+        # Remove link only if it points to our current source.
+        if ( defined $Param{ModuleDirectory} ) {
+            return 1 if readlink($DestDirectory) ne $OrigDirectory;
+        }
+
+        if ( !unlink($DestDirectory) ) {
+            $Self->PrintError("Can't unlink directory symlink: $DestDirectory\n");
+            return;
+        }
+        $Self->Print("  Directory link from $DestDirectory <green>removed</green>\n");
+
+        # Restore target if there is a backup.
+        if ( -d "$DestDirectory.old" ) {
+            if ( !rename( "$DestDirectory.old", $DestDirectory ) ) {
+                $Self->PrintError("Can't rename $DestDirectory.old to $DestDirectory: $!\n");
+                return;
+            }
+            $Self->Print("    Restored original directory: <yellow>$DestDirectory</yellow>\n");
+        }
+
+        return 1;
+    }
+
     my @List = glob("$SourceDirectory/*");
 
     return 1 if !@List;
