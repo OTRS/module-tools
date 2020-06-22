@@ -93,6 +93,14 @@ sub Run {
     my $OTRSMajorVersion  = '';
     if ( $OTRSReleaseString =~ m{ VERSION \s+ = \s+ (\d+) .* \z }xms ) {
         $OTRSMajorVersion = $1;
+
+        if ( $DatabaseType eq 'Oracle' && $OTRSMajorVersion >= 9 ) {
+            $Self->PrintError(
+                "OTRS 9+ does not support the Oracle database backend anymore.\n"
+            );
+            return $Self->ExitCodeError();
+        }
+
         $Self->Print("\n<yellow>Installing testsystem for OTRS version $OTRSMajorVersion.</yellow>\n\n");
     }
 

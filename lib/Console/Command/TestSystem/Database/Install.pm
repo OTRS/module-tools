@@ -131,6 +131,20 @@ sub Run {
         $CommonObject{XMLObject}  = Kernel::System::XML->new(%CommonObject);
     }
 
+    # Get OTRS major version number.
+    my $OTRSReleaseString = `cat $FrameworkDirectory/RELEASE`;
+    my $OTRSMajorVersion  = '';
+    if ( $OTRSReleaseString =~ m{ VERSION \s+ = \s+ (\d+) .* \z }xms ) {
+        $OTRSMajorVersion = $1;
+
+        if ( $CommonObject{DBObject}->{'DB::Type'} eq 'oracle' && $OTRSMajorVersion >= 9 ) {
+            $Self->PrintError(
+                "OTRS 9+ does not support the Oracle database backend anymore.\n"
+            );
+            return $Self->ExitCodeError();
+        }
+    }
+
     # Install database.
     $Self->Print("<yellow>Creating tables and inserting data...</yellow>\n");
 
