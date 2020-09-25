@@ -254,6 +254,10 @@ sub _GetGitLog {
     $GitLog
         =~ s{(?:Fixed[:]?[ ]) bug\#(\d{4,6}) [ ] (.*)}{Bug#[[http://bugs.otrs.org/show_bug.cgi?id=$1][$1]] - $2}imxg;
 
+    # Format fixed tickets.
+    $GitLog
+        =~ s{(?:Fixed[:]?[ ]) Ticket\#(\d{16}) [ ] (.*)}{Ticket#$1 $2}imxg;
+
     # Add Wiki section indentation.
     $GitLog =~ s{^(.*?)$}{   * $1}ismxg;
 
@@ -318,6 +322,10 @@ sub _ParseChangeLog {
             $LastMove = 'bug';
         }
         elsif ( $Line =~ m{follow-up\#}msxi ) {
+            $BugFixList .= $Line;
+            $LastMove = 'bug';
+        }
+        elsif ( $Line =~ m{Ticket#\d+\#}msxi ) {
             $BugFixList .= $Line;
             $LastMove = 'bug';
         }

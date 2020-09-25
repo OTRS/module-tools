@@ -97,6 +97,10 @@ sub Run {
         # Format bug links.
         $Section
             =~ s{ (?:Fixed [ ])? bug\# \[( \d{4,6} )\]\(.*?\) }{Bug#[[http://bugs.otrs.org/show_bug.cgi?id=$1][$1]]}ismxg;
+
+        # Format fixed tickets.
+        $Section
+            =~ s{(?:Fixed[:]?[ ]) Ticket\#(\d{16}) [ ] (.*)}{Ticket#$1 $2}imxg;
     }
 
     # Format in old style.
