@@ -3,10 +3,9 @@
 ---++ Important for Upgrading
    * Please consult our [[https://doc.otrs.com/doc/manual/admin/[MAYOR].0/en/html/updating.html][admin manual]] for detailed instructions.
 [ADVISORIES]
----++ Enhancements
-[ENHANCEMENTSLIST]
 
----++ Bug Fixes
+---++ Security Fixes
+[ENHANCEMENTSLIST]
 [BUGFIXLIST]
 
 The detailed !ChangeLog can be found at: https://github.com/OTRS/otrs/blob/rel-[MAYOR]_0_[PATHCHLEVEL]/CHANGES.md.
