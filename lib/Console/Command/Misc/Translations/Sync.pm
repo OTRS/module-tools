@@ -119,7 +119,7 @@ sub PreRun {
         $FrameworkDirectory = cwd;
     }
     if ( !-e "$FrameworkDirectory/RELEASE" ) {
-        die "Framework directory: '$FrameworkDirectory' does not seams to be valid.\n\n";
+        die "Framework directory: '$FrameworkDirectory' does not seem to be valid.\n\n";
     }
 
     # Get target path or use framework path or use current.
@@ -135,7 +135,7 @@ sub PreRun {
         && !$SOPMs[0],
         )
     {
-        die "Target direcotry: $TargetDirectory does not seams to be a valid OTRS framework or package directory.\n\n";
+        die "Target direcotry: $TargetDirectory does not seem to be a valid OTRS framework or package directory.\n\n";
     }
 
     if ( !-e "$TargetDirectory/.weblate" ) {

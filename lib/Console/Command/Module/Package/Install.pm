@@ -67,7 +67,7 @@ sub Configure {
     <green>otrs.ModuleTools.pl $Name /Users/MyUser/ws/MyModule</green>
     <green>otrs.ModuleTools.pl $Name /Users/MyUser/ws/MyModule /Users/MyUser/ws/OTRS-5_0</green>
 
-<yellow>Installing from module collaction</yellow>
+<yellow>Installing from module collection</yellow>
 
     <green>otrs.ModuleTools.pl $Name ModuleCollection</green>
 EOF
@@ -109,7 +109,7 @@ sub PreRun {
     }
 
     if ( !-e ( $FrameworkDirectory . '/RELEASE' ) ) {
-        die "$FrameworkDirectory does not seams to be an OTRS framework directory";
+        die "$FrameworkDirectory does not seem to be an OTRS framework directory";
     }
 
     return;

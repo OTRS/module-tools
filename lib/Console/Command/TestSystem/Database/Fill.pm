@@ -88,7 +88,7 @@ sub PreRun {
     }
 
     if ( !-e ( $FrameworkDirectory . '/RELEASE' ) ) {
-        die "$FrameworkDirectory does not seams to be an OTRS framework directory";
+        die "$FrameworkDirectory does not seem to be an OTRS framework directory";
     }
 
     return;
