@@ -423,16 +423,11 @@ EOD
 
     # Setting permissions.
     $Self->Print("\n  <yellow>Setting permissions...</yellow>\n");
-    if ( $OTRSMajorVersion >= 5 ) {
-        $Self->System(
-            "sudo perl $FrameworkDirectory/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-group=$Config{PermissionsWebGroup} --admin-group=$Config{PermissionsAdminGroup} $FrameworkDirectory"
-        );
-    }
-    else {
-        $Self->System(
-            "sudo perl $FrameworkDirectory/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $FrameworkDirectory"
-        );
-    }
+    $Self->_SetPermissions(
+        OTRSMajorVersion   => $OTRSMajorVersion,
+        FrameworkDirectory => $FrameworkDirectory,
+        Config             => \%Config,
+    );
 
     # Deleting Cache.
     $Self->Print("\n  <yellow>Deleting cache...</yellow>\n");
@@ -451,16 +446,11 @@ EOD
 
     # Setting permissions.
     $Self->Print("\n  <yellow>Setting permissions again (just to be sure)...</yellow>\n");
-    if ( $OTRSMajorVersion >= 5 ) {
-        $Self->System(
-            "sudo perl $FrameworkDirectory/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-group=$Config{PermissionsWebGroup} --admin-group=$Config{PermissionsAdminGroup} $FrameworkDirectory"
-        );
-    }
-    else {
-        $Self->System(
-            "sudo perl $FrameworkDirectory/bin/otrs.SetPermissions.pl --otrs-user=$Config{PermissionsOTRSUser} --web-user=$Config{PermissionsWebUser} --otrs-group=$Config{PermissionsOTRSGroup} --web-group=$Config{PermissionsWebGroup} --not-root $FrameworkDirectory"
-        );
-    }
+    $Self->_SetPermissions(
+        OTRSMajorVersion   => $OTRSMajorVersion,
+        FrameworkDirectory => $FrameworkDirectory,
+        Config             => \%Config,
+    );
 
     if ( $OTRSMajorVersion >= 7 ) {
         $Self->Print("\n  <yellow>Installing npm dependencies...</yellow>\n");
@@ -550,6 +540,28 @@ sub ExecuteCommand {
 
     $Output =~ s{^}{    }mg;
     $Self->Print($Output);
+
+    return 1;
+}
+
+sub _SetPermissions {
+    my ( $Self, %Param ) = @_;
+
+    if ( $Param{OTRSMajorVersion} >= 7 ) {
+        $Self->System(
+            "sudo perl $Param{FrameworkDirectory}/bin/otrs.SetPermissions.pl --otrs-user=$Param{Config}->{PermissionsOTRSUser} --admin-group=$Param{Config}->{PermissionsAdminGroup} $Param{FrameworkDirectory}"
+        );
+    }
+    elsif ( $Param{OTRSMajorVersion} >= 5 ) {
+        $Self->System(
+            "sudo perl $Param{FrameworkDirectory}/bin/otrs.SetPermissions.pl --otrs-user=$Param{Config}->{PermissionsOTRSUser} --web-group=$Param{Config}->{PermissionsWebGroup} --admin-group=$Param{Config}->{PermissionsAdminGroup} $Param{FrameworkDirectory}"
+        );
+    }
+    else {
+        $Self->System(
+            "sudo perl $Param{FrameworkDirectory}/bin/otrs.SetPermissions.pl --otrs-user=$Param{Config}->{PermissionsOTRSUser} --web-user=$Param{Config}->{PermissionsWebUser} --otrs-group=$Param{Config}->{PermissionsOTRSGroup} --web-group=$Param{Config}->{PermissionsWebGroup} --not-root $Param{FrameworkDirectory}"
+        );
+    }
 
     return 1;
 }
