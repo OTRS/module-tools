@@ -179,15 +179,23 @@ sub Run {
                 push @TablesToDrop, $ArrayKey->{Name};
             }
             if (@TablesToDrop) {
+                @TablesToDrop = sort @TablesToDrop;
                 my $TableList = join ', ', @TablesToDrop;
                 my $DBType    = $CommonObject{DBObject}->{'DB::Type'};
 
                 if ( $DBType eq 'mysql' ) {
 
-                    # Drop all tables in same statement.
+                    # Drop every table in a separate statement.
                     $CommonObject{DBObject}->Do(
-                        SQL =>
-                            "SET FOREIGN_KEY_CHECKS = 0; DROP TABLE IF EXISTS $TableList; SET FOREIGN_KEY_CHECKS = 1",
+                        SQL => 'SET FOREIGN_KEY_CHECKS = 0;',
+                    );
+
+                    for my $Table (@TablesToDrop) {
+                        $CommonObject{DBObject}->Do( SQL => "DROP TABLE $Table;" );
+                    }
+
+                    $CommonObject{DBObject}->Do(
+                        SQL => 'SET FOREIGN_KEY_CHECKS = 1;',
                     );
                 }
                 elsif ( $DBType eq 'postgresql' ) {

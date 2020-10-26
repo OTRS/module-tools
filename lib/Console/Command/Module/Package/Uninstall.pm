@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use File::Spec ();
+use File::Basename;
 
 use Console::Command::Module::File::Unlink;
 use Console::Command::Module::Database::Uninstall;
@@ -36,7 +37,7 @@ sub Configure {
     $Self->AddArgument(
         Name        => 'module',
         Description => "Specify a module directory or collection (specified in the /etc/config.pl file).",
-        Required    => 1,
+        Required    => 0,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddArgument(
@@ -51,6 +52,12 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
         ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddOption(
+        Name        => 'all',
+        Description => "Uninstall all modules in the specified framework root.",
+        Required    => 0,
+        HasValue    => 0,
     );
 
     my $Name = $Self->Name();
@@ -67,9 +74,13 @@ sub Configure {
     <green>otrs.ModuleTools.pl $Name /Users/MyUser/ws/MyModule</green>
     <green>otrs.ModuleTools.pl $Name /Users/MyUser/ws/MyModule /Users/MyUser/ws/OTRS-5_0</green>
 
-<yellow>Uninstalling from module collaction</yellow>
+<yellow>Uninstalling from module collection</yellow>
 
     <green>otrs.ModuleTools.pl $Name ModuleCollection</green>
+
+<yellow>Uninstalling all</yellow>
+
+    <green>otrs.ModuleTools.pl $Name --all</green>
 EOF
 
     return;
@@ -83,11 +94,29 @@ sub PreRun {
         die "This console command needs to be run from a framework root directory!";
     }
 
+    my $All    = $Self->GetOption('all');
+    my $Module = $Self->GetArgument('module');
+
+    my $ModuleDirectory;
+    if ($Module) {
+        $ModuleDirectory = File::Spec->rel2abs($Module);
+    }
+
+    if ( !$All && $Module && -e $Module && !-d $Module && -l $Module ) {
+        $ModuleDirectory = File::Basename::dirname( readlink($Module) );
+    }
+
+    if ( ( !$Module && !$All ) || ( $Module && $All ) ) {
+        die "Please provide module or --all parameter!";
+    }
+
     my @Directories;
 
-    my $Module          = $Self->GetArgument('module');
-    my $ModuleDirectory = File::Spec->rel2abs($Module);
-    if ( !-e $ModuleDirectory || !-d $ModuleDirectory ) {
+    if (
+        ( $ModuleDirectory && ( !-e $ModuleDirectory || !-d $ModuleDirectory ) )
+        && !$All
+        )
+    {
         my @Modules = @{ $Self->{Config}->{ModuleCollection}->{$Module} // [] };
         if ( !@Modules ) {
             die "$Module is not a directory or a module collection";
@@ -98,6 +127,17 @@ sub PreRun {
     my $FrameworkDirectory = File::Spec->rel2abs( $Self->GetArgument('framework-directory') || '.' );
 
     push @Directories, $FrameworkDirectory;
+
+    if ( $All && -e $FrameworkDirectory && -d $FrameworkDirectory ) {
+        my @SOPMs = glob "$FrameworkDirectory/*.sopm";
+
+        SOPMFILE:
+        for my $SOPMFile (@SOPMs) {
+            next SOPMFILE if !-l $SOPMFile;
+
+            push @Directories, File::Basename::dirname( readlink($SOPMFile) );
+        }
+    }
 
     for my $Directory (@Directories) {
         if ( !-e $Directory ) {
@@ -120,16 +160,37 @@ sub Run {
 
     my @Directories;
 
-    my $Module               = $Self->GetArgument('module');
-    my $ModuleDirectoryParam = File::Spec->rel2abs($Module);
-    if ( -e $ModuleDirectoryParam ) {
+    my $All    = $Self->GetOption('all');
+    my $Module = $Self->GetArgument('module');
+
+    my $ModuleDirectoryParam;
+    if ($Module) {
+        $ModuleDirectoryParam = File::Spec->rel2abs($Module);
+    }
+
+    if ( !$All && $Module && -e $Module && !-d $Module && -l $Module ) {
+        $ModuleDirectoryParam = File::Basename::dirname( readlink($Module) );
+    }
+
+    if ( $ModuleDirectoryParam && -e $ModuleDirectoryParam ) {
         push @Directories, $ModuleDirectoryParam;
     }
-    else {
+    elsif ($Module) {
         @Directories = reverse @{ $Self->{Config}->{ModuleCollection}->{$Module} // [] };
     }
 
     my $FrameworkDirectory = File::Spec->rel2abs( $Self->GetArgument('framework-directory') || '.' );
+
+    if ($All) {
+        my @SOPMs = glob "$FrameworkDirectory/*.sopm";
+
+        SOPMFILE:
+        for my $SOPMFile (@SOPMs) {
+            next SOPMFILE if !-l $SOPMFile;
+
+            push @Directories, File::Basename::dirname( readlink($SOPMFile) );
+        }
+    }
 
     # Get OTRS major version number.
     my $OTRSReleaseString = `cat $FrameworkDirectory/RELEASE`;
