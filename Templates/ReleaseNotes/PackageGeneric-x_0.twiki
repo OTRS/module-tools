@@ -11,4 +11,4 @@
 
 ---++ File-List and MD5 message digest (128-bit) checksums
 |*MD5 Sum*|*File*|
-| =[MD5]= | http://ftp.otrs.org/pub/otrs/packages/[PACKAGENAMERAW]-[MAYOR].0.[PATHCHLEVEL].opm |
+| =[MD5]= | [PACKAGENAME]-[MAYOR].0.[PATHCHLEVEL].opm |
