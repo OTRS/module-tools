@@ -140,7 +140,7 @@ sub Run {
         my $WebAppConfStr = $Self->ReadFile($WebAppConfDistFile);
 
         # Use fewer worker processed to save memory.
-        $WebAppConfStr =~ s{workers \s+ => \s+ (\d)+\,}{workers => 5,}xmsg;
+        $WebAppConfStr =~ s{workers \s+ => \s+ \d+\,}{workers => 5,}xmsg;
 
         my $Success = $Self->WriteFile( $WebAppConfFile, $WebAppConfStr );
         if ( !$Success ) {
